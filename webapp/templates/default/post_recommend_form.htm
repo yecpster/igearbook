@@ -1,0 +1,211 @@
+<#include "header.htm"/>
+<script type="text/javascript">
+var CONTEXTPATH = "${contextPath}";
+var SERVLET_EXTENSION  = "${extension}";
+</script>
+
+<style type="text/css">@import url( ${contextPath}/templates/${templateName}/styles/tabs.css?${startupTime} );</style>
+<style type="text/css">@import url( ${contextPath}/templates/${templateName}/styles/SyntaxHighlighter.css?${startupTime} );</style>
+<script type="text/javascript" src="${contextPath}/templates/${templateName}/js/jquery.js?${startupTime}"></script>
+<script type="text/javascript" src="${contextPath}/templates/${templateName}/js/post.js?${startupTime}"></script>
+<script type="text/javascript" charset="utf-8" src="${contextPath}/templates/${templateName}/editor/kindeditor.js"></script>
+<script type="text/javascript" charset="utf-8" src="${contextPath}/templates/${templateName}/editor/lang/zh_CN.js"></script>
+<link rel="stylesheet" href="${contextPath}/templates/${templateName}/editor/themes/simple/simple.css" />
+<script>
+        KindEditor.ready(function(K) {
+            window.editor = K.create('#messageEditor', {
+            width   : '885px',
+            height  : '280px',
+            themeType : 'simple',
+            allowPreviewEmoticons : true,
+            syncType: '',
+            allowImageRemote: false,
+            allowFlashUpload: false,
+            formatUploadUrl: false,
+            uploadJson : '${JForumContext.encodeURL("/uploadImg/upload")}',
+            extraFileUploadParams : {
+                        module : 'uploadImg',
+                        action : 'upload'
+                },
+            items : ['image']
+            });
+        });
+</script>
+<script type="text/javascript">
+<#include "js/utils.js"/>
+</script>
+
+<script type="text/javascript">
+<!--
+
+function validatePostForm(f)
+{   
+    editor.sync();
+    
+	<#if setType?default(true)>
+	if (f.title.value == "") {
+		alert("${I18n.getMessage("PostForm.subjectEmpty")}");
+		f.title.focus();
+		
+		return false;
+	}
+	</#if>
+	if (f.desc.value.replace(/^\s*|\s*$/g, "").length == 0) {
+		alert("${I18n.getMessage("PostRecommendForm.descEmpty")}");
+		f.desc.focus();
+		
+		return false;
+	}
+	if (f.desc.value.length > 120) {
+        alert("${I18n.getMessage("PostRecommendForm.descTooLong")}, now: "+f.desc.value.length);
+        f.desc.focus();
+        
+        return false;
+    }
+	
+	$("#icon_saving").css("display", "inline");
+	$("#btnSubmit").attr("disabled", "disabled").val("${I18n.getMessage("PostForm.saving")}...");
+	
+	return true;
+}
+
+function openFindUserWindow()
+{
+	var w = window.open("${JForumContext.encodeURL("/pm/findUser")}", "_findUser", "height=250,resizable=yes,width=400");
+	w.focus();
+}
+
+-->
+</script>
+
+<#assign isEdit = isEdit?if_exists/>
+
+<form action="${JForumContext.encodeURL("/jforum")}" method="post" enctype="multipart/form-data" name="post" id="post" onsubmit="return validatePostForm(this)">
+<input type="hidden" name="action" value="${action}" />
+<input type="hidden" name="module" value="${moduleName}" />
+<#if isEdit><input type="hidden" name="rtopic_id" value="${rtopic.id}" /></#if>
+<input type="hidden" name="topic_id" value="${rtopic.topicId}" />
+
+<table cellspacing="0" cellpadding="10" width="100%" align="center" border="0">
+	<tr>
+		<td class="bodyline">
+			<br clear="all" />
+
+			<table cellspacing="2" cellpadding="2" width="100%" align="center" border="0">
+				<tr>
+					<td align="left">
+						<span class="nav">
+							<a class="nav" href="${JForumContext.encodeURL("/forums/list")}">${I18n.getMessage("ForumListing.forumIndex")}</a>
+							<#if forum?exists>
+							&raquo; <a class="nav" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">${forum.name}</a>
+							</#if>
+						</span>
+					</td>
+				</tr>
+			</table>
+		
+			<table class="forumline" cellspacing="1" cellpadding="3" width="100%" border="0">
+				<tr>
+					<th class="thhead" colspan="2" height="25">
+						<b>
+							${I18n.getMessage("PostRecommendForm.title")}
+						</b>
+					</th>
+				</tr>
+
+				<#if errorMessage?exists>
+					<tr>
+						<td colspan="2" align="center"><span class="gen"><font color="#ff0000"><b>${errorMessage}</b></font></span></td>
+					</tr>
+				</#if>
+
+				<tr>
+					<td class="row1" width="7%"><span class="gen"><b>${I18n.getMessage("PostForm.subject")}</b></span></td>
+					<td class="row2" width="93%">
+						<span class="gen">
+							<input class="type" type="text" tabindex="2" maxlength="200" size="110" name="title" value="${rtopic.title?default("")}" /> 
+						</span>
+					</td>
+				</tr>
+                <tr>
+                    <td class="row1" valign="top">
+                        <span class="gen"><b>${I18n.getMessage("PostRecommendForm.imageUrl")}</b></span>
+                    </td>
+                    <td class="row2" valign="top">
+                        <div class="gen">
+                            <table cellspacing="0" cellpadding="2" border="0" width="100%">
+                                <tr>
+                                    <td valign="top">
+                                        <input class="type" type="text" tabindex="2" maxlength="200" size="110" name="imageUrl" value="${rtopic.imageUrl?default("")}" />  
+                                        ${I18n.getMessage("PostRecommendForm.imageUrlTip")}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div> 
+                    </td>
+                </tr>
+                <tr>
+                    <td class="row1" valign="top"><span class="gen">
+                        <span class="gen"><b>${I18n.getMessage("PostRecommendForm.desc")}</b></span>
+                    </td>
+                    <td class="row2" valign="top">
+                        <div class="gen">
+                            <table cellspacing="0" cellpadding="2" border="0" width="100%">
+                                <tr>
+                                    <td valign="top">
+                                        <textarea id="desc" class="message" tabindex="3" name="desc" rows="2"  cols="35"><#if post?exists>${desc?html}</#if></textarea> 
+                                    </td>
+                                </tr>
+                            </table>
+                        </div> 
+                    </td>
+                </tr>
+                <tr>
+                    <td class="row1" valign="top">
+                        <span class="gen"><b>${I18n.getMessage("Attachments.attach")}</b></span>
+                    </td>
+                    <td class="row2" valign="top">
+                        <div class="gen">
+                            <table cellspacing="0" cellpadding="2" border="0" width="100%">
+                                <tr>
+                                    <td valign="top">
+                                        <textarea id="messageEditor" class="message" onkeyup="storeCaret(this);" onclick="storeCaret(this);" onselect="storeCaret(this);" tabindex="4" name="message" rows="15"  cols="35"><#if post?exists>${text?html}</#if></textarea> 
+                                    </td>
+                                </tr>
+                            </table>
+                        </div> 
+                    </td>
+                </tr>
+
+				<#if error?exists>
+					<tr>
+						<td class="row1">&nbsp;</td>
+						<td class="row2"><span class="gen"><font color="red"><b>${error}</b></font></span></td>
+					</tr>
+				</#if>
+				
+				<tr>
+					<td align="center" height="28" colspan="2" class="catbottom">
+						<input class="mainoption" id="btnSubmit" accesskey="s" tabindex="6" type="submit" value="${I18n.getMessage("PostForm.submit")}" name="post" />
+						<img src="${contextPath}/images/transp.gif" id="icon_saving">
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+
+<script type="text/javascript">
+<!--
+<#if attachments?exists>
+	ignoreStart = true;
+	editAttachments();
+</#if>
+
+-->
+</script>
+
+</form>
+
+<#include "highlighter_js.htm"/>
+<#include "bottom.htm"/>

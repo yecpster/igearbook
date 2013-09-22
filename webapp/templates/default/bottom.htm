@@ -1,0 +1,56 @@
+    </div>
+    <div id="nav">
+    <#assign indexClass="" />
+    <#assign searchClass="" />
+    <#assign recentTopicClass="" />
+    <#assign hotTopicClass="" />
+    <#assign userListClass="" />
+    
+    <#if (currentChannel?exists) && (currentChannel=="index")>
+        <#assign indexClass="selected" />
+    <#elseif (currentChannel?exists) && (currentChannel=="search")>
+        <#assign searchClass="selected" />
+    <#elseif (currentChannel?exists) && (currentChannel=="recentTopic")>
+        <#assign recentTopicClass="selected" />
+    <#elseif (currentChannel?exists) && (currentChannel=="hotTopic")>
+        <#assign hotTopicClass="selected" />
+    <#elseif (currentChannel?exists) && (currentChannel=="userList")>
+        <#assign userListClass="selected" />
+    </#if>
+      <div class="wrapper">
+        <ul>
+          <li><a href="${homepageLink}" class="${indexClass}">${I18n.getMessage("ForumBase.index")}</a></li>
+          <#--
+          <li><a href="${JForumContext.encodeURL("/recentTopics/list")}" class="${recentTopicClass}">${I18n.getMessage("ForumBase.recentTopics")}</a></li>
+          <li><a href="${JForumContext.encodeURL("/hottestTopics/list")}" class="${hotTopicClass}">${I18n.getMessage("ForumBase.hottestTopics")}</a></li>
+          -->
+          <li><a href="${JForumContext.encodeURL("/user/list")}" class="${userListClass}">${I18n.getMessage("ForumBase.usersList")}</a></li>
+          <li class="last"><a href="${JForumContext.encodeURL("/search/filters")}" class="${searchClass}">${I18n.getMessage("ForumBase.search")}</a></li>
+        </ul>
+      </div>
+    </div>
+      </div>
+  <div id="footer">
+  <div id="site_nav">
+    <ul>
+      <li><a href="#">广告服务</a></li>
+      <li><a href="#">网站地图</a></li>
+      <li><a href="#">联系我们</a></li>
+      <li class="last"><a href="#">友情链接</a></li>
+       </li>
+    </ul>
+  </div>
+  <div id="copyright">
+    &copy; 2013 iGearBook.com    <a href="http://www.miibeian.gov.cn">沪ICP备13024167号 </a><br/>
+            装备网有限公司  版权所有<br /><br />
+     <script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F00416c1ff5a341660ffb2a00324e9be0' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+  </div>
+</div>
+
+    </div>
+  </body>
+</html>

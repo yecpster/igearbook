@@ -1,0 +1,1 @@
+ALTER TABLE jforum_forums ADD COLUMN forum_logo VARCHAR(50) DEFAULT NULL;

@@ -1,0 +1,1 @@
+ALTER TABLE jforum_recommendation ADD COLUMN topic_desc varchar(300) default '';

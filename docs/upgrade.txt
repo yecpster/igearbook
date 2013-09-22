@@ -1,0 +1,5 @@
+1. backup db: mysqldump --user=root -p hobbitox > /www/hobbitox/db_backup.2013.09.08
+2. upgrade: mysql -u root -p hobbitox < /www/hobbitox/WEB-INF/config/database/mysql/Upgrade2.1.12.sql
+3. change java oom: 
+cat /proc/5156/oom_score
+root@AY1306161632507297d6Z:~# echo -1000 > /proc/5156/oom_score_adj
