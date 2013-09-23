@@ -69,95 +69,93 @@ import freemarker.template.Configuration;
 
 /**
  * @author Rafael Steil
- * @version $Id: JForumBaseServlet.java,v 1.24 2007/09/21 15:54:31 rafaelsteil Exp $
+ * @version $Id: JForumBaseServlet.java,v 1.24 2007/09/21 15:54:31 rafaelsteil
+ *          Exp $
  */
-public class JForumBaseServlet extends HttpServlet
-{
-	private static Logger logger = Logger.getLogger(JForumBaseServlet.class);
+public class JForumBaseServlet extends HttpServlet {
+    private static final long serialVersionUID = -3063224288826501434L;
 
-	protected boolean debug;
+    private static Logger logger = Logger.getLogger(JForumBaseServlet.class);
 
-	protected void startApplication()
-	{
-		try {
-			SystemGlobals.loadQueries(SystemGlobals.getValue(ConfigKeys.SQL_QUERIES_GENERIC));
-			SystemGlobals.loadQueries(SystemGlobals.getValue(ConfigKeys.SQL_QUERIES_DRIVER));
-			
-			String filename = SystemGlobals.getValue(ConfigKeys.QUARTZ_CONFIG);
-			SystemGlobals.loadAdditionalDefaults(filename);
+    protected boolean debug;
 
-			ConfigLoader.createLoginAuthenticator();
-			ConfigLoader.loadDaoImplementation();
-			ConfigLoader.listenForChanges();
-			ConfigLoader.startSearchIndexer();
-			ConfigLoader.startSummaryJob();
-		}
-		catch (Exception e) {
-			throw new ForumStartupException("Error while starting JForum", e);
-		}
-	}
+    protected void startApplication() {
+        try {
+            SystemGlobals.loadQueries(SystemGlobals.getValue(ConfigKeys.SQL_QUERIES_GENERIC));
+            SystemGlobals.loadQueries(SystemGlobals.getValue(ConfigKeys.SQL_QUERIES_DRIVER));
 
-	public void init(ServletConfig config) throws ServletException
-	{
-		super.init(config);
+            String filename = SystemGlobals.getValue(ConfigKeys.QUARTZ_CONFIG);
+            SystemGlobals.loadAdditionalDefaults(filename);
 
-		try {
-			String appPath = config.getServletContext().getRealPath("");
-			debug = "true".equals(config.getInitParameter("development"));
+            ConfigLoader.createLoginAuthenticator();
+            ConfigLoader.loadDaoImplementation();
+            ConfigLoader.listenForChanges();
+            ConfigLoader.startSearchIndexer();
+            ConfigLoader.startSummaryJob();
+        } catch (Exception e) {
+            throw new ForumStartupException("Error while starting JForum", e);
+        }
+    }
 
-			DOMConfigurator.configure(appPath + "/WEB-INF/log4j.xml");
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
 
-			logger.info("Starting JForum. Debug mode is " + debug);
+        try {
+            String appPath = config.getServletContext().getRealPath("");
+            debug = "true".equals(config.getInitParameter("development"));
 
-			ConfigLoader.startSystemglobals(appPath);
-			ConfigLoader.startCacheEngine();
+            DOMConfigurator.configure(appPath + "/WEB-INF/log4j.xml");
 
-			// Configure the template engine
-			Configuration templateCfg = new Configuration();
-			templateCfg.setTemplateUpdateDelay(2);
-			templateCfg.setSetting("number_format", "#");
-			templateCfg.setSharedVariable("startupTime", new Long(new Date().getTime()));
+            logger.info("Starting JForum. Debug mode is " + debug);
 
-			// Create the default template loader
-			String defaultPath = SystemGlobals.getApplicationPath() + "/templates";
-			FileTemplateLoader defaultLoader = new FileTemplateLoader(new File(defaultPath));
+            ConfigLoader.startSystemglobals(appPath);
+            ConfigLoader.startCacheEngine();
 
-			String extraTemplatePath = SystemGlobals.getValue(ConfigKeys.FREEMARKER_EXTRA_TEMPLATE_PATH);
-			
-			if (StringUtils.isNotBlank(extraTemplatePath)) {
-				// An extra template path is configured, we need a MultiTemplateLoader
-				FileTemplateLoader extraLoader = new FileTemplateLoader(new File(extraTemplatePath));
-				TemplateLoader[] loaders = new TemplateLoader[] { extraLoader, defaultLoader };
-				MultiTemplateLoader multiLoader = new MultiTemplateLoader(loaders);
-				templateCfg.setTemplateLoader(multiLoader);
-			} 
-			else {
-				// An extra template path is not configured, we only need the default loader
-				templateCfg.setTemplateLoader(defaultLoader);
-			}
+            // Configure the template engine
+            Configuration templateCfg = new Configuration();
+            templateCfg.setTemplateUpdateDelay(2);
+            templateCfg.setSetting("number_format", "#");
+            templateCfg.setSharedVariable("startupTime", new Long(new Date().getTime()));
 
-			ModulesRepository.init(SystemGlobals.getValue(ConfigKeys.CONFIG_DIR));
+            // Create the default template loader
+            String defaultPath = SystemGlobals.getApplicationPath() + "/templates";
+            FileTemplateLoader defaultLoader = new FileTemplateLoader(new File(defaultPath));
 
-			this.loadConfigStuff();
+            String extraTemplatePath = SystemGlobals.getValue(ConfigKeys.FREEMARKER_EXTRA_TEMPLATE_PATH);
 
-			if (!this.debug) {
-				templateCfg.setTemplateUpdateDelay(3600);
-			}
+            if (StringUtils.isNotBlank(extraTemplatePath)) {
+                // An extra template path is configured, we need a
+                // MultiTemplateLoader
+                FileTemplateLoader extraLoader = new FileTemplateLoader(new File(extraTemplatePath));
+                TemplateLoader[] loaders = new TemplateLoader[] { extraLoader, defaultLoader };
+                MultiTemplateLoader multiLoader = new MultiTemplateLoader(loaders);
+                templateCfg.setTemplateLoader(multiLoader);
+            } else {
+                // An extra template path is not configured, we only need the
+                // default loader
+                templateCfg.setTemplateLoader(defaultLoader);
+            }
 
-			JForumExecutionContext.setTemplateConfig(templateCfg);
-		}
-		catch (Exception e) {
-			throw new ForumStartupException("Error while starting JForum", e);
-		}
-	}
+            ModulesRepository.init(SystemGlobals.getValue(ConfigKeys.CONFIG_DIR));
 
-	protected void loadConfigStuff()
-	{
-		ConfigLoader.loadUrlPatterns();
-		I18n.load();
-		Tpl.load(SystemGlobals.getValue(ConfigKeys.TEMPLATES_MAPPING));
+            this.loadConfigStuff();
 
-		// BB Code
-		BBCodeRepository.setBBCollection(new BBCodeHandler().parse());
-	}
+            if (!this.debug) {
+                templateCfg.setTemplateUpdateDelay(3600);
+            }
+
+            JForumExecutionContext.setTemplateConfig(templateCfg);
+        } catch (Exception e) {
+            throw new ForumStartupException("Error while starting JForum", e);
+        }
+    }
+
+    protected void loadConfigStuff() {
+        ConfigLoader.loadUrlPatterns();
+        I18n.load();
+        Tpl.load(SystemGlobals.getValue(ConfigKeys.TEMPLATES_MAPPING));
+
+        // BB Code
+        BBCodeRepository.setBBCollection(new BBCodeHandler().parse());
+    }
 }
