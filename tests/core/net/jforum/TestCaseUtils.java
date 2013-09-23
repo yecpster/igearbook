@@ -84,6 +84,7 @@ public class TestCaseUtils
         
         // Start the dao.driver implementation
         String driver = SystemGlobals.getValue(ConfigKeys.DAO_DRIVER);
+        @SuppressWarnings("rawtypes")
         Class c = Class.forName(driver);
         DataAccessDriver d = (DataAccessDriver)c.newInstance();
         DataAccessDriver.init(d);
