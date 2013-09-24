@@ -143,7 +143,17 @@ function limitTextArea(field, limit)
 		<td class="row1"><span class="gen">${I18n.getMessage("Forums.Form.Description")}</span></td>
 		<td class="row2"><textarea name="description" cols="40" rows="10" class="post" style="width: 100%" onKeyDown="limitTextArea(this, 255);" onKeyUp="limitTextArea(this, 255);"><#if forum?exists>${forum.description?default("")}</#if></textarea></td>
 	</tr>
-	
+	<#if edit>
+	<tr>
+        <td class="row1"><span class="gen">${I18n.getMessage("ForumIndex.forumAdmins")}</span></td>
+        <td class="row2">
+            <#list moderators as moderator>
+                ${moderator.username}<#if moderator_has_next>,&nbsp;</#if>
+            </#list>
+            <a href="${JForumContext.encodeURL("/adminGroups/editUsers/${moderationGroup.id}")}">${I18n.getMessage("Edit")}</a>
+        </td>
+    </tr>
+    </#if>
 	<tr>
 		<td class="row1"><span class="gen">${I18n.getMessage("Forums.Form.Permissions")}</span></td>
 		<td class="row2">

@@ -54,6 +54,7 @@ import net.jforum.dao.UserDAO;
 import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Group;
+import net.jforum.entities.User;
 import net.jforum.repository.ForumRepository;
 import net.jforum.repository.RolesRepository;
 import net.jforum.repository.SecurityRepository;
@@ -113,6 +114,14 @@ public class ForumAction extends AdminCommand {
         int anonymousUid = Integer.parseInt(SystemGlobals.getValue(ConfigKeys.ANONYMOUS_USER_ID));
         boolean permitAnonymousPosts = SecurityRepository.canAccess(anonymousUid, SecurityConstants.PERM_ANONYMOUS_POST, String.valueOf(forumId));
         this.context.put("permitAnonymousPosts", permitAnonymousPosts);
+
+        Group moderationGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_MODERATION_FORUMS, forumId);
+        if (moderationGroup == null) {
+            moderationGroup = this.createModerationGroup(groupDao, forumId);
+        }
+        List<User> moderators = DataAccessDriver.getInstance().newUserDAO().selectAllByGroup(moderationGroup.getId(), 0, 50);
+        this.context.put("moderationGroup", moderationGroup);
+        this.context.put("moderators", moderators);
 
         Group replyGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_REPLY, forumId);
         List<Group> replySelectedGroups = groupDao.getChildGroups(replyGroup.getId());
@@ -367,6 +376,22 @@ public class ForumAction extends AdminCommand {
         // this.handleMailIntegration();
 
         this.list();
+    }
+
+    private Group createModerationGroup(GroupDAO groupDao, int forumId) {
+        GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
+        PermissionControl pc = new PermissionControl();
+        pc.setSecurityModel(gmodel);
+        Group moderationGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_MODERATION_FORUMS, forumId);
+        this.addRole(pc, SecurityConstants.PERM_MODERATION, forumId, moderationGroup);
+        this.addRole(pc, SecurityConstants.PERM_CREATE_STICKY_ANNOUNCEMENT_TOPICS, forumId, moderationGroup);
+        this.addRole(pc, SecurityConstants.PERM_MODERATION_FORUMS, forumId, moderationGroup);
+        this.addRole(pc, SecurityConstants.PERM_MODERATION_APPROVE_MESSAGES, forumId, moderationGroup);
+        this.addRole(pc, SecurityConstants.PERM_MODERATION_POST_REMOVE, forumId, moderationGroup);
+        this.addRole(pc, SecurityConstants.PERM_MODERATION_POST_EDIT, forumId, moderationGroup);
+        this.addRole(pc, SecurityConstants.PERM_MODERATION_TOPIC_MOVE, forumId, moderationGroup);
+        this.addRole(pc, SecurityConstants.PERM_MODERATION_TOPIC_LOCK_UNLOCK, forumId, moderationGroup);
+        return moderationGroup;
     }
 
     private void updateChildGroups(Group parentGroup, String[] groups, GroupDAO groupDao) {

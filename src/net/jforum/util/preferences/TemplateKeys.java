@@ -162,6 +162,7 @@ public class TemplateKeys
 	public static final String GROUP_INSERT = "group.insert";
 	public static final String GROUP_EDIT = "group.edit";
 	public static final String GROUP_PERMISSIONS = "group.permissions";
+	public static final String GROUP_USERS  = "group.users";
 
 	public static final String MODERATION_ADMIN_LIST = "moderation.admin.list";
 	public static final String MODERATION_ADMIN_VIEW = "moderation.admin.view";

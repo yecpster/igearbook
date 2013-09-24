@@ -100,7 +100,7 @@ public interface UserDAO
 	 * @param count The total number of records to fetch
 	 * @return <code>List</code> with the users. Each entry is an <code>User</code> object
 	 */
-	public List selectAllByGroup(int groupId, int start, int count) ;
+	public List<User> selectAllByGroup(int groupId, int start, int count) ;
 	
 	/**
 	 * Gets all users

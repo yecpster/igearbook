@@ -482,7 +482,7 @@ public class PostAction extends Command {
             rtopic.setCreateTime(new Date(System.currentTimeMillis()));
             rtopic.setLastUpdateBy(user);
         }
-        
+
         PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
         postDao.saveRecommend(rtopic);
         TopicRepository.loadRecommendTopics();
@@ -672,7 +672,7 @@ public class PostAction extends Command {
             this.context.put("start", this.request.getParameter("start"));
             this.context.put("htmlAllowed", SecurityRepository.canAccess(SecurityConstants.PERM_HTML_DISABLED, Integer.toString(topic.getForumId())));
             this.context.put("canCreateStickyOrAnnouncementTopics",
-                    SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_STICKY_ANNOUNCEMENT_TOPICS));
+                    SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_STICKY_ANNOUNCEMENT_TOPICS, Integer.toString(topic.getForumId())));
             this.context.put("canCreatePolls", SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_POLL));
         }
 
