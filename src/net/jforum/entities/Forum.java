@@ -57,6 +57,7 @@ public class Forum implements Serializable
 {
 	private int id;
 	private int idCategories;
+	private int type;
 	private String name;
 	private String logo;
 	private String description;
@@ -79,6 +80,7 @@ public class Forum implements Serializable
 		this.description = f.getDescription();
 		this.id = f.getId();
 		this.idCategories = f.getCategoryId();
+		this.type = f.getType();
 		this.lastPostId = f.getLastPostId();
 		this.moderated = f.isModerated();
 		this.name = f.getName();
@@ -293,5 +295,13 @@ public class Forum implements Serializable
 	public void setLogo(String logo) {
 		this.logo = logo;
 	}
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
 	
 }

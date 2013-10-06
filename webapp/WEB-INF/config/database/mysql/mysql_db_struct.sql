@@ -38,11 +38,13 @@ CREATE TABLE jforum_config (
 
 --
 -- Table structure for table 'jforum_forums'
+-- forum_type: 0 - public forum, 1 - team forum
 --
 DROP TABLE IF EXISTS jforum_forums;
 CREATE TABLE jforum_forums (
   forum_id INT NOT NULL auto_increment,
   categories_id INT NOT NULL default '1',
+  forum_type TINYINT DEFAULT 0,
   forum_name varchar(150) NOT NULL default '',
   forum_desc varchar(255) default NULL,
   forum_order INT default '1',
