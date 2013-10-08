@@ -1,5 +1,5 @@
 <#include "header.htm"/>
-<#assign currentChannel="index" />
+<#assign currentChannel="team" />
 <link href="${contextPath}/templates/${templateName}/styles/team.css?${startupTime}" media="screen" rel="stylesheet" type="text/css" />
 
 <div id="side">
@@ -99,7 +99,7 @@
     </div>
     -->
   <p>
-  <a href="" class="new_group_link">申请群组</a>  &nbsp;&nbsp;
+  <a href="${JForumContext.encodeURL("/team/insert")}" class="new_group_link">申请群组</a>  &nbsp;&nbsp;
   <a href="" class="my_group_link">我的群组</a>  </p>
 
   

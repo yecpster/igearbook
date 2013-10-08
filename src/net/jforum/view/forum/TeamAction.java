@@ -17,4 +17,8 @@ public class TeamAction extends Command {
     public void list() {
         this.setTemplateName(TemplateKeys.TEAM_LIST);
     }
+
+    public void insert() {
+        this.setTemplateName(TemplateKeys.TEAM_INSERT);
+    }
 }
