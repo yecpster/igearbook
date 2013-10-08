@@ -165,4 +165,6 @@ public interface GroupDAO {
     public void updateChildGroups(int groupId, int[] childGroupIDs);
     
     public Group getEntitlementGroup(String permition, int moduleId);
+
+    public Group addNewEntitlementGroup(String permition);
 }

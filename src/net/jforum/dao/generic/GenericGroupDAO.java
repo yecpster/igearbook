@@ -382,4 +382,13 @@ public class GenericGroupDAO extends AutoKeys implements net.jforum.dao.GroupDAO
         this.addNew(entitlementGroup);
         return entitlementGroup;
     }
+
+    @Override
+    public Group addNewEntitlementGroup(String permition) {
+        Group entitlementGroup = new Group();
+        entitlementGroup.setName(permition);
+        entitlementGroup.setType(1);
+        this.addNew(entitlementGroup);
+        return entitlementGroup;
+    }
 }

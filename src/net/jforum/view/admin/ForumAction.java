@@ -63,8 +63,6 @@ import net.jforum.security.Role;
 import net.jforum.security.RoleValue;
 import net.jforum.security.RoleValueCollection;
 import net.jforum.security.SecurityConstants;
-import net.jforum.util.GroupNode;
-import net.jforum.util.TreeGroup;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
 import net.jforum.util.preferences.TemplateKeys;
@@ -87,15 +85,83 @@ public class ForumAction extends AdminCommand {
     // One more, one more
     public void insert() {
         CategoryDAO cm = DataAccessDriver.getInstance().newCategoryDAO();
-        List<GroupNode> grups = new TreeGroup().getNodes();
+        GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
+        List<Group> selectedGroups = Lists.newArrayList();
+        List<Group> candidateGrups = groupDao.getCandidateGroups(selectedGroups);
 
-        this.context.put("accessCandidateGroups", grups);
-        this.context.put("readOnlyCandidateGroups", grups);
-        this.context.put("htmlCandidateGroups", grups);
-        this.context.put("selectedList", Lists.newArrayList());
-        this.setTemplateName(TemplateKeys.FORUM_ADMIN_INSERT);
+        this.context.put("accessCandidateGroups", candidateGrups);
+        this.context.put("replyCandidateGroups", candidateGrups);
+        this.context.put("postCandidateGroups", candidateGrups);
+        this.context.put("htmlCandidateGroups", candidateGrups);
+        this.context.put("accessSelectedGroups", selectedGroups);
+        this.context.put("replySelectedGroups", selectedGroups);
+        this.context.put("postSelectedGroups", selectedGroups);
+        this.context.put("htmlSelectedGroups", selectedGroups);
         this.context.put("categories", cm.selectAll());
         this.context.put("action", "insertSave");
+        this.setTemplateName(TemplateKeys.FORUM_ADMIN_INSERT);
+    }
+
+    // A new one
+    public void insertSave() {
+        Forum f = new Forum();
+        f.setDescription(this.request.getParameter("description"));
+        f.setIdCategories(this.request.getIntParameter("categories_id"));
+        f.setName(this.request.getParameter("forum_name"));
+        f.setLogo(this.request.getParameter("forum_Logo"));
+        f.setModerated("1".equals(this.request.getParameter("moderate")));
+
+        int forumId = DataAccessDriver.getInstance().newForumDAO().addNew(f);
+        f.setId(forumId);
+
+        ForumRepository.addForum(f);
+
+        GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
+        PermissionControl pc = new PermissionControl();
+        pc.setSecurityModel(gmodel);
+
+        // Access
+        GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
+        Group accessGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_FORUM, forumId);
+        this.addRole(pc, SecurityConstants.PERM_FORUM, forumId, accessGroup);
+        String[] groupsAccess = request.getParameterValues("groupsAccess");
+        updateChildGroups(accessGroup, groupsAccess, groupDao);
+
+        // Anonymous posts
+        Group anonymousPostsGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_ANONYMOUS_POST, forumId);
+        this.addRole(pc, SecurityConstants.PERM_ANONYMOUS_POST, forumId, anonymousPostsGroup);
+
+        boolean permitAnonymousPosts = "1".equals(this.request.getParameter("permitAnonymousPosts"));
+        if (permitAnonymousPosts) {
+            UserDAO um = DataAccessDriver.getInstance().newUserDAO();
+            int anonymousUid = Integer.parseInt(SystemGlobals.getValue(ConfigKeys.ANONYMOUS_USER_ID));
+            um.addToGroup(anonymousUid, new int[] { anonymousPostsGroup.getId() });
+        }
+
+        // Permit to replay
+        Group replyGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_REPLY, forumId);
+        this.addRole(pc, SecurityConstants.PERM_REPLY, forumId, replyGroup);
+        String[] groupsReply = request.getParameterValues("groupsReply");
+        updateChildGroups(replyGroup, groupsReply, groupDao);
+
+        // Permit to new post
+        Group newPostGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_NEW_POST, forumId);
+        this.addRole(pc, SecurityConstants.PERM_NEW_POST, forumId, newPostGroup);
+        String[] groupsPost = request.getParameterValues("groupsPost");
+        updateChildGroups(newPostGroup, groupsPost, groupDao);
+
+        // HTML
+        Group htmlGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_HTML_DISABLED, forumId);
+        this.addRole(pc, SecurityConstants.PERM_HTML_DISABLED, forumId, htmlGroup);
+        String[] groupsHtml = request.getParameterValues("groupsHtml");
+        updateChildGroups(htmlGroup, groupsHtml, groupDao);
+
+        SecurityRepository.clean();
+        RolesRepository.clear();
+
+        // this.handleMailIntegration();
+
+        this.list();
     }
 
     // Edit
@@ -312,68 +378,6 @@ public class ForumAction extends AdminCommand {
             SecurityRepository.clean();
             RolesRepository.clear();
         }
-
-        this.list();
-    }
-
-    // A new one
-    public void insertSave() {
-        Forum f = new Forum();
-        f.setDescription(this.request.getParameter("description"));
-        f.setIdCategories(this.request.getIntParameter("categories_id"));
-        f.setName(this.request.getParameter("forum_name"));
-        f.setLogo(this.request.getParameter("forum_Logo"));
-        f.setModerated("1".equals(this.request.getParameter("moderate")));
-
-        int forumId = DataAccessDriver.getInstance().newForumDAO().addNew(f);
-        f.setId(forumId);
-
-        ForumRepository.addForum(f);
-
-        GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
-        PermissionControl pc = new PermissionControl();
-        pc.setSecurityModel(gmodel);
-
-        // Access
-        GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
-        Group accessGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_FORUM, forumId);
-        this.addRole(pc, SecurityConstants.PERM_FORUM, forumId, accessGroup);
-        String[] groupsAccess = request.getParameterValues("groupsAccess");
-        updateChildGroups(accessGroup, groupsAccess, groupDao);
-
-        // Anonymous posts
-        Group anonymousPostsGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_ANONYMOUS_POST, forumId);
-        this.addRole(pc, SecurityConstants.PERM_ANONYMOUS_POST, forumId, anonymousPostsGroup);
-
-        boolean permitAnonymousPosts = "1".equals(this.request.getParameter("permitAnonymousPosts"));
-        if (permitAnonymousPosts) {
-            UserDAO um = DataAccessDriver.getInstance().newUserDAO();
-            int anonymousUid = Integer.parseInt(SystemGlobals.getValue(ConfigKeys.ANONYMOUS_USER_ID));
-            um.addToGroup(anonymousUid, new int[] { anonymousPostsGroup.getId() });
-        }
-
-        // Permit to replay
-        Group replyGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_REPLY, forumId);
-        this.addRole(pc, SecurityConstants.PERM_REPLY, forumId, replyGroup);
-        String[] groupsReply = request.getParameterValues("groupsReply");
-        updateChildGroups(replyGroup, groupsReply, groupDao);
-
-        // Permit to new post
-        Group newPostGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_NEW_POST, forumId);
-        this.addRole(pc, SecurityConstants.PERM_NEW_POST, forumId, newPostGroup);
-        String[] groupsPost = request.getParameterValues("groupsPost");
-        updateChildGroups(newPostGroup, groupsPost, groupDao);
-
-        // HTML
-        Group htmlGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_HTML_DISABLED, forumId);
-        this.addRole(pc, SecurityConstants.PERM_HTML_DISABLED, forumId, htmlGroup);
-        String[] groupsHtml = request.getParameterValues("groupsHtml");
-        updateChildGroups(htmlGroup, groupsHtml, groupDao);
-
-        SecurityRepository.clean();
-        RolesRepository.clear();
-
-        // this.handleMailIntegration();
 
         this.list();
     }

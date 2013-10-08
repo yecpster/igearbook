@@ -38,4 +38,11 @@ public abstract class GenericUpgradeService implements UpgradeService {
 
         pc.addRoleValue(group.getId(), role, roleValues);
     }
+
+    protected void addRole(PermissionControl pc, String roleName, Group group) {
+        Role role = new Role();
+        role.setName(roleName);
+
+        pc.addRole(group.getId(), role);
+    }
 }
