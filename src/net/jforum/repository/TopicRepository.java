@@ -392,11 +392,11 @@ public class TopicRepository implements Cacheable
 	 * @param forumid The forum id 
 	 * @return <code>ArrayList</code> with the topics.
 	 */
-	public static List getTopics(int forumid)
+	public static List<Topic> getTopics(int forumid)
 	{
 		if (SystemGlobals.getBoolValue(ConfigKeys.TOPIC_CACHE_ENABLED)) {
 			synchronized (FQN_FORUM) {
-				List returnList = (List)cache.get(FQN_FORUM, Integer.toString(forumid));
+				List<Topic> returnList = (List)cache.get(FQN_FORUM, Integer.toString(forumid));
 
 				if (returnList == null) {
 					return new ArrayList();

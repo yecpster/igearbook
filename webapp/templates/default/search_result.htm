@@ -6,6 +6,12 @@
 <#import "../macros/search_pagination.ftl" as pagination>
 <#import "../macros/presentation.ftl" as presentation/>
 
+<#assign isTeamForum = isTeamForum?default(false) />
+<#if isTeamForum>
+    <#assign currentChannel="team" />
+</#if>
+
+
 <table cellspacing="0" cellpadding="10" width="100%" align="center" border="0">
 	<tr>
 		<td class="bodyline" valign="top">
@@ -26,8 +32,12 @@
 					</td>
 				</tr>
 				<tr>
-					<td align="left" valign="middle">		  
-						<a class="nav" href="${contextPath}/forums/list${extension}">${I18n.getMessage("ForumListing.forumIndex")}</a>
+					<td align="left" valign="middle">
+					   <#if isTeamForum>
+                            <a class="nav" href="${contextPath}/team/list.action">群组首页</a> 
+                        <#else>
+                            <a class="nav" href="${JForumContext.encodeURL("/forums/list")}">${I18n.getMessage("ForumListing.forumIndex")} </a> 
+                        </#if>
 					</td>
 					<td class="nav" valign="bottom" nowrap="nowrap" align="right">
 						<#assign paginationLinks>
@@ -58,7 +68,12 @@
 									<strong>
 										<a href="${postUrl}">${post.subject?html}</a>
 									</strong>, 
-									${I18n.getMessage("Search.postedOn")} <a href="${JForumContext.encodeURL("/forums/show/${post.forum.id}")}">${post.forum.name}</a>, 
+									<#if post.forum.type==1>
+									   <#assign forumUrl = "${contextPath}/team/show.action?teamId=${post.forum.id}" />
+                                    <#else>
+                                        <#assign forumUrl = JForumContext.encodeURL("/forums/show/${post.forum.id}") />
+                                    </#if>
+									${I18n.getMessage("Search.postedOn")} <a href="${forumUrl}">${post.forum.name}</a>, 
 									${I18n.getMessage("Search.postedAt")} ${post.time?datetime}, 
 									${I18n.getMessage("Search.postedBy")} <a href="${JForumContext.encodeURL("/user/profile/${post.userId}")}">${post.postUsername}</a>									
 								</span>

@@ -15,12 +15,14 @@ CREATE TABLE jforum_banlist (
 
 --
 -- Table structure for table 'jforum_categories'
+-- category_type: 0 - public category, 1 - team category
 --
 DROP TABLE IF EXISTS jforum_categories;
 CREATE TABLE jforum_categories (
   categories_id INT NOT NULL auto_increment,
   title varchar(100) NOT NULL default '',
   display_order INT NOT NULL default '0',
+  category_type TINYINT DEFAULT 0,
   moderated TINYINT(1) DEFAULT '0',
   PRIMARY KEY  (categories_id)
 ) ENGINE=InnoDB;
@@ -46,6 +48,7 @@ CREATE TABLE jforum_forums (
   categories_id INT NOT NULL default '1',
   forum_type TINYINT DEFAULT 0,
   forum_name varchar(150) NOT NULL default '',
+  forum_logo VARCHAR(255) default NULL,
   forum_desc varchar(255) default NULL,
   forum_order INT default '1',
   forum_topics INT NOT NULL default '0',

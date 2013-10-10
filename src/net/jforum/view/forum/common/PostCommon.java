@@ -322,7 +322,7 @@ public class PostCommon
 	{
 		return SessionFacade.isLogged()
 			&& (post.getUserId() == SessionFacade.getUserSession().getUserId()
-			|| SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT));
+			|| SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT, String.valueOf(post.getForumId())));
 	}
 
 	public static List topicPosts(PostDAO dao, boolean canEdit, int userId, int topicId, int start, int count)

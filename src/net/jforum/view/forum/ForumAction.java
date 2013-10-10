@@ -49,12 +49,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
+
 import net.jforum.Command;
 import net.jforum.JForumExecutionContext;
 import net.jforum.SessionFacade;
 import net.jforum.dao.DataAccessDriver;
 import net.jforum.dao.ForumDAO;
 import net.jforum.dao.ModerationDAO;
+import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
 import net.jforum.entities.MostUsersEverOnline;
 import net.jforum.entities.Recommendation;
@@ -84,7 +87,15 @@ public class ForumAction extends Command {
     public void list() {
         this.setTemplateName(TemplateKeys.FORUMS_LIST);
 
-        this.context.put("allCategories", ForumCommon.getAllCategoriesAndForums(true));
+        List<Category> allCategories = ForumCommon.getAllCategoriesAndForums(true);
+        List<Category> forumCategories = Lists.newArrayList();
+        for (Category category : allCategories) {
+            if (category.getType() == 0) {
+                forumCategories.add(category);
+            }
+        }
+
+        this.context.put("allCategories", forumCategories);
         this.context.put("topicsPerPage", new Integer(SystemGlobals.getIntValue(ConfigKeys.TOPICS_PER_PAGE)));
         this.context.put("rssEnabled", SystemGlobals.getBoolValue(ConfigKeys.RSS_ENABLED));
 
@@ -171,7 +182,7 @@ public class ForumAction extends Command {
         // The user can access this forum?
         Forum forum = ForumRepository.getForum(forumId);
 
-        if (forum == null || !ForumRepository.isCategoryAccessible(forum.getCategoryId())) {
+        if (forum == null || forum.getType() != 0 || !ForumRepository.isCategoryAccessible(forum.getCategoryId())) {
             new ModerationHelper().denied(I18n.getMessage("ForumListing.denied"));
             return;
         }
@@ -187,7 +198,7 @@ public class ForumAction extends Command {
         boolean isLogged = SessionFacade.isLogged();
         boolean isModerator = userSession.isModerator(forumId);
 
-        boolean canApproveMessages = (isLogged && isModerator && SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_APPROVE_MESSAGES));
+        boolean canApproveMessages = (isLogged && isModerator && SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_APPROVE_MESSAGES, String.valueOf(forumId)));
 
         Map topicsToApprove = new HashMap();
 
@@ -222,7 +233,7 @@ public class ForumAction extends Command {
         ViewCommon.contextToPagination(start, totalTopics, topicsPerPage);
         this.context.put("postsPerPage", new Integer(postsPerPage));
 
-        TopicsCommon.topicListingBase();
+        TopicsCommon.topicListingBaseWithModerationInfo(forumId);
         this.context.put("moderator", isLogged && isModerator);
     }
 

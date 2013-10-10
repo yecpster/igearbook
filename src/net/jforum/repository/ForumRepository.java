@@ -43,7 +43,6 @@
 package net.jforum.repository;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -51,10 +50,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
-import org.apache.log4j.Logger;
-
-import com.google.common.collect.Lists;
 
 import net.jforum.SessionFacade;
 import net.jforum.cache.CacheEngine;
@@ -80,6 +75,11 @@ import net.jforum.security.SecurityConstants;
 import net.jforum.util.CategoryOrderComparator;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
+
+import org.apache.log4j.Logger;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * Repository for the forums of the System. This repository acts like a cache
@@ -312,7 +312,7 @@ public class ForumRepository implements Cacheable {
         Category current = (Category) cache.get(FQN, Integer.toString(c.getId()));
         Category currentAtOrder = findCategoryByOrder(c.getOrder());
 
-        Set tmpSet = new TreeSet(new CategoryOrderComparator());
+        Set<Category> tmpSet = new TreeSet<Category>(new CategoryOrderComparator());
         tmpSet.addAll((Set) cache.get(FQN, CATEGORIES_SET));
 
         if (currentAtOrder != null) {
@@ -342,7 +342,7 @@ public class ForumRepository implements Cacheable {
      */
     public synchronized static void refreshCategory(Category c) {
         cache.add(FQN, Integer.toString(c.getId()), c);
-        Set s = (Set) cache.get(FQN, CATEGORIES_SET);
+        Set<Category> s = (Set<Category>) cache.get(FQN, CATEGORIES_SET);
         s.remove(c);
         s.add(c);
         cache.add(FQN, CATEGORIES_SET, s);
@@ -388,18 +388,18 @@ public class ForumRepository implements Cacheable {
         String categoryId = Integer.toString(c.getId());
         cache.add(FQN, categoryId, c);
 
-        Set s = (Set) cache.get(FQN, CATEGORIES_SET);
+        Set<Category> s = (Set<Category>) cache.get(FQN, CATEGORIES_SET);
 
         if (s == null) {
-            s = new TreeSet(new CategoryOrderComparator());
+            s = new TreeSet<Category>(new CategoryOrderComparator());
         }
 
         s.add(c);
         cache.add(FQN, CATEGORIES_SET, s);
 
-        Map relation = (Map) cache.get(FQN, RELATION);
+        Map<String, String> relation = (Map<String, String>) cache.get(FQN, RELATION);
         if (relation == null) {
-            relation = new HashMap();
+            relation = new HashMap<String, String>();
         }
 
         for (Iterator iter = c.getForums().iterator(); iter.hasNext();) {
@@ -459,7 +459,7 @@ public class ForumRepository implements Cacheable {
         c.addForum(forum);
         cache.add(FQN, categoryId, c);
 
-        Map m = (Map) cache.get(FQN, RELATION);
+        Map<String, String> m = (Map<String, String>) cache.get(FQN, RELATION);
         m.put(Integer.toString(forum.getId()), categoryId);
         cache.add(FQN, RELATION, m);
 
@@ -592,7 +592,7 @@ public class ForumRepository implements Cacheable {
      * @return List
      */
     public static List<ModeratorInfo> getModeratorList(int forumId) {
-        List<ModeratorInfo> l = (List) cache.get(FQN_MODERATORS, Integer.toString(forumId));
+        List<ModeratorInfo> l = (List<ModeratorInfo>) cache.get(FQN_MODERATORS, Integer.toString(forumId));
 
         if (l == null) {
             synchronized (FQN_MODERATORS) {
@@ -738,11 +738,11 @@ public class ForumRepository implements Cacheable {
      *            ForumDAO
      */
     private void loadForums(ForumDAO fm) {
-        List l = fm.selectAll();
+        List<Forum> l = fm.selectAll();
 
-        Map m = (Map) cache.get(FQN, RELATION);
+        Map<String, String> m = (Map<String, String>) cache.get(FQN, RELATION);
         if (m == null) {
-            m = new HashMap();
+            m = new HashMap<String, String>();
         }
 
         int lastId = 0;
@@ -791,12 +791,10 @@ public class ForumRepository implements Cacheable {
      *            CategoryDAO
      */
     private void loadCategories(CategoryDAO cm) {
-        List categories = cm.selectAll();
-        Set categoriesSet = new TreeSet(new CategoryOrderComparator());
+        List<Category> categories = cm.selectAll();
+        Set<Category> categoriesSet = Sets.newTreeSet(new CategoryOrderComparator());
 
-        for (Iterator iter = categories.iterator(); iter.hasNext();) {
-            Category c = (Category) iter.next();
-
+        for (Category c : categories) {
             cache.add(FQN, Integer.toString(c.getId()), c);
             categoriesSet.add(c);
         }

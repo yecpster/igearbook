@@ -35,7 +35,9 @@ public class FreemarkerContextInterceptor extends AbstractInterceptor {
     @Override
     public String intercept(ActionInvocation invocation) throws Exception {
 
-        if (!invocation.isExecuted()) {
+        if (invocation.isExecuted()) {
+            //JForumExecutionContext.finish();
+        } else {
             mockService(ServletActionContext.getRequest(), ServletActionContext.getResponse());
         }
         return invocation.invoke();

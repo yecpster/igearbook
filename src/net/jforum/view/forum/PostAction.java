@@ -161,7 +161,7 @@ public class PostAction extends Command {
         PermissionControl pc = SecurityRepository.get(us.getUserId());
 
         boolean moderatorCanEdit = false;
-        if (pc.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT)) {
+        if (pc.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT, String.valueOf(forum.getId()))) {
             moderatorCanEdit = true;
         }
 
@@ -212,7 +212,7 @@ public class PostAction extends Command {
         this.context.put("am", new AttachmentCommon(this.request, topic.getForumId()));
         this.context.put("karmaVotes", userVotes);
         this.context.put("rssEnabled", SystemGlobals.getBoolValue(ConfigKeys.RSS_ENABLED));
-        this.context.put("canRemove", pc.canAccess(SecurityConstants.PERM_MODERATION_POST_REMOVE));
+        this.context.put("canRemove", pc.canAccess(SecurityConstants.PERM_MODERATION_POST_REMOVE, String.valueOf(forum.getId())));
         this.context.put("moderatorCanEdit", moderatorCanEdit);
         this.context.put("allCategories", ForumCommon.getAllCategoriesAndForums(false));
         this.context.put("topic", topic);
@@ -245,7 +245,7 @@ public class PostAction extends Command {
 
         ViewCommon.contextToPagination(start, topic.getTotalReplies() + 1, count);
 
-        TopicsCommon.topicListingBase();
+        TopicsCommon.topicListingBaseWithModerationInfo(topic.getForumId());
         TopicRepository.updateTopic(topic);
     }
 
@@ -579,8 +579,8 @@ public class PostAction extends Command {
         this.context.put("needCaptcha", needCaptcha);
         this.context.put("htmlAllowed", SecurityRepository.canAccess(SecurityConstants.PERM_HTML_DISABLED, Integer.toString(forumId)));
         this.context.put("canCreateStickyOrAnnouncementTopics",
-                SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_STICKY_ANNOUNCEMENT_TOPICS));
-        this.context.put("canCreatePolls", SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_POLL));
+                SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_STICKY_ANNOUNCEMENT_TOPICS, String.valueOf(forumId)));
+        this.context.put("canCreatePolls", SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_POLL, String.valueOf(forumId)));
 
         User user = DataAccessDriver.getInstance().newUserDAO().selectById(userId);
 
@@ -611,7 +611,7 @@ public class PostAction extends Command {
             }
         }
 
-        boolean isModerator = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT);
+        boolean isModerator = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT, String.valueOf(p.getForumId()));
         boolean canEdit = SessionFacade.isLogged() && (isModerator || p.getUserId() == userId);
 
         if (!canEdit) {
@@ -673,7 +673,7 @@ public class PostAction extends Command {
             this.context.put("htmlAllowed", SecurityRepository.canAccess(SecurityConstants.PERM_HTML_DISABLED, Integer.toString(topic.getForumId())));
             this.context.put("canCreateStickyOrAnnouncementTopics",
                     SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_STICKY_ANNOUNCEMENT_TOPICS, Integer.toString(topic.getForumId())));
-            this.context.put("canCreatePolls", SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_POLL));
+            this.context.put("canCreatePolls", SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_POLL, String.valueOf(topic.getForumId())));
         }
 
         UserDAO udao = DataAccessDriver.getInstance().newUserDAO();
@@ -778,7 +778,7 @@ public class PostAction extends Command {
             return;
         }
 
-        boolean isModerator = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT);
+        boolean isModerator = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT, String.valueOf(post.getForumId()));
 
         String originalMessage = post.getText();
 
@@ -816,7 +816,8 @@ public class PostAction extends Command {
                 return;
             }
 
-            if (t.getStatus() == Topic.STATUS_LOCKED && !SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT)) {
+            if (t.getStatus() == Topic.STATUS_LOCKED
+                    && !SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT, String.valueOf(post.getForumId()))) {
                 this.topicLocked();
                 return;
             }
@@ -833,7 +834,9 @@ public class PostAction extends Command {
                 t.setTitle(post.getSubject());
 
                 int newType = this.request.getIntParameter("topic_type");
-                boolean changeType = SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_STICKY_ANNOUNCEMENT_TOPICS) && newType != t.getType();
+                boolean changeType = SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_STICKY_ANNOUNCEMENT_TOPICS,
+                        String.valueOf(post.getForumId()))
+                        && newType != t.getType();
 
                 if (changeType) {
                     t.setType(newType);
@@ -1007,7 +1010,8 @@ public class PostAction extends Command {
             if (this.request.getParameter("topic_type") != null) {
                 t.setType(this.request.getIntParameter("topic_type"));
 
-                if (t.getType() != Topic.TYPE_NORMAL && !SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_STICKY_ANNOUNCEMENT_TOPICS)) {
+                if (t.getType() != Topic.TYPE_NORMAL
+                        && !SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_STICKY_ANNOUNCEMENT_TOPICS, String.valueOf(forumId))) {
                     t.setType(Topic.TYPE_NORMAL);
                 }
             }
@@ -1091,8 +1095,7 @@ public class PostAction extends Command {
             PermissionControl pc = SecurityRepository.get(us.getUserId());
 
             // Moderators and admins don't need to have their messages moderated
-            boolean moderate = (forum.isModerated() && !pc.canAccess(SecurityConstants.PERM_MODERATION) && !pc
-                    .canAccess(SecurityConstants.PERM_ADMINISTRATION));
+            boolean moderate = (forum.isModerated() && !us.isModerator(forumId) && !us.isAdmin());
 
             if (newTopic) {
                 t.setTime(new Date());
@@ -1226,16 +1229,16 @@ public class PostAction extends Command {
     }
 
     public void delete() {
-        if (!SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_REMOVE)) {
+        // Post
+        PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
+        Post p = postDao.selectById(this.request.getIntParameter("post_id"));
+
+        if (!SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_REMOVE, String.valueOf(p.getForumId()))) {
             this.setTemplateName(TemplateKeys.POSTS_CANNOT_DELETE);
             this.context.put("message", I18n.getMessage("CannotRemovePost"));
 
             return;
         }
-
-        // Post
-        PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
-        Post p = postDao.selectById(this.request.getIntParameter("post_id"));
 
         if (p.getId() == 0) {
             this.postNotFound();

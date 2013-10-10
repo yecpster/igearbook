@@ -77,6 +77,7 @@ public interface ForumDAO
 	 * @see #selectById
 	 */
 	public List<Forum> selectAll() ;
+	public List<Forum> selectByType(int type) ;
 	
 	/**
 	 * Sets the forum's order one level up.

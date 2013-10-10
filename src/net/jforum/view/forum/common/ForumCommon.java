@@ -150,7 +150,7 @@ public class ForumCommon
      * @return List
      * @param checkUnreadPosts boolean
 	 */
-	public static List getAllCategoriesAndForums(boolean checkUnreadPosts)
+	public static List<Category> getAllCategoriesAndForums(boolean checkUnreadPosts)
 	{
 		return getAllCategoriesAndForums(SessionFacade.getUserSession(), 
 				SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID), 

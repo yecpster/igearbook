@@ -154,7 +154,7 @@
 						<#list userSessions as us>
 							<#if us.isAdmin()>
 								<#assign color = adminColor/>
-							<#elseif us.isModerator()>
+							<#elseif us.isSuperModerator()>
 								<#assign color = moderatorColor/>
 							<#else>
 								<#assign color = ""/>

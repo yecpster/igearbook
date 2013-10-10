@@ -19,11 +19,12 @@ GroupModel.appendChild = INSERT INTO jforum_groups_groups (group1_id, group2_id)
 # CategoryModel
 # #############
 CategoryModel.selectById = SELECT categories_id, title, display_order, moderated FROM jforum_categories WHERE categories_id = ? ORDER BY title 
-CategoryModel.selectAll = SELECT categories_id, title, display_order, moderated FROM jforum_categories ORDER BY display_order
+CategoryModel.selectAll = SELECT categories_id, category_type, title, display_order, moderated FROM jforum_categories ORDER BY display_order
+CategoryModel.selectByType = SELECT categories_id, category_type, title, display_order, moderated FROM jforum_categories  WHERE category_type = ? ORDER BY display_order
 CategoryModel.canDelete = SELECT COUNT(1) AS total FROM jforum_forums WHERE categories_id = ?
 CategoryModel.delete = DELETE FROM jforum_categories WHERE categories_id = ?
 CategoryModel.update = UPDATE jforum_categories SET title = ?, moderated = ? WHERE categories_id = ?
-CategoryModel.addNew = INSERT INTO jforum_categories (title, display_order, moderated) VALUES (?, ?, ?)
+CategoryModel.addNew = INSERT INTO jforum_categories (title, display_order, moderated, category_type) VALUES (?, ?, ?, ?)
 CategoryModel.setOrderById = UPDATE jforum_categories SET display_order = ? WHERE categories_id = ?
 CategoryModel.getMaxOrder = SELECT MAX(display_order) FROM jforum_categories
 
@@ -247,13 +248,17 @@ PollModel.selectVoterByIP = SELECT vote_id, vote_user_id, vote_user_ip \
 # #############
 # ForumModel
 # #############
-ForumModel.selectById = SELECT forum_id, forum_name, forum_logo, categories_id, forum_desc, forum_order, forum_topics, forum_last_post_id, moderated \
+ForumModel.selectById = SELECT forum_id, forum_type, forum_name, forum_logo, categories_id, forum_desc, forum_order, forum_topics, forum_last_post_id, moderated \
 	FROM jforum_forums \
 	WHERE forum_id = ?
 
-ForumModel.selectAll = SELECT forum_id, forum_name, forum_logo, categories_id, forum_desc, forum_order, forum_topics, forum_last_post_id, moderated \
+ForumModel.selectAll = SELECT forum_id, forum_type, forum_name, forum_logo, categories_id, forum_desc, forum_order, forum_topics, forum_last_post_id, moderated \
 	FROM jforum_forums \
 	ORDER BY forum_order ASC
+
+ForumModel.selectByType = SELECT forum_id, forum_type, forum_name, forum_logo, categories_id, forum_desc, forum_order, forum_topics, forum_last_post_id, moderated \
+    FROM jforum_forums WHERE forum_type = ? \
+    ORDER BY forum_order ASC
 
 ForumModel.selectAllForPermissions = SELECT forum_id, forum_name FROM jforum_forums ORDER BY forum_name
 
@@ -264,7 +269,7 @@ ForumModel.countForumPosts = SELECT COUNT(1) FROM jforum_posts WHERE forum_id = 
 ForumModel.setModerated = UPDATE jforum_forums SET moderated = ? WHERE categories_id = ?
 ForumModel.delete = DELETE FROM jforum_forums WHERE forum_id = ?
 ForumModel.update = UPDATE jforum_forums SET categories_id = ?, forum_name = ?, forum_logo = ?, forum_desc = ?, moderated = ? WHERE forum_id = ?
-ForumModel.addNew = INSERT INTO jforum_forums (categories_id, forum_name, forum_logo, forum_desc, forum_order, moderated) VALUES (?, ?, ?, ?, ?, ?)
+ForumModel.addNew = INSERT INTO jforum_forums (categories_id, forum_name, forum_logo, forum_desc, forum_order, moderated, forum_type) VALUES (?, ?, ?, ?, ?, ?, ?)
 ForumModel.updateLastPost = UPDATE jforum_forums SET forum_last_post_id = ? WHERE forum_id = ?
 ForumModel.incrementTotalTopics = UPDATE jforum_forums SET forum_topics = forum_topics + ? WHERE forum_id = ?
 ForumModel.decrementTotalTopics = UPDATE jforum_forums SET forum_topics = forum_topics - ? WHERE forum_id = ?

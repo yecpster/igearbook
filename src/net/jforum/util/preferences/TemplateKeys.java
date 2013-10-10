@@ -212,7 +212,4 @@ public class TemplateKeys {
     public static final String AJAX_LOAD_POST = "ajax.load.post";
 
     public static final String UPLOADIMG_UPLOAD = "uploadImg.upload";
-
-    public static final String TEAM_LIST = "team.list";
-    public static final String TEAM_INSERT = "team.insert";
 }

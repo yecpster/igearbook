@@ -65,7 +65,7 @@ class CategoryModelDummy implements CategoryDAO
 	/** 
 	 * @see net.jforum.dao.CategoryDAO#selectAll()
 	 */
-	public List selectAll() {
+	public List<Category> selectAll() {
 		return null;
 	}
 
@@ -106,5 +106,10 @@ class CategoryModelDummy implements CategoryDAO
 	 */
 	public void setOrderUp(Category c, Category c2) {
 	}
+
+    @Override
+    public List<Category> selecByType(int type) {
+        return null;
+    }
 	
 }

@@ -76,187 +76,185 @@ import freemarker.template.SimpleHash;
  * @author Rafael Steil
  * @version $Id: AjaxAction.java,v 1.7 2007/09/21 15:54:31 rafaelsteil Exp $
  */
-public class AjaxAction extends Command
-{
-	private static Logger logger = Logger.getLogger(AjaxAction.class);
-	
-	/**
-	 * Sends a test message
-	 * @param sender The sender's email address
-	 * @param host the smtp host
-	 * @param auth if need authorization or not
-	 * @param username the smtp server username, if auth is needed
-	 * @param password the smtp server password, if auth is needed
-	 * @param to the recipient
-	 * @return The status message
-	 */
-	public void sendTestMail()
-	{
-		String sender = this.request.getParameter("sender");
-		String host = this.request.getParameter("host");
-		String port = this.request.getParameter("port");
-		String auth = this.request.getParameter("auth");
-		String ssl = this.request.getParameter("ssl");
-		String username = this.request.getParameter("username");
-		String password = this.request.getParameter("password");
-		String to = this.request.getParameter("to");
-		
-		// Save the current values
-		String originalHost = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_HOST);
-		String originalAuth = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_AUTH);
-		String originalUsername = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_USERNAME);
-		String originalPassword = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_PASSWORD);
-		String originalSender = SystemGlobals.getValue(ConfigKeys.MAIL_SENDER);
-		String originalSSL = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_SSL);
-		String originalPort = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_PORT);
-		
-		// Now put the new ones
-		SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_HOST, host);
-		SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_AUTH, auth);
-		SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_USERNAME, username);
-		SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_PASSWORD, password);
-		SystemGlobals.setValue(ConfigKeys.MAIL_SENDER, sender);
-		SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_SSL, ssl);
-		SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_PORT, port);
-		
-		String status = "OK";
-		
-		// Send the test mail
-		class TestSpammer extends Spammer {
-			public TestSpammer(String to) {
-				List l = new ArrayList();
-				
-				User user = new User();
-				user.setEmail(to);
-				
-				l.add(user);
-				
-				this.setUsers(l);
-				
-				this.setTemplateParams(new SimpleHash());
-				this.prepareMessage("JForum Test Mail", null);
-			}
-			
-			protected String processTemplate() throws Exception {
-				return ("Test mail from JForum Admin Panel. Sent at " + new Date());
-			}
-			
-			protected void createTemplate(String messageFile) throws Exception {}
-		}
-		
-		Spammer s = new TestSpammer(to);
-		
-		try {
-			s.dispatchMessages();
-		}
-		catch (Exception e) {
-			status = StringEscapeUtils.escapeJavaScript(e.toString());
-			logger.error(e.toString(), e);
-		}
-		finally {
-			// Restore the original values
-			SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_HOST, originalHost);
-			SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_AUTH, originalAuth);
-			SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_USERNAME, originalUsername);
-			SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_PASSWORD, originalPassword);
-			SystemGlobals.setValue(ConfigKeys.MAIL_SENDER, originalSender);
-			SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_SSL, originalSSL);
-			SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_PORT, originalPort);
-		}
-		
-		this.setTemplateName(TemplateKeys.AJAX_TEST_MAIL);
-		this.context.put("status", status);
-	}
-	
-	public void isPostIndexed()
-	{
-		int postId = this.request.getIntParameter("post_id");
+public class AjaxAction extends Command {
+    private static Logger logger = Logger.getLogger(AjaxAction.class);
 
-		this.setTemplateName(TemplateKeys.AJAX_IS_POST_INDEXED);
-		
-		LuceneManager manager = (LuceneManager)SearchFacade.manager();
-		Document doc = manager.luceneSearch().findDocumentByPostId(postId);
-		
-		this.context.put("doc", doc);
-	}
-	
-	public void loadPostContents()
-	{
-		int postId = this.request.getIntParameter("id");
-		PostDAO dao = DataAccessDriver.getInstance().newPostDAO();
-		Post post = dao.selectById(postId);
-		this.setTemplateName(TemplateKeys.AJAX_LOAD_POST);
-		this.context.put("post", post);
-	}
-	
-	public void savePost()
-	{
-		PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
-		Post post = postDao.selectById(this.request.getIntParameter("id"));
-		
-		String originalMessage = post.getText();
-		
-		if (!PostCommon.canEditPost(post)) {
-			post = PostCommon.preparePostForDisplay(post);
-		}
-		else {
-			post.setText(this.request.getParameter("value"));
-			postDao.update(post);
-			SearchFacade.update(post);
-			post = PostCommon.preparePostForDisplay(post);
-		}
-		
-		boolean isModerator = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT);
-		
-		if (SystemGlobals.getBoolValue(ConfigKeys.MODERATION_LOGGING_ENABLED)
-				&& isModerator && post.getUserId() != SessionFacade.getUserSession().getUserId()) {
-			ModerationHelper helper = new ModerationHelper();
-			
-			this.request.addParameter("log_original_message", originalMessage);
-			this.request.addParameter("post_id", String.valueOf(post.getId()));
-			this.request.addParameter("topic_id", String.valueOf(post.getTopicId()));
-			
-			ModerationLog log = helper.buildModerationLogFromRequest();
-			log.getPosterUser().setId(post.getUserId());
-			
-			helper.saveModerationLog(log);
-		}
-		
-		if (SystemGlobals.getBoolValue(ConfigKeys.POSTS_CACHE_ENABLED)) {
-			PostRepository.update(post.getTopicId(), PostCommon.preparePostForDisplay(post));
-		}
-		
-		this.setTemplateName(TemplateKeys.AJAX_LOAD_POST);
-		this.context.put("post", post);
-	}
-	
-	public void previewPost()
-	{
-		Post post = new Post();
-		
-		post.setText(this.request.getParameter("text"));
-		post.setSubject(this.request.getParameter("subject"));
-		post.setHtmlEnabled("true".equals(this.request.getParameter("html")));
-		post.setBbCodeEnabled("true".equals(this.request.getParameter("bbcode")));
-		post.setSmiliesEnabled("true".equals(this.request.getParameter("smilies")));
-		
-		if (post.isHtmlEnabled()) {
-			post.setText(new SafeHtml().makeSafe(post.getText()));
-		}
-		
-		post = PostCommon.preparePostForDisplay(post);
-		post.setSubject(StringEscapeUtils.escapeJavaScript(post.getSubject()));
-		post.setText(StringEscapeUtils.escapeJavaScript(post.getText()));
+    /**
+     * Sends a test message
+     * 
+     * @param sender
+     *            The sender's email address
+     * @param host
+     *            the smtp host
+     * @param auth
+     *            if need authorization or not
+     * @param username
+     *            the smtp server username, if auth is needed
+     * @param password
+     *            the smtp server password, if auth is needed
+     * @param to
+     *            the recipient
+     * @return The status message
+     */
+    public void sendTestMail() {
+        String sender = this.request.getParameter("sender");
+        String host = this.request.getParameter("host");
+        String port = this.request.getParameter("port");
+        String auth = this.request.getParameter("auth");
+        String ssl = this.request.getParameter("ssl");
+        String username = this.request.getParameter("username");
+        String password = this.request.getParameter("password");
+        String to = this.request.getParameter("to");
 
-		this.setTemplateName(TemplateKeys.AJAX_PREVIEW_POST);
-		this.context.put("post", post);
-	}
-	
-	/**
-	 * @see net.jforum.Command#list()
-	 */
-	public void list()
-	{
-		this.ignoreAction();
-	}
+        // Save the current values
+        String originalHost = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_HOST);
+        String originalAuth = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_AUTH);
+        String originalUsername = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_USERNAME);
+        String originalPassword = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_PASSWORD);
+        String originalSender = SystemGlobals.getValue(ConfigKeys.MAIL_SENDER);
+        String originalSSL = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_SSL);
+        String originalPort = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_PORT);
+
+        // Now put the new ones
+        SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_HOST, host);
+        SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_AUTH, auth);
+        SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_USERNAME, username);
+        SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_PASSWORD, password);
+        SystemGlobals.setValue(ConfigKeys.MAIL_SENDER, sender);
+        SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_SSL, ssl);
+        SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_PORT, port);
+
+        String status = "OK";
+
+        // Send the test mail
+        class TestSpammer extends Spammer {
+            public TestSpammer(String to) {
+                List l = new ArrayList();
+
+                User user = new User();
+                user.setEmail(to);
+
+                l.add(user);
+
+                this.setUsers(l);
+
+                this.setTemplateParams(new SimpleHash());
+                this.prepareMessage("JForum Test Mail", null);
+            }
+
+            protected String processTemplate() throws Exception {
+                return ("Test mail from JForum Admin Panel. Sent at " + new Date());
+            }
+
+            protected void createTemplate(String messageFile) throws Exception {
+            }
+        }
+
+        Spammer s = new TestSpammer(to);
+
+        try {
+            s.dispatchMessages();
+        } catch (Exception e) {
+            status = StringEscapeUtils.escapeJavaScript(e.toString());
+            logger.error(e.toString(), e);
+        } finally {
+            // Restore the original values
+            SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_HOST, originalHost);
+            SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_AUTH, originalAuth);
+            SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_USERNAME, originalUsername);
+            SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_PASSWORD, originalPassword);
+            SystemGlobals.setValue(ConfigKeys.MAIL_SENDER, originalSender);
+            SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_SSL, originalSSL);
+            SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_PORT, originalPort);
+        }
+
+        this.setTemplateName(TemplateKeys.AJAX_TEST_MAIL);
+        this.context.put("status", status);
+    }
+
+    public void isPostIndexed() {
+        int postId = this.request.getIntParameter("post_id");
+
+        this.setTemplateName(TemplateKeys.AJAX_IS_POST_INDEXED);
+
+        LuceneManager manager = (LuceneManager) SearchFacade.manager();
+        Document doc = manager.luceneSearch().findDocumentByPostId(postId);
+
+        this.context.put("doc", doc);
+    }
+
+    public void loadPostContents() {
+        int postId = this.request.getIntParameter("id");
+        PostDAO dao = DataAccessDriver.getInstance().newPostDAO();
+        Post post = dao.selectById(postId);
+        this.setTemplateName(TemplateKeys.AJAX_LOAD_POST);
+        this.context.put("post", post);
+    }
+
+    public void savePost() {
+        PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
+        Post post = postDao.selectById(this.request.getIntParameter("id"));
+
+        String originalMessage = post.getText();
+
+        if (!PostCommon.canEditPost(post)) {
+            post = PostCommon.preparePostForDisplay(post);
+        } else {
+            post.setText(this.request.getParameter("value"));
+            postDao.update(post);
+            SearchFacade.update(post);
+            post = PostCommon.preparePostForDisplay(post);
+        }
+
+        boolean isModerator = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT, String.valueOf(post.getForumId()));
+
+        if (SystemGlobals.getBoolValue(ConfigKeys.MODERATION_LOGGING_ENABLED) && isModerator
+                && post.getUserId() != SessionFacade.getUserSession().getUserId()) {
+            ModerationHelper helper = new ModerationHelper();
+
+            this.request.addParameter("log_original_message", originalMessage);
+            this.request.addParameter("post_id", String.valueOf(post.getId()));
+            this.request.addParameter("topic_id", String.valueOf(post.getTopicId()));
+
+            ModerationLog log = helper.buildModerationLogFromRequest();
+            log.getPosterUser().setId(post.getUserId());
+
+            helper.saveModerationLog(log);
+        }
+
+        if (SystemGlobals.getBoolValue(ConfigKeys.POSTS_CACHE_ENABLED)) {
+            PostRepository.update(post.getTopicId(), PostCommon.preparePostForDisplay(post));
+        }
+
+        this.setTemplateName(TemplateKeys.AJAX_LOAD_POST);
+        this.context.put("post", post);
+    }
+
+    public void previewPost() {
+        Post post = new Post();
+
+        post.setText(this.request.getParameter("text"));
+        post.setSubject(this.request.getParameter("subject"));
+        post.setHtmlEnabled("true".equals(this.request.getParameter("html")));
+        post.setBbCodeEnabled("true".equals(this.request.getParameter("bbcode")));
+        post.setSmiliesEnabled("true".equals(this.request.getParameter("smilies")));
+
+        if (post.isHtmlEnabled()) {
+            post.setText(new SafeHtml().makeSafe(post.getText()));
+        }
+
+        post = PostCommon.preparePostForDisplay(post);
+        post.setSubject(StringEscapeUtils.escapeJavaScript(post.getSubject()));
+        post.setText(StringEscapeUtils.escapeJavaScript(post.getText()));
+
+        this.setTemplateName(TemplateKeys.AJAX_PREVIEW_POST);
+        this.context.put("post", post);
+    }
+
+    /**
+     * @see net.jforum.Command#list()
+     */
+    public void list() {
+        this.ignoreAction();
+    }
 }

@@ -116,11 +116,8 @@ public class CategoryAction extends AdminCommand {
         Group accessGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_CATEGORY, categoryId);
 
         String[] groups = this.request.getParameterValues("groups");
-        int[] childGroupIDs = new int[groups.length];
-        for (int i = 0; i < groups.length; i++) {
-            childGroupIDs[i] = Integer.parseInt(groups[i]);
-        }
-        groupDao.updateChildGroups(accessGroup.getId(), childGroupIDs);
+        updateChildGroups(accessGroup, groups, groupDao);
+
         SecurityRepository.clean();
         RolesRepository.clear();
 
@@ -181,15 +178,22 @@ public class CategoryAction extends AdminCommand {
         pc.addRoleValue(accessGroup.getId(), role, roleValues);
 
         String[] groups = this.request.getParameterValues("groups");
-        int[] childGroupIDs = new int[groups.length];
-        for (int i = 0; i < groups.length; i++) {
-            childGroupIDs[i] = Integer.parseInt(groups[i]);
-        }
-        groupDao.updateChildGroups(accessGroup.getId(), childGroupIDs);
+        updateChildGroups(accessGroup, groups, groupDao);
 
         SecurityRepository.clean();
         RolesRepository.clear();
         this.list();
+    }
+
+    private void updateChildGroups(Group parentGroup, String[] groups, GroupDAO groupDao) {
+        if (groups == null) {
+            groups = new String[] {};
+        }
+        int[] childGroupIDs = new int[groups.length];
+        for (int i = 0; i < groups.length; i++) {
+            childGroupIDs[i] = Integer.parseInt(groups[i]);
+        }
+        groupDao.updateChildGroups(parentGroup.getId(), childGroupIDs);
     }
 
     public void up() {

@@ -27,7 +27,7 @@
           <li><a href="${JForumContext.encodeURL("/recentTopics/list")}" class="${recentTopicClass}">${I18n.getMessage("ForumBase.recentTopics")}</a></li>
           <li><a href="${JForumContext.encodeURL("/hottestTopics/list")}" class="${hotTopicClass}">${I18n.getMessage("ForumBase.hottestTopics")}</a></li>
           -->
-          <li><a href="${JForumContext.encodeURL("/team/list")}" class="${teamClass}">群组</a></li>
+          <li><a href="${contextPath}/team/list.action" class="${teamClass}">群组</a></li>
           <li><a href="${JForumContext.encodeURL("/user/list")}" class="${userListClass}">${I18n.getMessage("ForumBase.usersList")}</a></li>
           <li class="last"><a href="${JForumContext.encodeURL("/search/filters")}" class="${searchClass}">${I18n.getMessage("ForumBase.search")}</a></li>
         </ul>

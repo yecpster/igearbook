@@ -1,7 +1,7 @@
 package net.jforum.view.admin;
 
 import net.jforum.util.preferences.TemplateKeys;
-import net.jforum.view.admin.upgrade.Upgrade2_1_13;
+import net.jforum.view.admin.upgrade.Upgrade2_2_0;
 import net.jforum.view.admin.upgrade.UpgradeService;
 
 /**
@@ -17,7 +17,7 @@ public class UpgradeAction extends AdminCommand {
     }
 
     public void upgrade() {
-        UpgradeService upgradeService = new Upgrade2_1_13();
+        UpgradeService upgradeService = new Upgrade2_2_0();
         upgradeService.upgrade();
     }
 

@@ -12,14 +12,20 @@
   <!-- <constant name="struts.convention.action.mapAllMatches" value="true" /> -->
   <constant name="struts.convention.default.parent.package" value="default" />
 
-  <constant name="struts.devMode" value="true" />
+  <constant name="struts.devMode" value="false" />
   <constant name="struts.convention.classes.reload" value="true" />
   <constant name="struts.freemarker.manager.classname" value="com.igearbook.resulttype.CustomFreemarkerManager" />
+  <constant name="struts.ui.theme" value="simple" />
 
   <package name="default" namespace="/" extends="struts-default">
+    <result-types>
+      <result-type name="freemarker" class="com.igearbook.resulttype.CustomFreemarkerResult" />
+    </result-types>
     <interceptors>
       <interceptor name="igearbook" class="com.igearbook.interceptor.FreemarkerContextInterceptor" />
+      <interceptor name="igearbookInterceptor" class="com.igearbook.interceptor.CustomExceptionInterceptor" />
       <interceptor-stack name="defaultStackIgearbook">
+        <interceptor-ref name="igearbookInterceptor" />
         <interceptor-ref name="alias" />
         <interceptor-ref name="servletConfig" />
         <interceptor-ref name="i18n" />
@@ -27,7 +33,6 @@
         <interceptor-ref name="chain" />
         <interceptor-ref name="scopedModelDriven" />
         <interceptor-ref name="modelDriven" />
-        <interceptor-ref name="fileUpload" />
         <interceptor-ref name="checkbox" />
         <interceptor-ref name="multiselect" />
         <interceptor-ref name="staticParams" />
@@ -43,10 +48,18 @@
           <param name="excludeMethods">input,back,cancel,browse</param>
         </interceptor-ref>
         <interceptor-ref name="debugging" />
-
         <interceptor-ref name="igearbook" />
       </interceptor-stack>
     </interceptors>
+    <default-interceptor-ref name="defaultStackIgearbook" />
+
+    <global-results>
+      <result name="invalid.token" type="freemarker">/templates/default/invalid_token.ftl</result>
+      <result name="exception" type="freemarker">/templates/default/exception.ftl</result>
+    </global-results>
+    <global-exception-mappings>
+      <exception-mapping exception="java.lang.Throwable" result="exception" />
+    </global-exception-mappings>
   </package>
 
 </struts>

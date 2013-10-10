@@ -947,7 +947,7 @@ public class User implements Serializable {
      * 
      * @return <code>true</code> if the user has moderations rights
      */
-    public boolean isModerator() {
-        return SecurityRepository.canAccess(this.id, SecurityConstants.PERM_MODERATION);
+    public boolean isSuperModerator() {
+        return SecurityRepository.canAccess(this.id, SecurityConstants.PERM_SUPER_MODERATION);
     }
 }

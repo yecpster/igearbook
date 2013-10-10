@@ -49,27 +49,23 @@ import net.jforum.entities.Category;
 
 /**
  * @author Rafael Steil
- * @version $Id: CategoryOrderComparator.java,v 1.5 2006/08/23 02:13:44 rafaelsteil Exp $
+ * @version $Id: CategoryOrderComparator.java,v 1.5 2006/08/23 02:13:44
+ *          rafaelsteil Exp $
  */
-public class CategoryOrderComparator implements Comparator, Serializable
-{
-	/** 
-	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-	 */
-	public int compare(Object o1, Object o2) 
-	{
-		Category c1 = (Category)o1;
-		Category c2 = (Category)o2;
-		
-		if (c1.getOrder() > c2.getOrder()) {
-			return 1;
-		}
-		else if (c1.getOrder() < c2.getOrder() ) {
-			return -1;
-		}
-		else {
-			return c1.getName().compareTo(c2.getName());
-		}
-	}
+public class CategoryOrderComparator implements Comparator<Category>, Serializable {
+
+    private static final long serialVersionUID = 4527868867528111747L;
+
+    @Override
+    public int compare(Category c1, Category c2) {
+
+        if (c1.getOrder() > c2.getOrder()) {
+            return 1;
+        } else if (c1.getOrder() < c2.getOrder()) {
+            return -1;
+        } else {
+            return c1.getName().compareTo(c2.getName());
+        }
+    }
 
 }

@@ -387,7 +387,6 @@ public class ForumAction extends AdminCommand {
         PermissionControl pc = new PermissionControl();
         pc.setSecurityModel(gmodel);
         Group moderationGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_MODERATION_FORUMS, forumId);
-        this.addRole(pc, SecurityConstants.PERM_MODERATION, forumId, moderationGroup);
         this.addRole(pc, SecurityConstants.PERM_CREATE_STICKY_ANNOUNCEMENT_TOPICS, forumId, moderationGroup);
         this.addRole(pc, SecurityConstants.PERM_MODERATION_FORUMS, forumId, moderationGroup);
         this.addRole(pc, SecurityConstants.PERM_MODERATION_APPROVE_MESSAGES, forumId, moderationGroup);

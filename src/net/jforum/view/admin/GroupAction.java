@@ -212,7 +212,6 @@ public class GroupAction extends AdminCommand {
         this.context.put("users", users);
         this.context.put("group_id", groupId);
         this.setTemplateName(TemplateKeys.GROUP_USERS);
-
     }
 
     public void editUsersSave() {
@@ -241,6 +240,9 @@ public class GroupAction extends AdminCommand {
                 userDao.removeFromGroup(Integer.parseInt(userId), new int[] { groupId });
             }
         }
+        SecurityRepository.clean();
+        RolesRepository.clear();
+        ForumRepository.clearModeratorList();
         this.editUsers();
     }
 

@@ -75,6 +75,8 @@ public interface CategoryDAO
 	 */
 	public List<Category> selectAll();
 	
+	public List<Category> selecByType(int type);
+	
 	/**
 	 * Checks if is possible to delete a specific category.
 	 * 

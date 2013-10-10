@@ -19,6 +19,7 @@
 		<td class="row1" width="38%"><span class="gen">${I18n.getMessage("Groups.Form.GroupName")}</span></td>
 		<td class="row2"><input type="text" name="group_name" value="<#if group?exists>${group.name}</#if>" /></td>
 	</tr>
+	<#--
 	<tr>
 		<td class="row1"><span class="gen">${I18n.getMessage("Groups.Form.ParentGroup")}</span></td>
 		<td class="row2">
@@ -29,6 +30,7 @@
 		    </#if>
 		</td>
 	</tr>
+	-->
 	<tr>
 		<td class="row1"><span class="gen">${I18n.getMessage("Groups.Form.Description")}</span></td>
 		<td class="row2"><textarea rows="4" cols="30" wrap="virtual" name="group_description"><#if group?exists>${group.description?default("")}</#if></textarea></td>

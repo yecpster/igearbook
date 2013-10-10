@@ -96,7 +96,7 @@ public class ExceptionWriter
 			}
 
 			boolean canViewStackTrace = !SystemGlobals.getBoolValue(ConfigKeys.STACKTRACE_MODERATORS_ONLY)
-				|| (SessionFacade.isLogged() && SessionFacade.getUserSession().isModerator());
+				|| (SessionFacade.isLogged() && SessionFacade.getUserSession().isSuperModerator());
 			
 			String filter = "[<>]";
 			String stackTrace = canViewStackTrace

@@ -78,6 +78,7 @@ public class Category implements Serializable {
     private static final long serialVersionUID = -4894230707020588049L;
     private int id;
     private int order;
+    private int type = 0; // 0 - public category, 1 - team category
     private boolean moderated;
     private String name;
     private Map<Integer, Forum> forumsIdMap = Maps.newHashMap();
@@ -98,6 +99,7 @@ public class Category implements Serializable {
     public Category(Category c) {
         this.name = c.getName();
         this.id = c.getId();
+        this.type = c.getType();
         this.order = c.getOrder();
         this.moderated = c.isModerated();
 
@@ -163,6 +165,14 @@ public class Category implements Serializable {
      */
     public void setOrder(int order) {
         this.order = order;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     /**

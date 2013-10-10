@@ -55,7 +55,7 @@ public class SecurityConstants {
     public static final String PERM_CATEGORY = "perm_category";
     public static final String PERM_FORUM = "perm_forum";
     public static final String PERM_ANONYMOUS_POST = "perm_anonymous_post";
-    public static final String PERM_MODERATION = "perm_moderation";
+    public static final String PERM_SUPER_MODERATION = "perm_super_moderation";
     public static final String PERM_REPLY_WITHOUT_MODERATION = "perm_reply_without_moderation";
     public static final String PERM_MODERATION_APPROVE_MESSAGES = "perm_moderation_approve_messages";
     public static final String PERM_MODERATION_FORUMS = "perm_moderation_forums";
@@ -77,4 +77,9 @@ public class SecurityConstants {
     public static final String PERM_FULL_MODERATION_LOG = "perm_full_moderation_log";
 
     public static final String PERM_TEAMFORUM_CREATE = "perm_teamforum_create";
+    public static final String PERM_TEAMFORUM_ADMIN = "perm_teamforum_admin";
+    public static final String PERM_TEAMFORUM_OWNER = "perm_teamforum_owner";
+    public static final String PERM_TEAMFORUM_USER = "perm_teamforum_user";
+    public static final String PERM_TEAMFORUM_USER_CANDIDATE = "perm_teamforum_user_candidate";
+    public static final String PERM_TEAMFORUM_USER_BAN2POST = "perm_teamforum_user_ban2post";
 }

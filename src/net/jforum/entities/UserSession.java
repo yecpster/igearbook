@@ -65,406 +65,381 @@ import com.octo.captcha.image.ImageCaptcha;
  * @author Rafael Steil
  * @version $Id: UserSession.java,v 1.37 2007/09/10 01:17:20 rafaelsteil Exp $
  */
-public class UserSession implements Serializable
-{
-	static final long serialVersionUID = 0;
-	
-	private long sessionTime;
-	
-	private int userId;
-	private int privateMessages;
-	
-	private Date startTime;
-	private Date lastVisit;
-	
-	private String sessionId;
-	private String username;
-	private String lang;
-	private String ip;
-	
-	private boolean autoLogin;
-	
-	private boolean isMobileUser;
-	
-	private ImageCaptcha imageCaptcha = null;
+public class UserSession implements Serializable {
+    static final long serialVersionUID = 0;
 
-	public UserSession() {}
+    private long sessionTime;
 
-	public UserSession(UserSession us)
-	{
-		if (us.getStartTime() != null) {
-			this.startTime = new Date(us.getStartTime().getTime());
-		}
+    private int userId;
+    private int privateMessages;
 
-		if (us.getLastVisit() != null) {
-			this.lastVisit = new Date(us.getLastVisit().getTime());
-		}
-		
-		this.sessionTime = us.getSessionTime();
-		this.userId = us.getUserId();
-		this.sessionId = us.getSessionId();
-		this.username = us.getUsername();
-		this.autoLogin = us.getAutoLogin();
-		this.lang = us.getLang();
-		this.privateMessages = us.getPrivateMessages();
-		this.imageCaptcha = us.imageCaptcha;
-		this.ip = us.getIp();
-	}
-	
-	public Date sessionLastUpdate()
-	{
-		return new Date(this.startTime.getTime() + this.sessionTime);
-	}
-	
-	public void setIp(String ip)
-	{
-		this.ip = ip;
-	}
-	
-	public String getIp()
-	{
-		return this.ip;
-	}
+    private Date startTime;
+    private Date lastVisit;
 
-	/**
-	 * Set session's start time.
-	 * 
-	 * @param startTime  Start time in miliseconds
-	 */
-	public void setStartTime(Date startTime)
-	{
-		this.startTime = startTime;
-	}
+    private String sessionId;
+    private String username;
+    private String lang;
+    private String ip;
 
-	/**
-	 * @return Returns the privateMessages.
-	 */
-	public int getPrivateMessages()
-	{
-		return this.privateMessages;
-	}
+    private boolean autoLogin;
 
-	/**
-	 * @param privateMessages The privateMessages to set.
-	 */
-	public void setPrivateMessages(int privateMessages)
-	{
-		this.privateMessages = privateMessages;
-	}
+    private boolean isMobileUser;
 
-	/**
-	 * Set session last visit time.
-	 * 
-	 * @param lastVisit Time in miliseconds
-	 */
-	public void setLastVisit(Date lastVisit)
-	{
-		this.lastVisit = lastVisit;
-	}
+    private ImageCaptcha imageCaptcha = null;
 
-	/**
-	 * Set user's id
-	 * 
-	 * @param userId The user id
-	 */
-	public void setUserId(int userId)
-	{
-		this.userId = userId;
-	}
+    public UserSession() {
+    }
 
-	/**
-	 * Set user's name
-	 * 
-	 * @param username The username
-	 */
-	public void setUsername(String username)
-	{
-		this.username = username;
-	}
+    public UserSession(UserSession us) {
+        if (us.getStartTime() != null) {
+            this.startTime = new Date(us.getStartTime().getTime());
+        }
 
-	public void setSessionId(String sessionId)
-	{
-		this.sessionId = sessionId;
-	}
+        if (us.getLastVisit() != null) {
+            this.lastVisit = new Date(us.getLastVisit().getTime());
+        }
 
-	public void setSessionTime(long sessionTime)
-	{
-		this.sessionTime = sessionTime;
-	}
+        this.sessionTime = us.getSessionTime();
+        this.userId = us.getUserId();
+        this.sessionId = us.getSessionId();
+        this.username = us.getUsername();
+        this.autoLogin = us.getAutoLogin();
+        this.lang = us.getLang();
+        this.privateMessages = us.getPrivateMessages();
+        this.imageCaptcha = us.imageCaptcha;
+        this.ip = us.getIp();
+    }
 
-	public void setLang(String lang)
-	{
-		this.lang = lang;
-	}
+    public Date sessionLastUpdate() {
+        return new Date(this.startTime.getTime() + this.sessionTime);
+    }
 
-	/**
-	 * Update the session time.
-	 */
-	public void updateSessionTime()
-	{
-		this.sessionTime = System.currentTimeMillis() - this.startTime.getTime();
-	}
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
 
-	/**
-	 * Enable or disable auto-login.
-	 * 
-	 * @param autoLogin  <code>true</code> or <code>false</code> to represent auto-login status
-	 */
-	public void setAutoLogin(boolean autoLogin)
-	{
-		this.autoLogin = autoLogin;
-	}
+    public String getIp() {
+        return this.ip;
+    }
 
-	/**
-	 * Gets user's session start time
-	 * 
-	 * @return Start time in miliseconds
-	 */
-	public Date getStartTime()
-	{
-		return this.startTime;
-	}
+    /**
+     * Set session's start time.
+     * 
+     * @param startTime
+     *            Start time in miliseconds
+     */
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
 
-	public String getLang()
-	{
-		return this.lang;
-	}
+    /**
+     * @return Returns the privateMessages.
+     */
+    public int getPrivateMessages() {
+        return this.privateMessages;
+    }
 
-	/**
-	 * Gets user's last visit time
-	 * 
-	 * @return Time in miliseconds
-	 */
-	public Date getLastVisit()
-	{
-		//return new GregorianCalendar(2007, 6, 28, 15, 15, 19).getTime();
-		return this.lastVisit;
-	}
+    /**
+     * @param privateMessages
+     *            The privateMessages to set.
+     */
+    public void setPrivateMessages(int privateMessages) {
+        this.privateMessages = privateMessages;
+    }
 
-	/**
-	 * Gets the session time.
-	 * 
-	 * @return The session time
-	 */
-	public long getSessionTime()
-	{
-		return this.sessionTime;
-	}
+    /**
+     * Set session last visit time.
+     * 
+     * @param lastVisit
+     *            Time in miliseconds
+     */
+    public void setLastVisit(Date lastVisit) {
+        this.lastVisit = lastVisit;
+    }
 
-	/**
-	 * Gets user's id
-	 * 
-	 * @return The user id
-	 */
-	public int getUserId()
-	{
-		return this.userId;
-	}
+    /**
+     * Set user's id
+     * 
+     * @param userId
+     *            The user id
+     */
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
-	/**
-	 * Gets the username
-	 * 
-	 * @return The username
-	 */
-	public String getUsername()
-	{
-		if (this.username == null && this.userId == SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID)) {
-			this.username = I18n.getMessage("Guest");
-		}
-		
-		return this.username;
-	}
+    /**
+     * Set user's name
+     * 
+     * @param username
+     *            The username
+     */
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	/**
-	 * Gets auto-login status
-	 * 
-	 * @return <code>true</code> if auto-login is enabled, or <code>false</code> if disabled.
-	 */
-	public boolean getAutoLogin()
-	{
-		return this.autoLogin;
-	}
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
 
-	/**
-	 * Gets the session id related to this user session
-	 * 
-	 * @return A string with the session id
-	 */
-	public String getSessionId()
-	{
-		return this.sessionId;
-	}
+    public void setSessionTime(long sessionTime) {
+        this.sessionTime = sessionTime;
+    }
 
-	/**
-	 * Checks if the user is an administrator
-	 * 
-	 * @return <code>true</code> if the user is an administrator
-	 */
-	public boolean isAdmin()
-	{
-		return SecurityRepository.canAccess(this.userId, SecurityConstants.PERM_ADMINISTRATION);
-	}
+    public void setLang(String lang) {
+        this.lang = lang;
+    }
 
-	/**
-	 * Checks if the user is a moderator
-	 * 
-	 * @return <code>true</code> if the user has moderations rights
-	 */
-	public boolean isModerator()
-	{
-		return SecurityRepository.canAccess(this.userId, SecurityConstants.PERM_MODERATION);
-	}
-	
-	/**
-	 * Checks if the user can moderate a forum
-	 * 
-	 * @param forumId the forum's id to check for moderation rights
-	 * @return <code>true</code> if the user has moderations rights
-	 */
-	public boolean isModerator(int forumId)
-	{
-		PermissionControl pc = SecurityRepository.get(this.userId);
-		
-		return (pc.canAccess(SecurityConstants.PERM_MODERATION))
-			&& (pc.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, 
-				Integer.toString(forumId)));
-	}
+    /**
+     * Update the session time.
+     */
+    public void updateSessionTime() {
+        this.sessionTime = System.currentTimeMillis() - this.startTime.getTime();
+    }
 
-	/**
-	 * Makes the user's session "anoymous" - eg, the user. This method sets the session's start and
-	 * last visit time to the current datetime, the user id to the return of a call to
-	 * <code>SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID)</code> and finally sets
-	 * session attribute named "logged" to "0" will be considered a non-authenticated / anonymous
-	 * user
-	 */
-	public void makeAnonymous()
-	{
-		this.registerBasicInfo();
-		
-		ControllerUtils.addCookie(SystemGlobals.getValue(ConfigKeys.COOKIE_AUTO_LOGIN), null);
-		ControllerUtils.addCookie(SystemGlobals.getValue(ConfigKeys.COOKIE_NAME_DATA),
-			SystemGlobals.getValue(ConfigKeys.ANONYMOUS_USER_ID));
+    /**
+     * Enable or disable auto-login.
+     * 
+     * @param autoLogin
+     *            <code>true</code> or <code>false</code> to represent
+     *            auto-login status
+     */
+    public void setAutoLogin(boolean autoLogin) {
+        this.autoLogin = autoLogin;
+    }
 
-		SessionFacade.makeUnlogged();
-	}
+    /**
+     * Gets user's session start time
+     * 
+     * @return Start time in miliseconds
+     */
+    public Date getStartTime() {
+        return this.startTime;
+    }
 
-	/**
-	 * Sets the startup and last visit time to now, as well set the
-	 * user id to Anonymous. This method is usually called when the
-	 * user hits the forum for the first time. 
-	 */
-	public void registerBasicInfo()
-	{
-		this.setStartTime(new Date(System.currentTimeMillis()));
-		this.setLastVisit(new Date(System.currentTimeMillis()));
-		this.setUserId(SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID));
-	}
+    public String getLang() {
+        return this.lang;
+    }
 
-	/**
-	 * Sets a new user session information using information from an <code>User</code> instance.
-	 * This method sets the user id, username, the number of private messages, the session's start
-	 * time ( set to the current date and time ) and the language.
-	 * 
-	 * @param user The <code>User</code> instance to get data from
-	 */
-	public void dataToUser(User user)
-	{
-		this.setUserId(user.getId());
-		this.setUsername(user.getUsername());
-		this.setPrivateMessages(user.getPrivateMessagesCount());
-		this.setStartTime(new Date(System.currentTimeMillis()));
-		this.setLang(user.getLang());
-	}
+    /**
+     * Gets user's last visit time
+     * 
+     * @return Time in miliseconds
+     */
+    public Date getLastVisit() {
+        // return new GregorianCalendar(2007, 6, 28, 15, 15, 19).getTime();
+        return this.lastVisit;
+    }
 
-	/**
-	 * Get the captcha image to challenge the user
-	 * 
-	 * @return BufferedImage the captcha image to challenge the user
-	 */
-	public BufferedImage getCaptchaImage()
-	{
-		if (this.imageCaptcha == null) {
-			return null;
-		}
-		
-		return (BufferedImage)this.imageCaptcha.getChallenge();
-	}
+    /**
+     * Gets the session time.
+     * 
+     * @return The session time
+     */
+    public long getSessionTime() {
+        return this.sessionTime;
+    }
 
-	/**
-	 * Validate the captcha response of user
-	 * 
-	 * @param userResponse String the captcha response from user
-	 * @return boolean true if the answer is valid, otherwise return false
-	 */
-	public boolean validateCaptchaResponse(String userResponse)
-	{
-		if ((SystemGlobals.getBoolValue(ConfigKeys.CAPTCHA_REGISTRATION) 
-				|| SystemGlobals.getBoolValue(ConfigKeys.CAPTCHA_POSTS))
-				&& this.imageCaptcha != null) {
-			
-			if (SystemGlobals.getBoolValue(ConfigKeys.CAPTCHA_IGNORE_CASE)) {
-				userResponse = userResponse.toLowerCase();
-			}
-			
-			boolean result =  this.imageCaptcha.validateResponse(userResponse).booleanValue();
-			this.destroyCaptcha();
-			return result;
-		}
-		
-		return true;
-	}
+    /**
+     * Gets user's id
+     * 
+     * @return The user id
+     */
+    public int getUserId() {
+        return this.userId;
+    }
 
-	/**
-	 * create a new image captcha
-	 * 
-	 */
-	public void createNewCaptcha()
-	{
-		this.destroyCaptcha();
-		this.imageCaptcha = Captcha.getInstance().getNextImageCaptcha();
-	}
+    /**
+     * Gets the username
+     * 
+     * @return The username
+     */
+    public String getUsername() {
+        if (this.username == null && this.userId == SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID)) {
+            this.username = I18n.getMessage("Guest");
+        }
 
-	/**
-	 * Destroy the current captcha validation is done
-	 * 
-	 */
-	public void destroyCaptcha()
-	{
-		this.imageCaptcha = null;
-	}
-	
-	/**
+        return this.username;
+    }
+
+    /**
+     * Gets auto-login status
+     * 
+     * @return <code>true</code> if auto-login is enabled, or <code>false</code>
+     *         if disabled.
+     */
+    public boolean getAutoLogin() {
+        return this.autoLogin;
+    }
+
+    /**
+     * Gets the session id related to this user session
+     * 
+     * @return A string with the session id
+     */
+    public String getSessionId() {
+        return this.sessionId;
+    }
+
+    /**
+     * Checks if the user is an administrator
+     * 
+     * @return <code>true</code> if the user is an administrator
+     */
+    public boolean isAdmin() {
+        return SecurityRepository.canAccess(this.userId, SecurityConstants.PERM_ADMINISTRATION);
+    }
+
+    /**
+     * Checks if the user is a moderator
+     * 
+     * @return <code>true</code> if the user has moderations rights
+     */
+    public boolean isSuperModerator() {
+        return SecurityRepository.canAccess(this.userId, SecurityConstants.PERM_SUPER_MODERATION);
+    }
+
+    /**
+     * Checks if the user can moderate a forum
+     * 
+     * @param forumId
+     *            the forum's id to check for moderation rights
+     * @return <code>true</code> if the user has moderations rights
+     */
+    public boolean isModerator(int forumId) {
+        PermissionControl pc = SecurityRepository.get(this.userId);
+
+        return pc.canAccess(SecurityConstants.PERM_SUPER_MODERATION)
+                || pc.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, Integer.toString(forumId));
+    }
+
+    /**
+     * Makes the user's session "anoymous" - eg, the user. This method sets the
+     * session's start and last visit time to the current datetime, the user id
+     * to the return of a call to
+     * <code>SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID)</code> and
+     * finally sets session attribute named "logged" to "0" will be considered a
+     * non-authenticated / anonymous user
+     */
+    public void makeAnonymous() {
+        this.registerBasicInfo();
+
+        ControllerUtils.addCookie(SystemGlobals.getValue(ConfigKeys.COOKIE_AUTO_LOGIN), null);
+        ControllerUtils.addCookie(SystemGlobals.getValue(ConfigKeys.COOKIE_NAME_DATA), SystemGlobals.getValue(ConfigKeys.ANONYMOUS_USER_ID));
+
+        SessionFacade.makeUnlogged();
+    }
+
+    /**
+     * Sets the startup and last visit time to now, as well set the user id to
+     * Anonymous. This method is usually called when the user hits the forum for
+     * the first time.
+     */
+    public void registerBasicInfo() {
+        this.setStartTime(new Date(System.currentTimeMillis()));
+        this.setLastVisit(new Date(System.currentTimeMillis()));
+        this.setUserId(SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID));
+    }
+
+    /**
+     * Sets a new user session information using information from an
+     * <code>User</code> instance. This method sets the user id, username, the
+     * number of private messages, the session's start time ( set to the current
+     * date and time ) and the language.
+     * 
+     * @param user
+     *            The <code>User</code> instance to get data from
+     */
+    public void dataToUser(User user) {
+        this.setUserId(user.getId());
+        this.setUsername(user.getUsername());
+        this.setPrivateMessages(user.getPrivateMessagesCount());
+        this.setStartTime(new Date(System.currentTimeMillis()));
+        this.setLang(user.getLang());
+    }
+
+    /**
+     * Get the captcha image to challenge the user
+     * 
+     * @return BufferedImage the captcha image to challenge the user
+     */
+    public BufferedImage getCaptchaImage() {
+        if (this.imageCaptcha == null) {
+            return null;
+        }
+
+        return (BufferedImage) this.imageCaptcha.getChallenge();
+    }
+
+    /**
+     * Validate the captcha response of user
+     * 
+     * @param userResponse
+     *            String the captcha response from user
+     * @return boolean true if the answer is valid, otherwise return false
+     */
+    public boolean validateCaptchaResponse(String userResponse) {
+        if ((SystemGlobals.getBoolValue(ConfigKeys.CAPTCHA_REGISTRATION) || SystemGlobals.getBoolValue(ConfigKeys.CAPTCHA_POSTS))
+                && this.imageCaptcha != null) {
+
+            if (SystemGlobals.getBoolValue(ConfigKeys.CAPTCHA_IGNORE_CASE)) {
+                userResponse = userResponse.toLowerCase();
+            }
+
+            boolean result = this.imageCaptcha.validateResponse(userResponse).booleanValue();
+            this.destroyCaptcha();
+            return result;
+        }
+
+        return true;
+    }
+
+    /**
+     * create a new image captcha
+     * 
+     */
+    public void createNewCaptcha() {
+        this.destroyCaptcha();
+        this.imageCaptcha = Captcha.getInstance().getNextImageCaptcha();
+    }
+
+    /**
+     * Destroy the current captcha validation is done
+     * 
+     */
+    public void destroyCaptcha() {
+        this.imageCaptcha = null;
+    }
+
+    /**
      * @deprecated use JForumExecutionContext.getForumContext().isBot() instead
-     *
-     *
-	 * Checks if it's a bot
-	 * @return <code>true</code> if this user session is from any robot
-	 */
-	public boolean isBot()
-	{
-//        return Boolean.TRUE.equals(JForumExecutionContext.getRequest().getAttribute(ConfigKeys.IS_BOT));
+     * 
+     * 
+     *             Checks if it's a bot
+     * @return <code>true</code> if this user session is from any robot
+     */
+    public boolean isBot() {
+        // return
+        // Boolean.TRUE.equals(JForumExecutionContext.getRequest().getAttribute(ConfigKeys.IS_BOT));
         return JForumExecutionContext.getForumContext().isBot();
     }
-	
-	/**
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	public boolean equals(Object o)
-	{
-		if (!(o instanceof UserSession)) {
-			return false;
-		}
-		
-		return this.sessionId.equals(((UserSession)o).getSessionId());
-	}
-	
-	/**
-	 * @see java.lang.Object#hashCode()
-	 */
-	public int hashCode()
-	{
-		return this.sessionId.hashCode();
-	}
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(Object o) {
+        if (!(o instanceof UserSession)) {
+            return false;
+        }
+
+        return this.sessionId.equals(((UserSession) o).getSessionId());
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
+        return this.sessionId.hashCode();
+    }
 
     public boolean isMobileUser() {
         return isMobileUser;
@@ -473,5 +448,5 @@ public class UserSession implements Serializable
     public void setMobileUser(boolean isMobileUser) {
         this.isMobileUser = isMobileUser;
     }
-	
+
 }
