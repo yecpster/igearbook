@@ -115,7 +115,9 @@ public class JForumBaseServlet extends HttpServlet {
             Configuration templateCfg = new Configuration();
             templateCfg.setTemplateUpdateDelay(2);
             templateCfg.setSetting("number_format", "#");
-            templateCfg.setSharedVariable("startupTime", new Long(new Date().getTime()));
+            long startupTime = new Date().getTime();
+            templateCfg.setSharedVariable("startupTime", startupTime);
+            config.getServletContext().setAttribute("startupTime", startupTime);
 
             // Create the default template loader
             String defaultPath = SystemGlobals.getApplicationPath() + "/templates";

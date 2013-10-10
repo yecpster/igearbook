@@ -1,4 +1,4 @@
-<#include "header.htm"/>
+<#include "../header.htm"/>
 <#assign currentChannel="team" />
 <link href="${contextPath}/templates/${templateName}/styles/team.css?${startupTime}" media="screen" rel="stylesheet" type="text/css" />
 
@@ -135,4 +135,4 @@
 
   
 
-<#include "bottom.htm"/>
+<#include "../bottom.htm"/>
