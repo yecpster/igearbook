@@ -10,20 +10,27 @@
 
 
 <fieldset class="groups_new">
+<@s.if test="team==null">
 <h3>基本要求：</h3>
   <ul>
     <li>1.申请群组主题明确,简介翔实清晰。</li>
     <li>2.新申请的群组不能和已有群组内容重复,类似。</li>
   <ul>
+</@s.if>
+<@s.if test="team==null">
 <h3>创建群组：</h3>
+</@s.if>
+<@s.else>
+<h3>修改群组：</h3>
+</@s.else>
+
 <ul>
     <li><label>群组名称</label>
-        <@s.if test="team!=null">
-            <@s.textfield cssClass="text" size="30" name="team.name" disabled="true" />
-        </@s.if>
-        <@s.else>
+        <#if !team?exists || session.isAdmin()>
             <@s.textfield cssClass="text" size="30" name="team.name"  />
-        </@s.else>
+        <#else>
+            <@s.textfield cssClass="text" size="30" name="team.name" disabled="true" />
+        </#if>
     </li>
     <li><label>群组图标</label> 
         <@s.if test="team!=null">

@@ -46,7 +46,7 @@
 					    <#if logged && !isTeamMember&& !isBanUser>
                             <a href="<@s.url namespace="/team" action="join"><@s.param name="teamId" value="${team.id}" /></@s.url>">加入此群组</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         </#if>
-                        <#if logged && moderator>
+                        <#if logged && moderator || session.isAdmin()>
                             <a href="<@s.url namespace="/team" action="edit"><@s.param name="teamId" value="${team.id}" /></@s.url>">修改群组</a>&nbsp;&nbsp;&nbsp;&nbsp;
                         </#if>
                         <#if logged && isTeamOwner>
@@ -224,7 +224,7 @@
 					<td align="left" colspan="3"><span class="nav"></span></td>
 				</tr>
 			</table>
-
+<#--
 			<table cellspacing="0" cellpadding="5" width="100%" border="0">
 				<tr>
 					<td align="left" class="gensmall">
@@ -234,7 +234,7 @@
 								<a href="#watch" onClick="watchForum('${JForumContext.encodeURL("/forums/watchForum/${team.id}")}', '${I18n.getMessage("ForumShow.confirmWatch")}');">
 							<#else>
 								<#assign watchMessage = I18n.getMessage("ForumShow.unwatch")/>
-								<a href="${JForumContext.encodeURL("/forums/unwatchForum/${forum.id}")}">
+								<a href="${JForumContext.encodeURL("/forums/unwatchForum/${team.id}")}">
 							</#if>
 							<img src="${contextPath}/templates/${templateName}/images/watch.gif" align="middle" alt="Watch" />&nbsp;${watchMessage}</a>
 						</#if>
@@ -242,7 +242,7 @@
 					<td align="right"><@presentation.forumsComboTable/></td>
 				</tr>
 			</table>
-
+-->
 			<table cellspacing="0" cellpadding="0" width="100%" align="center" border="0">
 				<tr>
 					<td valign="top" align="left">

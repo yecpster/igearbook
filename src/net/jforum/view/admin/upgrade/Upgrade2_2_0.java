@@ -22,9 +22,9 @@ public class Upgrade2_2_0 extends GenericUpgradeService implements UpgradeServic
 
     @Override
     public void upgrade() {
-        createTeamCategory();
-       // createEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_CREATE);
-        //createEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_ADMIN);
+//        createTeamCategory();
+        createEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_CREATE);
+        createEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_ADMIN);
 
         SecurityRepository.clean();
         RolesRepository.clear();

@@ -11,7 +11,9 @@ public class CustomExceptionInterceptor extends ExceptionMappingInterceptor {
 
     @Override
     protected void publishException(ActionInvocation invocation, ExceptionHolder exceptionHolder) {
-        JForumExecutionContext.enableRollback();
+        if (JForumExecutionContext.exists()) {
+            JForumExecutionContext.enableRollback();
+        }
         String exceptionId = "Ex" + System.currentTimeMillis();
         Exception e = new Exception("ExceptionId:" + exceptionId + "!", exceptionHolder.getException());
         e.printStackTrace();

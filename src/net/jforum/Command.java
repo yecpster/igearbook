@@ -113,7 +113,9 @@ public abstract class Command
 			try {
 				this.getClass().getMethod(action, NO_ARGS_CLASS).invoke(this, NO_ARGS_OBJECT);
 			}
-			catch (NoSuchMethodException e) {		
+			catch (NoSuchMethodException e) {
+			    context.put("action", "list");
+			    request.addOrReplaceParameter("action", "list");
 				this.list();		
 			}
 			catch (Exception e)

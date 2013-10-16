@@ -182,9 +182,6 @@ public class GenericTopicDAO extends AutoKeys implements TopicDAO
 		catch (SQLException e) {
 			throw new DatabaseException(e);
 		}
-		finally {
-			DbUtils.close(p);
-		}
 	}
 
 	/**
@@ -472,9 +469,6 @@ public class GenericTopicDAO extends AutoKeys implements TopicDAO
 		catch (SQLException e) {
 			throw new DatabaseException(e);
 		}
-		finally {
-			DbUtils.close(p);
-		}
 	}
 
 	/**
@@ -498,9 +492,6 @@ public class GenericTopicDAO extends AutoKeys implements TopicDAO
 		}
 		catch (SQLException e) {
 			throw new DatabaseException(e);
-		}
-		finally {
-			DbUtils.close(p);
 		}
 	}
 
@@ -864,9 +855,6 @@ public class GenericTopicDAO extends AutoKeys implements TopicDAO
 		catch (SQLException e) {
 			throw new DatabaseException(e);
 		}
-		finally {
-			DbUtils.close(p);
-		}
 	}
 
 	/**
@@ -975,9 +963,6 @@ public class GenericTopicDAO extends AutoKeys implements TopicDAO
 		catch (SQLException e) {
 			throw new DatabaseException(e);
 		}
-		finally {
-			DbUtils.close(p);
-		}
 	}
 
 	/**
@@ -997,9 +982,6 @@ public class GenericTopicDAO extends AutoKeys implements TopicDAO
 	    }
 	    catch (SQLException e) {
 	        throw new DatabaseException(e);
-	    }
-	    finally {
-	        DbUtils.close(p);
 	    }
 	}
 	

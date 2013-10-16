@@ -164,6 +164,7 @@ public class JForumExecutionContext {
             try {
                 c.setAutoCommit(!SystemGlobals.getBoolValue(ConfigKeys.DATABASE_USE_TRANSACTIONS));
             } catch (Exception e) {
+                e.printStackTrace();
                 // catch error autocommit
             }
 
@@ -331,5 +332,13 @@ public class JForumExecutionContext {
         }
 
         userData.set(null);
+    }
+
+    private void releaseConnection(Connection conn) {
+        try {
+            DBConnection.getImplementation().releaseConnection(conn);
+        } catch (Exception e) {
+            logger.error("Error while releasing the connection : " + e, e);
+        }
     }
 }

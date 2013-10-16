@@ -13,7 +13,7 @@
   <constant name="struts.convention.default.parent.package" value="default" />
 
   <constant name="struts.devMode" value="false" />
-  <constant name="struts.convention.classes.reload" value="true" />
+  <constant name="struts.convention.classes.reload" value="false" />
   <constant name="struts.freemarker.manager.classname" value="com.igearbook.resulttype.CustomFreemarkerManager" />
   <constant name="struts.ui.theme" value="simple" />
 

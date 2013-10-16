@@ -61,6 +61,7 @@ public class DbUtils {
             try {
                 rs.close();
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
@@ -69,6 +70,7 @@ public class DbUtils {
                 st.clearWarnings();
                 st.close();
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -78,6 +80,7 @@ public class DbUtils {
             try {
                 rs.close();
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -88,6 +91,7 @@ public class DbUtils {
                 st.clearWarnings();
                 st.close();
             } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -99,7 +103,7 @@ public class DbUtils {
             sb.append(group.getId()).append(",");
         }
         if (sb.length() > 0) {
-            sb.deleteCharAt(sb.length()-1);
+            sb.deleteCharAt(sb.length() - 1);
         } else {
             // We suppose there is no "negative" id
             sb.append("-1");
@@ -115,7 +119,7 @@ public class DbUtils {
             sb.append(id).append(",");
         }
         if (sb.length() > 0) {
-            sb.deleteCharAt(sb.length()-1);
+            sb.deleteCharAt(sb.length() - 1);
         } else {
             // We suppose there is no "negative" id
             sb.append("-1");
@@ -131,7 +135,7 @@ public class DbUtils {
             sb.append(group.getId()).append(",");
         }
         if (sb.length() > 0) {
-            sb.deleteCharAt(sb.length()-1);
+            sb.deleteCharAt(sb.length() - 1);
         } else {
             // We suppose there is no "negative" id
             sb.append("-1");

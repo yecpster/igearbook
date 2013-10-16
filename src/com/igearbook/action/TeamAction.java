@@ -387,8 +387,8 @@ public class TeamAction extends ActionSupport {
 
     @Action(value = "edit", results = { @Result(name = SUCCESS, location = "team_form.ftl") })
     public String edit() {
-        boolean canEditTeam = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS);
-        if (canEditTeam) {
+        boolean canEditTeam = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
+        if (canEditTeam || SessionFacade.getUserSession().isAdmin()) {
             this.team = ForumRepository.getForum(teamId);
             return SUCCESS;
         } else {
@@ -397,7 +397,7 @@ public class TeamAction extends ActionSupport {
     }
 
     @Action(value = "save", interceptorRefs = {
-            @InterceptorRef("token"),
+            @InterceptorRef("tokenSession"),
             @InterceptorRef(value = "fileUpload", params = { "allowedExtensions ", ".gif,.jpg,.png", "allowedTypes",
                     "image/png,image/gif,image/jpeg,image/pjpeg" }), @InterceptorRef("defaultStackIgearbook") }, results = { @Result(name = SUCCESS, location = "/team/list.action", type = "redirect") })
     public String save() {
@@ -410,18 +410,21 @@ public class TeamAction extends ActionSupport {
 
     private String editSave() {
         boolean isModerator = SessionFacade.getUserSession().isModerator(team.getId());
-        if (!isModerator) {
+        if (!isModerator && !SessionFacade.getUserSession().isAdmin()) {
             return ERROR;
         }
 
         String logoUrl = this.doUpload();
-        if (logoUrl == null) {
-            logoUrl = team.getLogo();
-        }
+
         ForumDAO forumDao = DataAccessDriver.getInstance().newForumDAO();
-        Forum teamUpdate = forumDao.selectById(team.getId());
-        teamUpdate.setLogo(logoUrl);
+        Forum teamUpdate = ForumRepository.getForum(team.getId());
+        if (logoUrl != null) {
+            teamUpdate.setLogo(logoUrl);
+        }
         teamUpdate.setDescription(team.getDescription());
+        if (SessionFacade.getUserSession().isAdmin()) {
+            teamUpdate.setName(team.getName());
+        }
         forumDao.update(teamUpdate);
         ForumRepository.reloadForum(team.getId());
         return SUCCESS;
@@ -510,7 +513,7 @@ public class TeamAction extends ActionSupport {
         if (upload == null) {
             return null;
         }
-        String savePath = SystemGlobals.getValue(ConfigKeys.ATTACHMENTS_STORE_DIR) + "/teamLogo/";
+        String savePath = SystemGlobals.getValue(ConfigKeys.ATTACHMENTS_STORE_DIR) + "/teamlogo/";
 
         int suffixIndex = uploadFileName.lastIndexOf(".");
         String suffix = uploadFileName.substring(suffixIndex, uploadFileName.length());
@@ -526,7 +529,7 @@ public class TeamAction extends ActionSupport {
             tmpFile.delete();
         }
 
-        return ServletActionContext.getRequest().getContextPath() + "/upload/teamLogo/" + fileSaveName;
+        return ServletActionContext.getRequest().getContextPath() + "/upload/teamlogo/" + fileSaveName;
     }
 
     /**
