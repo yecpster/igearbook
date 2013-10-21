@@ -460,9 +460,8 @@ public class GenericTopicDAO extends AutoKeys implements TopicDAO
 		try {
 			p = JForumExecutionContext.getConnection().prepareStatement(sql);
 			p.setInt(1, forumId);
-			p.setInt(2, forumId);
-			p.setInt(3, startFrom);
-			p.setInt(4, count);
+			p.setInt(2, startFrom);
+			p.setInt(3, count);
 
 			return this.fillTopicsData(p);
 		}

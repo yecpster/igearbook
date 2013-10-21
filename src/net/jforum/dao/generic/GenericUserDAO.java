@@ -492,6 +492,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
 
             u.setEmail(rs.getString("user_email"));
             u.setId(rs.getInt("user_id"));
+            u.setAvatar(rs.getString("user_avatar"));
             u.setTotalPosts(rs.getInt("user_posts"));
             u.setRegistrationDate(new Date(rs.getTimestamp("user_regdate").getTime()));
             u.setUsername(rs.getString("username"));

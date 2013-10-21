@@ -59,13 +59,13 @@ UserModel.selectById = SELECT COUNT(pm.privmsgs_to_userid) AS private_messages, 
 	WHERE u.user_id = ? \
 	GROUP BY pm.privmsgs_to_userid
 
-UserModel.selectAll = SELECT user_email, user_id, user_posts, user_regdate, username, deleted, user_karma, user_from, \
+UserModel.selectAll = SELECT user_email, user_id, user_avatar, user_posts, user_regdate, username, deleted, user_karma, user_from, \
 	user_website, user_viewemail FROM jforum_users ORDER BY user_id
 
-UserModel.selectAllByLimit = SELECT user_email, user_id, user_posts, user_regdate, username, deleted, user_karma, user_from, user_website, user_viewemail \
+UserModel.selectAllByLimit = SELECT user_email, user_id, user_avatar, user_posts, user_regdate, username, deleted, user_karma, user_from, user_website, user_viewemail \
 	FROM jforum_users ORDER BY username LIMIT ?, ?
 
-UserModel.selectAllByGroup = SELECT user_email, u.user_id, user_posts, user_regdate, username, deleted, user_karma, user_from, \
+UserModel.selectAllByGroup = SELECT user_email, u.user_id, user_avatar, user_posts, user_regdate, username, deleted, user_karma, user_from, \
 	user_website, user_viewemail \
 	FROM jforum_users u, jforum_user_groups ug \
 	WHERE u.user_id = ug.user_id \
@@ -339,7 +339,7 @@ TopicModel.selectRaw = SELECT topic_id, forum_id, topic_title, user_id, topic_vi
 
 TopicModel.selectAllByForumByLimit = SELECT t.*, p.user_id AS last_user_id, p.post_time, p.attach AS attach \
 	FROM jforum_topics t, jforum_posts p \
-	WHERE (t.forum_id = ? OR t.topic_moved_id = ?) \
+	WHERE t.forum_id = ? \
 	AND p.post_id = t.topic_last_post_id \
 	AND p.need_moderate = 0 \
 	ORDER BY t.topic_type DESC, t.topic_last_post_id DESC \

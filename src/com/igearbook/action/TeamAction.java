@@ -108,7 +108,7 @@ public class TeamAction extends ActionSupport {
         Collections.sort(hotTeams, new Comparator<Forum>() {
             @Override
             public int compare(Forum o1, Forum o2) {
-                return o2.getLastPostId() - o1.getLastPostId();
+                return o1.getLastPostId() - o2.getLastPostId();
             }
         });
         context.put("hotTeams", hotTeams);
@@ -283,10 +283,12 @@ public class TeamAction extends ActionSupport {
         return SUCCESS;
     }
 
-    @Action(value = "show", results = { @Result(name = SUCCESS, location = "team_show.ftl") })
+    @Action(value = "show", results = { @Result(name = SUCCESS, location = "team_show2.ftl") })
     public String show() {
         ActionContext context = ServletActionContext.getContext();
         ForumDAO fm = DataAccessDriver.getInstance().newForumDAO();
+        GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
+        UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
 
         // The user can access this team?
         Forum team = ForumRepository.getForum(teamId);
@@ -330,6 +332,22 @@ public class TeamAction extends ActionSupport {
         context.put("isTeamMember", isTeamMember);
         context.put("isBanUser", isBanUser);
         context.put("isTeamOwner", isTeamOwner);
+        context.put("avatarAllowExternalUrl", SystemGlobals.getBoolValue(ConfigKeys.AVATAR_ALLOW_EXTERNAL_URL));
+
+        Group ownerGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_OWNER, teamId);
+        List<User> owners = userDao.selectAllByGroup(ownerGorup.getId(), 0, 5);
+        Group teamUserGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER, teamId);
+        int totalUsers = userDao.getTotalUsersByGroup(teamUserGorup.getId());
+        List<User> users = userDao.selectAllByGroup(teamUserGorup.getId(), 1, 9);
+
+        Group moderatorsGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_MODERATION_FORUMS, teamId);
+        totalUsers += userDao.getTotalUsersByGroup(moderatorsGorup.getId()) + 1;
+        List<User> moderators = userDao.selectAllByGroup(moderatorsGorup.getId(), 0, 10);
+
+        context.put("teanOwner", owners.get(0));
+        context.put("users", users);
+        context.put("moderators", moderators);
+        context.put("totalUsers", totalUsers);
 
         // Pagination
         int topicsPerPage = SystemGlobals.getIntValue(ConfigKeys.TOPICS_PER_PAGE);

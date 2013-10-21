@@ -42,7 +42,6 @@
  */
 package net.jforum.view.forum;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -271,7 +270,7 @@ public class ModerationHelper {
 
             context.put("topics", sb.toString());
         }
-        return SUCCESS;
+        return IGNORE;
     }
 
     public int moveTopicsSave(String successUrl) {

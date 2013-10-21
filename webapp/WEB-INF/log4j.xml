@@ -18,32 +18,32 @@
 	   </layout>
 	</appender>
 	
-<!-- 	<category name="org.jgroups"> -->
-<!-- 		<priority value="info"/> -->
-<!-- 		<appender-ref ref="jforum-stdout"/> -->
-<!-- 	</category> -->
+	<category name="org.jgroups">
+		<priority value="info"/>
+		<appender-ref ref="jforum-stdout"/>
+	</category>
 	
-<!-- 	<category name="org.jboss"> -->
-<!-- 		<priority value="info"/> -->
-<!-- 		<appender-ref ref="jforum-stdout"/> -->
-<!-- 	</category> -->
+	<category name="org.jboss">
+		<priority value="info"/>
+		<appender-ref ref="jforum-stdout"/>
+	</category>
 
-<!-- 	<category name="net.jforum"> -->
-<!-- 		<priority value="info" /> -->
-<!-- 		<appender-ref ref="jforum-stdout" /> -->
-<!-- 	</category> -->
+	<category name="net.jforum">
+		<priority value="info" />
+		<appender-ref ref="jforum-stdout" />
+	</category>
 	
-<!-- 	<category name="freemarker"> -->
-<!-- 		<priority value="info"/> -->
-<!-- 		<appender-ref ref="jforum-stdout"/>		 -->
-<!-- 	</category> -->
+	<category name="freemarker">
+		<priority value="info"/>
+		<appender-ref ref="jforum-stdout"/>		
+	</category>
 
-<!-- 	<category name="com.mchange"> -->
-<!-- 		<priority value="info" /> -->
-<!-- 		<appender-ref ref="jforum-stdout" /> -->
-<!-- 	</category> -->
-  <root>
-        <priority value="debug" />
-        <appender-ref ref="jforum-stdout" />
-    </root>
+	<category name="com.mchange">
+		<priority value="info" />
+		<appender-ref ref="jforum-stdout" />
+	</category>
+<!--   <root> -->
+<!--         <priority value="debug" /> -->
+<!--         <appender-ref ref="jforum-stdout" /> -->
+<!--     </root> -->
 </log4j:configuration>

@@ -1,6 +1,6 @@
 <#include "../header.htm"/>
 <#assign currentChannel="team" />
-<link href="${contextPath}/templates/${templateName}/styles/team.css?${startupTime}" media="screen" rel="stylesheet" type="text/css" />
+<link href="${contextPath}/templates/${templateName}/styles/teams.css?${startupTime}" media="screen" rel="stylesheet" type="text/css" />
 
 <#--side-->
 <div id="side">
