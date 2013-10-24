@@ -5,7 +5,12 @@
 </head>
 <body>
 <script type="text/javascript">
-document.location = "forums/list.page";
+if(location.href.match(/http:\/\/igearbook\.com.*/i)){
+    var url = location.href.replace("http://igearbook.com", "http://www.igearbook.com");
+    document.location = url;
+}else{
+    document.location = "forums/list.page";
+}
 </script>
 <noscript>
 <h1>iGearBook.com</h1>

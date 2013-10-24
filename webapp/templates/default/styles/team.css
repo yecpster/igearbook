@@ -573,7 +573,7 @@ div#user_nav a {
     padding:2px 6px 1px 6px;
     color: gray;
     line-height: 1em;
-    background-image: url(/images/line_gray.gif);
+    background-image: url(../images/line_gray.gif);
     background-position: right center;
     background-repeat: no-repeat;
 }

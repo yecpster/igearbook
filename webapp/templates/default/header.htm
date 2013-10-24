@@ -24,6 +24,17 @@
     <#if hasCodeBlock>
     <#include "highlighter_js.htm"/>
     </#if>
+    <script type="text/javascript">
+if(location.href.match(/http:\/\/igearbook\.com.*/i)){
+    var url = location.href.replace("http://igearbook.com", "http://www.igearbook.com");
+    document.location = url;
+}
+</script>
+<noscript>
+<h1>iGearBook.com</h1>
+<p>Javascript must be enabled to access the website. 
+Please check your browser settings or use a Javascript-capable browser.</p>
+</noscript>
   </head>
   <body class="${language}">
     <div id="page">
