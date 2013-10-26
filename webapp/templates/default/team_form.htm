@@ -1,0 +1,30 @@
+<#include "header.htm"/>
+<#assign currentChannel="index" />
+<link href="${contextPath}/templates/${templateName}/styles/team.css?${startupTime}" media="screen" rel="stylesheet" type="text/css" />
+
+<form action="${contextPath}/jforum${extension}" method="post" name="form" id="form" accept-charset="${encoding}" onSubmit="return checkInput();" enctype="multipart/form-data">
+<input type="hidden" name="action" value="${action}" />
+<input type="hidden" name="module" value="${moduleName}" />
+<fieldset class="groups_new">
+<h3>基本要求：</h3>
+  <ul>
+    <li>1.申请群组主题明确,简介翔实清晰。</li>
+    <li>2.新申请的群组不能和已有群组内容重复,类似。</li>
+  <ul>
+<h3>创建群组：</h3>
+<ul>
+    <li><label>群组名称</label>
+        <input class="text" id="group_name" name="group[name]" size="30" type="text" title="">
+    </li>
+    <li><label>群组图标</label> 
+        <input class="text" id="group_domain" name="group[domain]" size="30" type="text" title="">
+    </li>
+    <li><label>群组简介</label>
+        <textarea cols="30" id="group_description" name="group[description]" rows="15" title=""></textarea>
+    </li>
+</ul>
+<input class="submit" id="submit_button" name="commit" type="submit" value="${I18n.getMessage("Forums.Form.ClickToUpdate")}">
+</fieldset>
+</form>
+
+<#include "bottom.htm"/>
