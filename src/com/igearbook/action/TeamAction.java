@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -17,10 +18,13 @@ import net.jforum.dao.DataAccessDriver;
 import net.jforum.dao.ForumDAO;
 import net.jforum.dao.GroupDAO;
 import net.jforum.dao.GroupSecurityDAO;
+import net.jforum.dao.PostDAO;
+import net.jforum.dao.TopicDAO;
 import net.jforum.dao.UserDAO;
 import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Group;
+import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
@@ -33,6 +37,7 @@ import net.jforum.security.RoleValue;
 import net.jforum.security.RoleValueCollection;
 import net.jforum.security.SecurityConstants;
 import net.jforum.util.I18n;
+import net.jforum.util.SafeHtml;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
 import net.jforum.view.forum.ModerationHelper;
@@ -40,6 +45,7 @@ import net.jforum.view.forum.common.ForumCommon;
 import net.jforum.view.forum.common.TopicsCommon;
 import net.jforum.view.forum.common.ViewCommon;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.InterceptorRef;
@@ -108,7 +114,7 @@ public class TeamAction extends ActionSupport {
         Collections.sort(hotTeams, new Comparator<Forum>() {
             @Override
             public int compare(Forum o1, Forum o2) {
-                return o1.getLastPostId() - o2.getLastPostId();
+                return o2.getLastPostId() - o1.getLastPostId();
             }
         });
         context.put("hotTeams", hotTeams);
@@ -283,7 +289,7 @@ public class TeamAction extends ActionSupport {
         return SUCCESS;
     }
 
-    @Action(value = "show", results = { @Result(name = SUCCESS, location = "team_show2.ftl") })
+    @Action(value = "show", results = { @Result(name = SUCCESS, location = "team_show.ftl") })
     public String show() {
         ActionContext context = ServletActionContext.getContext();
         ForumDAO fm = DataAccessDriver.getInstance().newForumDAO();
@@ -301,6 +307,18 @@ public class TeamAction extends ActionSupport {
         int start = ViewCommon.getStartPage();
 
         List<Topic> tmpTopics = TopicsCommon.topicsByForum(teamId, start);
+
+        TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
+        PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
+        List<Topic> topics = topicDao.selectByForumByTypeByLimit(teamId, Topic.TYPE_ANNOUNCE, 0, 1);
+        if (topics.size() > 0) {
+            Topic announceTopic = topics.get(0);
+            Post announcePost = postDao.selectById(announceTopic.getFirstPostId());
+            String announcement = announcePost.getText();
+            if (StringUtils.isNotBlank(announcement)) {
+                context.put("announcement", announcement);
+            }
+        }
 
         // Moderation
         UserSession userSession = SessionFacade.getUserSession();
@@ -348,6 +366,164 @@ public class TeamAction extends ActionSupport {
         context.put("users", users);
         context.put("moderators", moderators);
         context.put("totalUsers", totalUsers);
+
+        // Pagination
+        int topicsPerPage = SystemGlobals.getIntValue(ConfigKeys.TOPICS_PER_PAGE);
+        int postsPerPage = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
+        int totalTopics = team.getTotalTopics();
+
+        contextToPagination(start, totalTopics, topicsPerPage);
+        context.put("postsPerPage", new Integer(postsPerPage));
+
+        topicListingBase();
+
+        return SUCCESS;
+    }
+
+    @Action(value = "editAnnounce", results = { @Result(name = SUCCESS, location = "team_announce_form.ftl") })
+    public String editAnnounce() {
+        boolean canEditTeam = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
+        if (canEditTeam || SessionFacade.getUserSession().isAdmin()) {
+            ActionContext context = ServletActionContext.getContext();
+            this.team = ForumRepository.getForum(teamId);
+            TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
+            PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
+            List<Topic> topics = topicDao.selectByForumByTypeByLimit(teamId, Topic.TYPE_ANNOUNCE, 0, 1);
+            if (topics.size() > 0) {
+                Topic announceTopic = topics.get(0);
+                Post announcePost = postDao.selectById(announceTopic.getFirstPostId());
+                String announcement = announcePost.getText();
+                if (StringUtils.isNotBlank(announcement)) {
+                    context.put("announcement", announcement);
+                }
+            }
+            return SUCCESS;
+        } else {
+            return ERROR;
+        }
+    }
+
+    @Action(value = "saveAnnounce", interceptorRefs = { @InterceptorRef("tokenSession"), @InterceptorRef("defaultStackIgearbook") }, results = { @Result(name = SUCCESS, location = "show.action", type = "redirect", params = {
+            "teamId", "${teamId}" }) })
+    public String saveAnnounce() {
+        teamId = team.getId();
+        boolean canEditTeam = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
+        if (!canEditTeam && !SessionFacade.getUserSession().isAdmin()) {
+            return ERROR;
+        }
+        boolean newTopic = true;
+        UserSession us = SessionFacade.getUserSession();
+        User u = DataAccessDriver.getInstance().newUserDAO().selectById(us.getUserId());
+
+        TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
+        PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
+
+        Topic t = null;
+        Post p = null;
+
+        List<Topic> topics = topicDao.selectByForumByTypeByLimit(teamId, Topic.TYPE_ANNOUNCE, 0, 1);
+        if (topics.size() > 0) {
+            t = topics.get(0);
+            newTopic = false;
+            p = postDao.selectById(t.getFirstPostId());
+        } else {
+            t = new Topic(-1);
+            t.setForumId(teamId);
+            t.setType(Topic.TYPE_ANNOUNCE);
+            p = new Post();
+        }
+        t.setTime(new Date());
+        t.setTitle(p.getSubject());
+        t.setModerated(false);
+        t.setPostedBy(u);
+        t.setFirstPostTime(ViewCommon.formatDate(t.getTime()));
+
+        p.setForumId(teamId);
+        p.setTime(new Date());
+        p.setSubject("Announcement:" + new Date());
+        p.setBbCodeEnabled(false);
+        p.setSmiliesEnabled(false);
+        p.setSignatureEnabled(false);
+        p.setHtmlEnabled(false);
+
+        String ip = ServletActionContext.getRequest().getRemoteAddr();
+        if (StringUtils.isNotBlank(ip)) {
+            p.setUserIp(ip);
+        } else {
+            p.setUserIp("0.0.0.0");
+        }
+        p.setUserId(SessionFacade.getUserSession().getUserId());
+        p.setText(new SafeHtml().makeSafe(ServletActionContext.getRequest().getParameter("announcement")));
+
+        // Check the elapsed time since the last post from the user
+        int delay = SystemGlobals.getIntValue(ConfigKeys.POSTS_NEW_DELAY);
+        if (delay > 0) {
+            Long lastPostTime = (Long) SessionFacade.getAttribute(ConfigKeys.LAST_POST_TIME);
+            if (lastPostTime != null) {
+                if (System.currentTimeMillis() < (lastPostTime.longValue() + delay)) {
+                    return I18n.getMessage("PostForm.tooSoon");
+                }
+            }
+        }
+
+        // Currently for announcement we always update the existing topic and
+        // post.
+        if (newTopic) {
+            int topicId = topicDao.addNew(t);
+            t.setId(topicId);
+            p.setTopicId(topicId);
+            int postId = postDao.addNew(p);
+            t.setFirstPostId(postId);
+            t.setLastPostId(postId);
+        } else {
+            postDao.update(p);
+        }
+
+        t.setLastPostBy(u);
+        t.setLastPostDate(p.getTime());
+        t.setLastPostTime(p.getFormatedTime());
+        topicDao.update(t);
+
+        if (delay > 0) {
+            SessionFacade.setAttribute(ConfigKeys.LAST_POST_TIME, new Long(System.currentTimeMillis()));
+        }
+        return SUCCESS;
+    }
+
+    @Action(value = "forum", results = { @Result(name = SUCCESS, location = "team_forum.ftl") })
+    public String forum() {
+        ActionContext context = ServletActionContext.getContext();
+        ForumDAO fm = DataAccessDriver.getInstance().newForumDAO();
+
+        // The user can access this team?
+        Forum team = ForumRepository.getForum(teamId);
+
+        if (team == null || team.getType() != 1 || !ForumRepository.isCategoryAccessible(team.getCategoryId())) {
+            new ModerationHelper().denied(I18n.getMessage("ForumListing.denied"));
+            return ERROR;
+        }
+
+        int start = ViewCommon.getStartPage();
+
+        List<Topic> tmpTopics = TopicsCommon.topicsByForum(teamId, start);
+
+        // Moderation
+        UserSession userSession = SessionFacade.getUserSession();
+        boolean isLogged = SessionFacade.isLogged();
+        boolean isModerator = userSession.isModerator(teamId);
+        context.put("moderator", isLogged && isModerator);
+
+        context.put("attachmentsEnabled", SecurityRepository.canAccess(SecurityConstants.PERM_ATTACHMENTS_ENABLED, Integer.toString(teamId))
+                || SecurityRepository.canAccess(SecurityConstants.PERM_ATTACHMENTS_DOWNLOAD));
+
+        context.put("topics", TopicsCommon.prepareTopics(tmpTopics));
+        context.put("allCategories", ForumCommon.getAllCategoriesAndForums(false));
+        context.put("team", team);
+        context.put("rssEnabled", SystemGlobals.getBoolValue(ConfigKeys.RSS_ENABLED));
+        context.put("pageTitle", team.getName());
+        context.put("replyOnly", !SecurityRepository.canAccess(SecurityConstants.PERM_NEW_POST, Integer.toString(team.getId())));
+        context.put("readonly", !SecurityRepository.canAccess(SecurityConstants.PERM_REPLY, Integer.toString(teamId)));
+        context.put("watching", fm.isUserSubscribed(teamId, userSession.getUserId()));
 
         // Pagination
         int topicsPerPage = SystemGlobals.getIntValue(ConfigKeys.TOPICS_PER_PAGE);

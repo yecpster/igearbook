@@ -55,6 +55,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
+
 import net.jforum.JForumExecutionContext;
 import net.jforum.SessionFacade;
 import net.jforum.dao.DataAccessDriver;
@@ -865,9 +867,9 @@ public class GenericTopicDAO extends AutoKeys implements TopicDAO
 	 * @return A list with all topics found
 	 * @throws SQLException
 	 */
-	public List fillTopicsData(PreparedStatement p)
+	public List<Topic> fillTopicsData(PreparedStatement p)
 	{
-		List l = new ArrayList();
+		List<Topic> l = Lists.newArrayList();
 		ResultSet rs = null;
 		
 		try {
@@ -1183,4 +1185,24 @@ public class GenericTopicDAO extends AutoKeys implements TopicDAO
 			DbUtils.close(rs, p);
 		}
 	}
+
+    @Override
+    public List<Topic> selectByForumByTypeByLimit(int forumId, int type, int startFrom, int count) {
+        String sql = SystemGlobals.getSql("TopicModel.selectByForumByTypeByLimit");
+
+        PreparedStatement p = null;
+
+        try {
+            p = JForumExecutionContext.getConnection().prepareStatement(sql);
+            p.setInt(1, forumId);
+            p.setInt(2, type);
+            p.setInt(3, startFrom);
+            p.setInt(4, count);
+
+            return this.fillTopicsData(p);
+        }
+        catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
+    }
 }

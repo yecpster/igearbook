@@ -8,13 +8,6 @@
     font-size: 15px;
     line-height: 1px;
 }
-.clearfix:after {
-    content: "."; 
-    display: block; 
-    height: 0; 
-    clear: both; 
-    visibility: hidden;
-}
 .clearfix {display: inline-table;}
 * html .clearfix {
     height:1%;
@@ -59,13 +52,6 @@ span.accesskey {
     left: -999em;
 }
 
-body {
-  text-align: left;
-  font-family: Helvetica, Tahoma, Arial, sans-serif;
-  font-size: 12px;
-  line-height: 1.5;
-  color: black;
-}
 
 img {
   border: 0;
@@ -292,78 +278,9 @@ form div.submit input {
 }
 
 
-div#nav div.wrapper {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  font-size: 13px;
-  padding-bottom: 6px;
-  background: #6293bb url(/images/shadow.png) repeat-x bottom left;
-}
-div#nav ul {
-  width: 100%;
-  
-  margin: 0;
-  padding: 0;
-}
-div#nav li {
-  float: left;
-  display: inline;
-  
-  list-style: none;
-  
-  margin: 0;
-  padding: 0 10px;
-  
-  line-height: 1em;
-  background-image: url(/images/line_white.gif);
-  background-position: right center;
-  background-repeat: no-repeat;
-}
-div#nav li.last {
-  background: none;
-}
-div#nav a,
-div#nav a:link,
-div#nav a:active,
-div#nav a:visited {
-  display: inline-block;
-  /* hide from ie/mac \*/
-  display: block;
-  /* end hide */
-  font-weight: bold;
-  text-decoration: none;
-  
-  margin: 0;
-  padding: 7px 13px;
-  
-  color: white;
-}
-div#nav .subnav a,
-div#nav .subnav a:link,
-div#nav .subnav a:active,
-div#nav .subnav a:visited {
-  display: inline-block;
-  padding: 7px 6px;
-}
-div#nav a:hover, div#nav a.selected {
-  background-color: #3671a5;
-}
-
-div#content {
-  position: relative;
-  z-index: 0;
-  
-  margin: 0 auto 20px auto;
-  padding: 0;
-  
-  text-align: left;
-}
-
 div#main {
   float: left;
-  width: 746px;
+  width: 710px;
   display: inline;
   margin-top: 5px;
   overflow: hidden;
@@ -377,44 +294,8 @@ div#local {
 div#sub {
   display: none;
 }
-div#nav {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  text-align: left;
-}
 
-body {
-  margin: 0;
-  padding: 0;
-  
-  background: white;
-  
-  text-align: center;
-}
-div#page {
-  width: 950px;
-  
-  margin:  0 auto;
-  padding: 0;
-  
-  background: white;
-  text-align: center;
-}
 
-div#header {
-  padding: 0;
-  margin: 0;
-  color: white;
-  background-color: white;
-}
-div#branding {
-  float: left;
-  width: 200px;
-  margin: 1px 0;
-  text-align: left;
-}
 div#search {
   float: right;
   width: 49%;
@@ -424,24 +305,6 @@ div#search {
   
   text-align: right;
 }
-
-div#content {
-  width: 100%;
-  margin-top: 35px;
-}
-
-div#footer {
-  color: black;
-  background-color: white;  
-}
-div#footer p {
-  font-size: 0.8em;
-  
-  margin: 0;
-  padding: 15px;
-}
-
-
 
 
 ul.subnav {
@@ -1013,14 +876,6 @@ div#chat_button img {
     text-align: center;
 }
 
-div#site_nav, div#channel_nav {
-    z-index: 1;
-}
-
-div#header {
-    z-index: 2;
-    position: relative;
-}
 .logo a:hover {
     background-color: inherit;
 }
@@ -1118,9 +973,7 @@ input#login_button {
 
 #content div.notices_area {margin-bottom: 6px; padding:3px 5px 3px 20px; border:1px dashed #f8cc7e; background:#fffce7 url(/images/light.png) no-repeat 5px 4px;}
 #content div.notices_area a {color: #000}
-#content div.notices_area a b {color: #f00; display: block;}div#main {
-    width: 666px;
-}
+#content div.notices_area a b {color: #f00; display: block;}
 
 div#local {
     width: 248px;

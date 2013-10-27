@@ -342,9 +342,20 @@ TopicModel.selectAllByForumByLimit = SELECT t.*, p.user_id AS last_user_id, p.po
 	WHERE t.forum_id = ? \
 	AND p.post_id = t.topic_last_post_id \
 	AND p.need_moderate = 0 \
+	AND t.topic_type <> 2 \
 	ORDER BY t.topic_type DESC, t.topic_last_post_id DESC \
 	LIMIT ?, ?
 
+TopicModel.selectByForumByTypeByLimit = SELECT t.*, p.user_id AS last_user_id, p.post_time, p.attach AS attach \
+    FROM jforum_topics t, jforum_posts p \
+    WHERE t.forum_id = ? \
+    AND t.topic_type = ? \
+    AND p.post_id = t.topic_last_post_id \
+    AND p.need_moderate = 0 \
+    ORDER BY t.topic_type DESC, t.topic_last_post_id DESC \
+    LIMIT ?, ?
+	
+	
 TopicModel.topicPosters = SELECT user_id, username, user_karma, user_avatar, user_allowavatar, user_regdate, user_posts, user_icq, \
 	user_from, user_email, rank_id, user_sig, user_attachsig, user_viewemail, user_msnm, user_yim, user_website, user_sig, user_aim \
 	FROM jforum_users \
@@ -393,6 +404,7 @@ TopicModel.selectRecentTopicsByLimit = SELECT t.*, p.user_id AS last_user_id, p.
 	FROM jforum_topics t, jforum_posts p \
 	WHERE p.post_id = t.topic_last_post_id \
 	AND p.need_moderate = 0 \
+	AND t.topic_type <> 2 \
 	ORDER BY topic_last_post_id DESC \
 	LIMIT ?
 	
@@ -407,6 +419,7 @@ TopicModel.selectHottestTopicsByLimit = SELECT t.*, p.user_id AS last_user_id, p
     FROM jforum_topics t, jforum_posts p \
     WHERE p.post_id = t.topic_last_post_id \
     AND p.need_moderate = 0 \
+    AND t.topic_type <> 2 \
     ORDER BY topic_views DESC \
     LIMIT ?
     

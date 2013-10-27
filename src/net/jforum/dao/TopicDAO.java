@@ -109,6 +109,8 @@ public interface TopicDAO
      * @param count int
 	 */
 	public List selectAllByForumByLimit(int forumId, int startFrom, int count) ;
+	
+	public List<Topic> selectByForumByTypeByLimit(int forumId, int type, int startFrom, int count) ;
 
     /**
      * Selects all topics associated to a specific user and belonging to

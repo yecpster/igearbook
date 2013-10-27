@@ -2,6 +2,10 @@
 <#assign preview = preview?default(false)/>
 <#assign logModeration = moderationLoggingEnabled && isEdit?default(false) && isModerator && user.id != post.userId/>
 <#assign allowPoll = setType?default(true) && canCreatePolls?default(false)/>
+<#assign isTeamForum = (forum?exists && forum.type ==1) />
+<#if isTeamForum>
+    <#assign currentChannel="team" />
+</#if>
 
 <script type="text/javascript">
 var CONTEXTPATH = "${contextPath}";
@@ -187,11 +191,14 @@ function smiliePopup()
 				<tr>
 					<td align="left">
 						<span class="nav">
-							<a class="nav" href="${JForumContext.encodeURL("/forums/list")}">${I18n.getMessage("ForumListing.forumIndex")}</a>
-
-							<#if forum?exists>
-							&raquo; <a class="nav" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">${forum.name}</a>
-							</#if>
+                            <#if isTeamForum>
+                            <a class="nav" href="${contextPath}/team/list.action">群组首页</a> 
+                            &raquo; 
+                            <a class="nav" href="${contextPath}/team/show.action?teamId=${forum.id}">${forum.name?html}</a>
+                            <#elseif forum?exists>
+                                <a class="nav" href="${JForumContext.encodeURL("/forums/list")}">${I18n.getMessage("ForumListing.forumIndex")} </a> 
+                                &raquo; <a class="nav" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">${forum.name} </a>
+                            </#if>
 						</span>
 					</td>
 				</tr>

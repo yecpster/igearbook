@@ -142,14 +142,14 @@
 						<#assign adminColor = "class='admin'"/>
 						<#assign moderatorColor = "class='moderator'"/>
 						<#assign color = ""/>
-                        <#--
+                        <#if session.isAdmin()>
 						${I18n.getMessage("ForumListing.numberOfUsersOnline", [ totalOnlineUsers, totalRegisteredOnlineUsers, totalAnonymousUsers ])}&nbsp;&nbsp;
 			
 						[ <span ${adminColor}>${I18n.getMessage("Administrator")}</span> ]&nbsp;[ <span ${moderatorColor}>${I18n.getMessage("Moderator")}</span> ]
 						<br />
-						-->
+						</#if>
 						${I18n.getMessage("ForumListing.mostUsersEverOnline", [ mostUsersEverOnline.getTotal(), mostUsersEverOnline.getDate()?string ])}									
-						<#--
+						<#if session.isAdmin()>
 						<br />
 						${I18n.getMessage("ForumListing.connectedUsers")}: 
 			
@@ -164,7 +164,7 @@
 
 								<a href="${JForumContext.encodeURL("/user/profile/${us.userId}")}"><span ${color}>${us.username}</span></a>&nbsp;
 						</#list>	
-						-->		
+						</#if>
 					</td>
 				</tr>
 			</table>
