@@ -25,6 +25,7 @@ import net.jforum.entities.Topic;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.ForumRepository;
+import net.jforum.repository.PostRepository;
 import net.jforum.repository.RolesRepository;
 import net.jforum.repository.SecurityRepository;
 import net.jforum.security.PermissionControl;
@@ -283,7 +284,7 @@ public class TeamAction extends ActionSupport {
         return SUCCESS;
     }
 
-    @Action(value = "show", results = { @Result(name = SUCCESS, location = "team_show2.ftl") })
+    @Action(value = "show", results = { @Result(name = SUCCESS, location = "team_show.ftl") })
     public String show() {
         ActionContext context = ServletActionContext.getContext();
         ForumDAO fm = DataAccessDriver.getInstance().newForumDAO();
@@ -301,6 +302,13 @@ public class TeamAction extends ActionSupport {
         int start = ViewCommon.getStartPage();
 
         List<Topic> tmpTopics = TopicsCommon.topicsByForum(teamId, start);
+
+        for (Topic topic : tmpTopics) {
+            if (topic.getType() == Topic.TYPE_ANNOUNCE) {
+                context.put("announcement", PostRepository.selectAllByTopicByLimit(topic.getId(), 0, 1).get(0));
+                break;
+            }
+        }
 
         // Moderation
         UserSession userSession = SessionFacade.getUserSession();
@@ -348,6 +356,54 @@ public class TeamAction extends ActionSupport {
         context.put("users", users);
         context.put("moderators", moderators);
         context.put("totalUsers", totalUsers);
+
+        // Pagination
+        int topicsPerPage = SystemGlobals.getIntValue(ConfigKeys.TOPICS_PER_PAGE);
+        int postsPerPage = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
+        int totalTopics = team.getTotalTopics();
+
+        contextToPagination(start, totalTopics, topicsPerPage);
+        context.put("postsPerPage", new Integer(postsPerPage));
+
+        topicListingBase();
+
+        return SUCCESS;
+    }
+
+    @Action(value = "forum", results = { @Result(name = SUCCESS, location = "team_forum.ftl") })
+    public String forum() {
+        ActionContext context = ServletActionContext.getContext();
+        ForumDAO fm = DataAccessDriver.getInstance().newForumDAO();
+
+        // The user can access this team?
+        Forum team = ForumRepository.getForum(teamId);
+
+        if (team == null || team.getType() != 1 || !ForumRepository.isCategoryAccessible(team.getCategoryId())) {
+            new ModerationHelper().denied(I18n.getMessage("ForumListing.denied"));
+            return ERROR;
+        }
+
+        int start = ViewCommon.getStartPage();
+
+        List<Topic> tmpTopics = TopicsCommon.topicsByForum(teamId, start);
+
+        // Moderation
+        UserSession userSession = SessionFacade.getUserSession();
+        boolean isLogged = SessionFacade.isLogged();
+        boolean isModerator = userSession.isModerator(teamId);
+        context.put("moderator", isLogged && isModerator);
+
+        context.put("attachmentsEnabled", SecurityRepository.canAccess(SecurityConstants.PERM_ATTACHMENTS_ENABLED, Integer.toString(teamId))
+                || SecurityRepository.canAccess(SecurityConstants.PERM_ATTACHMENTS_DOWNLOAD));
+
+        context.put("topics", TopicsCommon.prepareTopics(tmpTopics));
+        context.put("allCategories", ForumCommon.getAllCategoriesAndForums(false));
+        context.put("team", team);
+        context.put("rssEnabled", SystemGlobals.getBoolValue(ConfigKeys.RSS_ENABLED));
+        context.put("pageTitle", team.getName());
+        context.put("replyOnly", !SecurityRepository.canAccess(SecurityConstants.PERM_NEW_POST, Integer.toString(team.getId())));
+        context.put("readonly", !SecurityRepository.canAccess(SecurityConstants.PERM_REPLY, Integer.toString(teamId)));
+        context.put("watching", fm.isUserSubscribed(teamId, userSession.getUserId()));
 
         // Pagination
         int topicsPerPage = SystemGlobals.getIntValue(ConfigKeys.TOPICS_PER_PAGE);
