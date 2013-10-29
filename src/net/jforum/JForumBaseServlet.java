@@ -143,7 +143,7 @@ public class JForumBaseServlet extends HttpServlet {
             this.loadConfigStuff();
 
             if (!this.debug) {
-                templateCfg.setTemplateUpdateDelay(3600);
+                templateCfg.setTemplateUpdateDelay(300);
             }
 
             JForumExecutionContext.setTemplateConfig(templateCfg);

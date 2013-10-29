@@ -42,11 +42,13 @@
  */
 package net.jforum.entities;
 
+import java.io.Serializable;
+
 /**
  * @author Rafael Steil
  * @version $Id: ForumModerationInfo.java,v 1.4 2006/08/23 02:13:47 rafaelsteil Exp $
  */
-public class ForumModerationInfo
+public class ForumModerationInfo implements Serializable
 {
 	private int forumId;
 	private String forumName;

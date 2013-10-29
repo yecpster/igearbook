@@ -43,11 +43,13 @@
  */
 package net.jforum.entities;
 
+import java.io.Serializable;
+
 /**
  * @author Rafael Steil
  * @version $Id: PrivateMessage.java,v 1.6 2006/12/06 21:56:28 rafaelsteil Exp $
  */
-public class PrivateMessage 
+public class PrivateMessage implements Serializable
 {
 	private int id;
 	private int type;

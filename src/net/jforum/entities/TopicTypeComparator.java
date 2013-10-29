@@ -42,13 +42,14 @@
  */
 package net.jforum.entities;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
  * @author Rafael Steil
  * @version $Id: TopicTypeComparator.java,v 1.3 2006/08/20 22:47:36 rafaelsteil Exp $
  */
-public class TopicTypeComparator implements Comparator
+public class TopicTypeComparator implements Comparator, Serializable
 {
 	public int compare(Object o1, Object o2)
 	{

@@ -42,11 +42,13 @@
  */
 package net.jforum.entities;
 
+import java.io.Serializable;
+
 /**
  * @author Rafael Steil
  * @version $Id: AttachmentExtensionGroup.java,v 1.3 2005/07/26 03:04:48 rafaelsteil Exp $
  */
-public class AttachmentExtensionGroup
+public class AttachmentExtensionGroup implements Serializable 
 {
 	public static final int DOWNLOAD_INLINE = 1;
 	public static final int DOWNLOAD_PHYSICAL = 2;

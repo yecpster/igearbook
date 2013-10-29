@@ -42,11 +42,13 @@
  */
 package net.jforum.entities;
 
+import java.io.Serializable;
+
 /**
  * @author Rafael Steil
  * @version $Id: Bookmark.java,v 1.4 2006/08/23 02:13:46 rafaelsteil Exp $
  */
-public class Bookmark
+public class Bookmark implements Serializable 
 {
 	private int id;
 	private int userId;

@@ -42,57 +42,63 @@
  */
 package net.jforum.entities;
 
+import java.io.Serializable;
+
 /**
  * @author Rafael Steil
- * @version  $Id: Config.java,v 1.6 2006/08/23 02:13:45 rafaelsteil Exp $
+ * @version $Id: Config.java,v 1.6 2006/08/23 02:13:45 rafaelsteil Exp $
  */
-public class Config 
-{
-	private int id;
-	private String name;
-	private String value;
-	
-	public Config() {}
-	
-	/**
-	 * Gets the entry name
-	 * @return The Entry name
-	 */
-	public String getName() {
-		return this.name;
-	}
+public class Config implements Serializable {
+    private int id;
+    private String name;
+    private String value;
 
-	/**
-	 * Gets the entry value
-	 * @return The Entry value
-	 */
-	public String getValue() {
-		return this.value;
-	}
-	
-	public int getId() {
-		return this.id;
-	}
+    public Config() {
+    }
 
-	/**
-	 * Sets the entry name
-	 * 
-	 * @param string The entry name to set
-	 */
-	public void setName(String string) {
-		this.name = string;
-	}
+    /**
+     * Gets the entry name
+     * 
+     * @return The Entry name
+     */
+    public String getName() {
+        return this.name;
+    }
 
-	/**
-	 * Sets the entry value
-	 * 
-	 * @param string The entry value to set
-	 */
-	public void setValue(String string) {
-		this.value = string;
-	}
-	
-	public void setId(int id) {
-		this.id = id;
-	}
+    /**
+     * Gets the entry value
+     * 
+     * @return The Entry value
+     */
+    public String getValue() {
+        return this.value;
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
+    /**
+     * Sets the entry name
+     * 
+     * @param string
+     *            The entry name to set
+     */
+    public void setName(String string) {
+        this.name = string;
+    }
+
+    /**
+     * Sets the entry value
+     * 
+     * @param string
+     *            The entry value to set
+     */
+    public void setValue(String string) {
+        this.value = string;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }

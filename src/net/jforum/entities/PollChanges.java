@@ -1,5 +1,6 @@
 package net.jforum.entities;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -12,7 +13,7 @@ import net.jforum.view.forum.common.PostCommon;
  * @author Rafael Steil
  * @version $Id: PollChanges.java,v 1.4 2007/04/24 02:19:46 rafaelsteil Exp $
  */
-public class PollChanges {
+public class PollChanges  implements Serializable{
 	private List deletedOptions = new ArrayList();
 	private List newOptions = new ArrayList();
 	private List changedOptions = new ArrayList();

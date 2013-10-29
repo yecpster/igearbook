@@ -42,6 +42,7 @@
  */
 package net.jforum.entities;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +50,7 @@ import java.util.List;
  * @author Rafael Steil
  * @version $Id: TopicModerationInfo.java,v 1.5 2006/08/23 02:13:45 rafaelsteil Exp $
  */
-public class TopicModerationInfo
+public class TopicModerationInfo implements Serializable
 {
 	private int topicId;
 	private int topicReplies;

@@ -42,11 +42,13 @@
  */
 package net.jforum.entities;
 
+import java.io.Serializable;
+
 /**
  * @author Rafael Steil
  * @version $Id: QuotaLimit.java,v 1.5 2005/07/26 03:04:51 rafaelsteil Exp $
  */
-public class QuotaLimit
+public class QuotaLimit implements Serializable
 {
 	public static final int KB = 1;
 	public static final int MB = 2;

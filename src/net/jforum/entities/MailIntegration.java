@@ -3,11 +3,13 @@
  */
 package net.jforum.entities;
 
+import java.io.Serializable;
+
 /**
  * @author Rafael Steil
  * @version $Id: MailIntegration.java,v 1.4 2006/10/10 01:59:55 rafaelsteil Exp $
  */
-public class MailIntegration
+public class MailIntegration implements Serializable
 {
 	private int forumId;
 	private int popPort;

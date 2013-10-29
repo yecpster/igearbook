@@ -45,12 +45,14 @@
  */
 package net.jforum.entities;
 
+import java.io.Serializable;
+
 /**
  * Represents a group in the system.
  * 
  * @author Rafael Steil
  */
-public class Group {
+public class Group implements Serializable {
     private int id;
     private int type = 0;// group_type: 0 - user group, 1 - entitlement group
     private int parentId;

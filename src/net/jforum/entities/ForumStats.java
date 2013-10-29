@@ -42,11 +42,13 @@
  */
 package net.jforum.entities;
 
+import java.io.Serializable;
+
 /**
  * @author Rafael Steil
  * @version $Id: ForumStats.java,v 1.3 2006/08/20 22:47:36 rafaelsteil Exp $
  */
-public class ForumStats
+public class ForumStats implements Serializable
 {
 	private int users;
 	private int posts;

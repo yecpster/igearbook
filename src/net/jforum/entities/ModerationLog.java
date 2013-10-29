@@ -42,13 +42,14 @@
  */
 package net.jforum.entities;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author Rafael Steil
  * @version $Id: ModerationLog.java,v 1.3 2007/07/10 01:04:31 rafaelsteil Exp $
  */
-public class ModerationLog
+public class ModerationLog implements Serializable
 {
 	private int id;
 	private int postId;

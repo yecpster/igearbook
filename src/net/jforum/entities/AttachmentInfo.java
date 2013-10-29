@@ -42,13 +42,14 @@
  */
 package net.jforum.entities;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author Rafael Steil
  * @version $Id: AttachmentInfo.java,v 1.6 2006/08/20 22:47:36 rafaelsteil Exp $
  */
-public class AttachmentInfo
+public class AttachmentInfo implements Serializable 
 {
 	private int id;
 	private int attachId;

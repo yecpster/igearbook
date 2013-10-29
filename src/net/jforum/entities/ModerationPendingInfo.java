@@ -42,6 +42,7 @@
  */
 package net.jforum.entities;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +50,7 @@ import java.util.List;
  * @author Rafael Steil
  * @version $Id: ModerationPendingInfo.java,v 1.4 2006/08/23 02:13:47 rafaelsteil Exp $
  */
-public class ModerationPendingInfo
+public class ModerationPendingInfo implements Serializable
 {
 	private int categoryId;
 	private String categoryName;

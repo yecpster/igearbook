@@ -50,6 +50,7 @@ import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
 
 import org.apache.log4j.Logger;
+import org.jboss.cache.DummyTransactionManagerLookup;
 import org.jboss.cache.Fqn;
 import org.jboss.cache.Node;
 import org.jboss.cache.PropertyConfigurator;
@@ -71,6 +72,7 @@ public class JBossCacheEngine implements CacheEngine
 	{
 		try {
 			this.cache = new TreeCache();
+			cache.setTransactionManagerLookupClass(DummyTransactionManagerLookup.class.getName());  
 			PropertyConfigurator config = new PropertyConfigurator();
 			config.configure(this.cache, SystemGlobals.getValue(ConfigKeys.JBOSS_CACHE_PROPERTIES));
 			

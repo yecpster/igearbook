@@ -42,13 +42,14 @@
  */
 package net.jforum.entities;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author Rafael Steil
  * @version $Id: Karma.java,v 1.6 2006/08/23 02:13:46 rafaelsteil Exp $
  */
-public class Karma
+public class Karma implements Serializable
 {
 	private int id;
 	private int postId;

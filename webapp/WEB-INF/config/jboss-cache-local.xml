@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <server>
-	<mbean code="org.jboss.cache.TreeCache" name="jboss.cache:service=TreeCache">
-		<attribute name="IsolationLevel">NONE</attribute>
-		<attribute name="CacheMode">LOCAL</attribute>
-	</mbean>
+  <mbean code="org.jboss.cache.TreeCache" name="jboss.cache:service=TreeCache">
+    <attribute name="IsolationLevel">NONE</attribute>
+    <attribute name="CacheMode">LOCAL</attribute>
+    <attribute name="CacheLoaderConfig">
+      location=E:\\projects\\igearbook\\webapp\\tmp\\cache
+    </attribute>
+  </mbean>
 </server>

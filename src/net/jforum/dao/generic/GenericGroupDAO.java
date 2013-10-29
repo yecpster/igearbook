@@ -168,7 +168,7 @@ public class GenericGroupDAO extends AutoKeys implements net.jforum.dao.GroupDAO
     public void addNew(Group group) {
         PreparedStatement p = null;
         try {
-            p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("GroupModel.addNew"));
+            p = this.getStatementForAutoKeys("GroupModel.addNew");;
             p.setString(1, group.getName());
             p.setString(2, group.getDescription());
             p.setInt(3, group.getParentId());
