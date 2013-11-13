@@ -237,7 +237,7 @@ public class SessionFacade implements Cacheable
 	 * Gets the {@link UserSession} instance of all logged users
 	 * @return A list with the user sessions
 	 */
-	public static List getLoggedSessions()
+	public static List<UserSession> getLoggedSessions()
 	{
 		synchronized (FQN) {
 			return new ArrayList(cache.getValues(FQN_LOGGED));

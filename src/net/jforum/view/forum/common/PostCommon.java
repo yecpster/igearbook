@@ -42,7 +42,6 @@
  */
 package net.jforum.view.forum.common;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -65,6 +64,8 @@ import net.jforum.util.SafeHtml;
 import net.jforum.util.bbcode.BBCode;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
+
+import com.google.common.collect.Lists;
 
 /**
  * @author Rafael Steil
@@ -325,10 +326,10 @@ public class PostCommon
 			|| SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT, String.valueOf(post.getForumId())));
 	}
 
-	public static List topicPosts(PostDAO dao, boolean canEdit, int userId, int topicId, int start, int count)
+	public static List<Post> topicPosts(PostDAO dao, boolean canEdit, int userId, int topicId, int start, int count)
 	{
 		boolean needPrepare = true;
-		List posts;
+		List<Post> posts;
 		
  		if (SystemGlobals.getBoolValue(ConfigKeys.POSTS_CACHE_ENABLED)) {
  			posts = PostRepository.selectAllByTopicByLimit(topicId, start, count);
@@ -338,18 +339,18 @@ public class PostCommon
  			posts = dao.selectAllByTopicByLimit(topicId, start, count);
  		}
  		
-		List helperList = new ArrayList();
+		List<Post> helperList = Lists.newArrayList();
 
 		int anonymousUser = SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID);
 
-		for (Iterator iter = posts.iterator(); iter.hasNext(); ) {
+		for (Iterator<Post> iter = posts.iterator(); iter.hasNext(); ) {
 			Post p;
 			
 			if (needPrepare) {
-				p = (Post)iter.next();
+				p = iter.next();
 			}
 			else {
-				p = new Post((Post)iter.next());
+				p = new Post(iter.next());
 			}
 			
 			if (canEdit || (p.getUserId() != anonymousUser && p.getUserId() == userId)) {

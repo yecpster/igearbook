@@ -168,7 +168,8 @@ public class UploadImageAction extends Command {
                 this.response.setContentType(a.getInfo().getMimetype());
             }
 
-            if (this.request.getHeader("User-Agent").indexOf("Firefox") != -1) {
+            String userAgent = this.request.getHeader("User-Agent");
+            if (userAgent != null && userAgent.indexOf("Firefox") != -1) {
                 this.response.setHeader(
                         "Content-Disposition",
                         "attachment; filename=\""

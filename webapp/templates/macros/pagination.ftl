@@ -115,16 +115,10 @@
 			<#assign start = thisPage * recordsPerPage/>
 			<a href="${contextPath}/${moduleName}/${action}<#if (start > 0)>/${start}</#if><#if (id > -1)>/${id}</#if>${extension}">&#9658;</a>
 		</#if>
-
-		<a href="#goto" onClick="return overlay(this, 'goToBox', 'rightbottom');">${I18n.getMessage("ForumIndex.goToGo")}</a>
-		<div id="goToBox">
-			<div class="title">${I18n.getMessage("goToPage")}...</div>
-			<div class="form">
-				<input type="text" style="width: 50px;" id="pageToGo">
-				<input type="button" value=" ${I18n.getMessage("ForumIndex.goToGo")} " onClick="goToAnotherPage(${totalPages}, ${recordsPerPage}, '${contextPath}', '${moduleName}', '${action}', ${id}, '${extension}');">
-				<input type="button" value="${I18n.getMessage("cancel")}" onClick="document.getElementById('goToBox').style.display = 'none';">
-			</div>
-		</div>
+		
+		<span style="margin: 0 0 0 20px;padding-top: 0;font-weight: normal;color: #265827;font-size: 12px;" >输入页码跳转</span>
+        <input type="text" title="输入后按回车就可以跳转哦！" size="4" style="margin: 0;padding-top: 0;border-color: #2d2d2d;font-size: 12px;" onkeypress="if(event.keyCode==13){goToAnotherPage(${totalPages}, ${recordsPerPage}, '${contextPath}', '${moduleName}', '${action}', ${id}, '${extension}', this.value);return false;}" />
+		<a href="#goto" onClick="goToAnotherPage(${totalPages}, ${recordsPerPage}, '${contextPath}', '${moduleName}', '${action}', ${id}, '${extension}', $(this).prev().val());">GO&#9658;</a>
 
 		</div>
 	</#if>

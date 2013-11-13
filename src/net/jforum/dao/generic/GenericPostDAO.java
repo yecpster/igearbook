@@ -281,6 +281,7 @@ public class GenericPostDAO extends AutoKeys implements net.jforum.dao.PostDAO {
         }
     }
 
+    @Override
     public int saveRecommend(Recommendation topic) {
         try {
             PreparedStatement p = null;
@@ -306,6 +307,32 @@ public class GenericPostDAO extends AutoKeys implements net.jforum.dao.PostDAO {
             }
 
             return topic.getId();
+        } catch (Exception e) {
+            throw new DatabaseException(e);
+        }
+    }
+
+    @Override
+    public void updateRecommend(Recommendation topic) {
+        try {
+            PreparedStatement p = null;
+            try {
+                p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("PostModel.updateRecommend"));
+
+                p.setString(1, topic.getImageUrl());
+                p.setString(2, topic.getTitle());
+                p.setString(3, topic.getDesc());
+                p.setInt(4, topic.getLastUpdateBy().getId());
+                p.setTimestamp(5, new Timestamp(topic.getLastUpdateTime().getTime()));
+                p.setInt(6, topic.getId());
+
+                p.executeUpdate();
+            } catch (SQLException e) {
+                throw new DatabaseException(e);
+            } finally {
+                DbUtils.close(p);
+            }
+
         } catch (Exception e) {
             throw new DatabaseException(e);
         }
@@ -360,8 +387,8 @@ public class GenericPostDAO extends AutoKeys implements net.jforum.dao.PostDAO {
     /**
      * @see net.jforum.dao.PostDAO#selectAllBytTopicByLimit(int, int, int)
      */
-    public List selectAllByTopicByLimit(int topicId, int startFrom, int count) {
-        List l = new ArrayList();
+    public List<Post> selectAllByTopicByLimit(int topicId, int startFrom, int count) {
+        List<Post> l = Lists.newArrayList();
 
         String sql = SystemGlobals.getSql("PostModel.selectAllByTopicByLimit");
 
@@ -539,17 +566,18 @@ public class GenericPostDAO extends AutoKeys implements net.jforum.dao.PostDAO {
     }
 
     @Override
-    public List<Recommendation> selectRecommendByLimit(int count) {
+    public List<Recommendation> selectRecommendByTypeByLimit(int type, int count) {
         List<Recommendation> l = Lists.newArrayList();
 
-        String sql = SystemGlobals.getSql("PostModel.selectRecommendByLimit");
+        String sql = SystemGlobals.getSql("PostModel.selectRecommendByTypeByLimit");
 
         PreparedStatement p = null;
         ResultSet rs = null;
 
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(sql);
-            p.setInt(1, count);
+            p.setInt(1, type);
+            p.setInt(2, count);
 
             rs = p.executeQuery();
             Recommendation topic = null;
@@ -569,6 +597,40 @@ public class GenericPostDAO extends AutoKeys implements net.jforum.dao.PostDAO {
                 l.add(topic);
             }
             return l;
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        } finally {
+            DbUtils.close(rs, p);
+        }
+    }
+
+    @Override
+    public Recommendation selectRecommendByTopicId(int topicId) {
+        String sql = SystemGlobals.getSql("PostModel.selectRecommendByTopicId");
+
+        PreparedStatement p = null;
+        ResultSet rs = null;
+        try {
+            p = JForumExecutionContext.getConnection().prepareStatement(sql);
+            p.setInt(1, topicId);
+
+            rs = p.executeQuery();
+            Recommendation topic = null;
+            UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
+            if (rs.next()) {
+                topic = new Recommendation();
+                topic.setId(rs.getInt("recommend_id"));
+                topic.setType(rs.getInt("recommend_type"));
+                topic.setImageUrl(rs.getString("image_url"));
+                topic.setTopicId(rs.getInt("topic_id"));
+                topic.setTitle(rs.getString("topic_title"));
+                topic.setDesc(rs.getString("topic_desc"));
+                topic.setCreateBy(userDao.selectById(rs.getInt("create_user_id")));
+                topic.setLastUpdateBy(userDao.selectById(rs.getInt("last_update_user_id")));
+                topic.setCreateTime(new Date(rs.getTimestamp("create_time").getTime()));
+                topic.setLastUpdateTime(new Date(rs.getTimestamp("last_update_time").getTime()));
+            }
+            return topic;
         } catch (SQLException e) {
             throw new DatabaseException(e);
         } finally {

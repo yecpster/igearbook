@@ -122,11 +122,16 @@ public class TeamAction extends ActionSupport {
         return SUCCESS;
     }
 
-    @Action(value = "moderation", results = { @Result(name = SUCCESS, location = "team_show.ftl") })
+    @Action(value = "moderation", results = { @Result(name = SUCCESS, location = "team_forum.ftl") })
     public String moderation() {
-        ActionContext context = ServletActionContext.getContext();
-        context.put("openModeration", true);
-        return this.show();
+        boolean canEditTeam = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
+        if (canEditTeam || SessionFacade.getUserSession().isAdmin()) {
+            ActionContext context = ServletActionContext.getContext();
+            context.put("openModeration", true);
+            return this.show();
+        } else {
+            return ERROR;
+        }
     }
 
     @Action(value = "join", results = { @Result(name = SUCCESS, location = "show", type = "chain") })
@@ -157,6 +162,12 @@ public class TeamAction extends ActionSupport {
         boolean isTeamOwner = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_OWNER, String.valueOf(teamId));
         if (!isTeamOwner) {
             return ERROR;
+        }
+        this.team = ForumRepository.getForum(teamId);
+        if (this.team == null) {
+            ForumDAO forumDao = DataAccessDriver.getInstance().newForumDAO();
+            this.team = forumDao.selectById(teamId);
+            ForumRepository.addForum(this.team);
         }
 
         ActionContext context = ServletActionContext.getContext();
@@ -554,6 +565,7 @@ public class TeamAction extends ActionSupport {
         // Topic Types
         context.put("TOPIC_ANNOUNCE", new Integer(Topic.TYPE_ANNOUNCE));
         context.put("TOPIC_STICKY", new Integer(Topic.TYPE_STICKY));
+        context.put("TOPIC_GOOD", new Integer(Topic.TYPE_GOOD));
         context.put("TOPIC_NORMAL", new Integer(Topic.TYPE_NORMAL));
 
         // Topic Status

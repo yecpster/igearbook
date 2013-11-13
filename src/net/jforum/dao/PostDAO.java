@@ -48,101 +48,125 @@ import net.jforum.entities.Post;
 import net.jforum.entities.Recommendation;
 
 /**
-  * Model interface for {@link net.jforum.entities.Post}.
- * This interface defines methods which are expected to be
- * implementd by a specific data access driver. The intention is
- * to provide all functionality needed to update, insert, delete and
- * select some specific data.
+ * Model interface for {@link net.jforum.entities.Post}. This interface defines
+ * methods which are expected to be implementd by a specific data access driver.
+ * The intention is to provide all functionality needed to update, insert,
+ * delete and select some specific data.
  * 
  * @author Rafael Steil
  * @version $Id: PostDAO.java,v 1.12 2007/08/20 19:35:52 rafaelsteil Exp $
  */
-public interface PostDAO 
-{
-	/**
-	 * Gets a specific <code>Post</code>.
-	 * 
-	 * @param postId The Post ID to search
-	 * @return <code>Post</code>object containing all the information
-	 */
-	public Post selectById(int postId) ;
-		
-	/**
-	 * Delete a Post.
-	 * 
-	 * @param post Post The Post to delete
-	 */
-	public void delete(Post post) ;
-	
-	/**
-	 * Updates a Post.
-	 * 
-	 * @param post Reference to a <code>Post</code> object to update
-	 */
-	public void update(Post post) ;
-	
-	/**
-	 * Adds a new Post.
-	 * 
-	 * @param post Post Reference to a valid and configured <code>Post</code> object
-	 * @return The new ID
-	 */
-	public int addNew(Post post) ;
-	
-	/**
-	 * Selects all messages relacted to a specific topic. 
-	 * 
-	 * @param topicId The topic ID 
-	 * @param startFrom The count position to start fetching
-	 * @param count The total number of records to retrieve
-	 * @return <code>ArrayList</code> containing all records found. Each entry of the <code>ArrayList</code> is a {@link net.jforum.entities.Post} object
-	 */
-	public List selectAllByTopicByLimit(int topicId, int startFrom, int count) ;
+public interface PostDAO {
+    /**
+     * Gets a specific <code>Post</code>.
+     * 
+     * @param postId
+     *            The Post ID to search
+     * @return <code>Post</code>object containing all the information
+     */
+    public Post selectById(int postId);
 
+    /**
+     * Delete a Post.
+     * 
+     * @param post
+     *            Post The Post to delete
+     */
+    public void delete(Post post);
 
-       /**
-	 * Selects all posts associated to a specific user and belonging to 
-	 * given forums
-	 * @param userId int User ID.
-	 * @param startFrom int
-	 * @param count int
-	 * @return  List
-	 */
-	public List selectByUserByLimit(int userId,int startFrom, int count) ;
+    /**
+     * Updates a Post.
+     * 
+     * @param post
+     *            Reference to a <code>Post</code> object to update
+     */
+    public void update(Post post);
+
+    /**
+     * Adds a new Post.
+     * 
+     * @param post
+     *            Post Reference to a valid and configured <code>Post</code>
+     *            object
+     * @return The new ID
+     */
+    public int addNew(Post post);
+
+    /**
+     * Selects all messages relacted to a specific topic.
+     * 
+     * @param topicId
+     *            The topic ID
+     * @param startFrom
+     *            The count position to start fetching
+     * @param count
+     *            The total number of records to retrieve
+     * @return <code>ArrayList</code> containing all records found. Each entry
+     *         of the <code>ArrayList</code> is a
+     *         {@link net.jforum.entities.Post} object
+     */
+    public List<Post> selectAllByTopicByLimit(int topicId, int startFrom, int count);
+
+    /**
+     * Selects all posts associated to a specific user and belonging to given
+     * forums
+     * 
+     * @param userId
+     *            int User ID.
+     * @param startFrom
+     *            int
+     * @param count
+     *            int
+     * @return List
+     */
+    public List selectByUserByLimit(int userId, int startFrom, int count);
 
     /**
      * Count user posts.
-     * @param userId int
+     * 
+     * @param userId
+     *            int
      * @return int
      */
-	public int countUserPosts(int userId) ;
+    public int countUserPosts(int userId);
 
-	/**
-	 * Selects all messages relacted to a specific topic. 
-	 * 
-	 * @param topicId The topic ID 
-	 * @return <code>ArrayList</code> containing all records found. Each entry of the <code>ArrayList</code> is a {@link net.jforum.entities.Post} object
-	 */
-	public List selectAllByTopic(int topicId) ;
-	
-	/**
-	 * Delete all posts related to the given topic
-	 * 
-	 * @param topicId int
-	 */
-	public void deleteByTopic(int topicId) ;
+    /**
+     * Selects all messages relacted to a specific topic.
+     * 
+     * @param topicId
+     *            The topic ID
+     * @return <code>ArrayList</code> containing all records found. Each entry
+     *         of the <code>ArrayList</code> is a
+     *         {@link net.jforum.entities.Post} object
+     */
+    public List<Post> selectAllByTopic(int topicId);
 
-	/**
-	 * Count how many previous posts there are before the given post id
-	 * @param postId int
-	 * @return int
-	 */
-	public int countPreviousPosts(int postId) ;
-	
-	public List selectLatestByForumForRSS(int forumId, int limit);
-	
-	public List selectHotForRSS(int limit);
-	
-	public int saveRecommend(Recommendation topic);
-	public List<Recommendation> selectRecommendByLimit(int count) ;
+    /**
+     * Delete all posts related to the given topic
+     * 
+     * @param topicId
+     *            int
+     */
+    public void deleteByTopic(int topicId);
+
+    /**
+     * Count how many previous posts there are before the given post id
+     * 
+     * @param postId
+     *            int
+     * @return int
+     */
+    public int countPreviousPosts(int postId);
+
+    public List selectLatestByForumForRSS(int forumId, int limit);
+
+    public List selectHotForRSS(int limit);
+
+    public int saveRecommend(Recommendation topic);
+
+    public void updateRecommend(Recommendation topic);
+
+    public List<Recommendation> selectRecommendByTypeByLimit(int type, int count);
+    
+    public Recommendation selectRecommendByTopicId(int topicId);
 }

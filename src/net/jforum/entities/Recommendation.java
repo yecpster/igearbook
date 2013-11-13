@@ -12,6 +12,7 @@ public class Recommendation implements Serializable {
     private static final long serialVersionUID = -52490539424260507L;
 
     public static final int TYPE_INDEX_IMG = 0;
+    public static final int TYPE_INDEX_TEAM = 1;
 
     private int id = TYPE_INDEX_IMG;
     private int type;

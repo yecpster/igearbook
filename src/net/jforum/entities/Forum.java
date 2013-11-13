@@ -55,6 +55,8 @@ import net.jforum.repository.ForumRepository;
  */
 public class Forum implements Serializable {
     private static final long serialVersionUID = -5566145240758297008L;
+    public static final int TYPE_PUBLIC = 0;
+    public static final int TYPE_TEAM = 1;
 
     private int id;
     private int idCategories;

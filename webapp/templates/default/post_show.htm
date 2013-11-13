@@ -4,7 +4,9 @@
 
 <#assign isTeamForum = (forum.type ==1) />
 <#if isTeamForum>
-    <#assign currentChannel="team" />
+    <@navHeader "team" />
+<#else>
+    <@navHeader "bbs" />
 </#if>
 
 <#assign canEditSomeMessage = false/>
@@ -56,15 +58,20 @@
 <table cellspacing="0" cellpadding="10" width="100%" align="center" border="0">
 	<tr>
 		<td class="bodyline">
-			<table cellspacing="2" cellpadding="2" width="100%" border="0">
+			<table cellspacing="0" cellpadding="0" width="100%" border="0">
 				<tr>
-					<td valign="middle" align="left" colspan="2">
+					<td valign="middle" align="center" colspan="2">
 					    <#-- 
 						<span class="maintitle"><a href="${JForumContext.encodeURL("/posts/list/${topic.id}")}" name="top" class="maintitle" id="top">${topic.title?html}</a></span>
-						-->
+						
+						
 						<#if rssEnabled>
 						&nbsp;<a href="${contextPath}/rss/topicPosts/${topic.id}${extension}"><img src="${contextPath}/templates/${templateName}/images/xml_button.gif" border="0" alt="XML" /></a>
 						</#if>
+						-->
+						<#if moderator && topicRecommended>
+						  <span style="font-size: 12px;color:#265827;">此文章已被推荐到首页</span>
+						 </#if>
 					</td>
 				</tr>
 			</table>
@@ -77,6 +84,8 @@
                             <a class="nav" href="${contextPath}/team/list.action">群组首页</a> 
                             &raquo; 
                             <a class="nav" href="${contextPath}/team/show.action?teamId=${forum.id}">${forum.name?html}</a>
+                            &raquo; 
+                            <a class="nav" href="${contextPath}/team/forum.action?teamId=${forum.id}">群组论坛</a>
                         <#else>
                             <a class="nav" href="${JForumContext.encodeURL("/forums/list")}">${I18n.getMessage("ForumListing.forumIndex")} </a> 
                             &raquo; <a class="nav" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">${forum.name} </a>
@@ -85,11 +94,11 @@
                         </span>
                     </td>
                     
-                    <td valign="middle" align="right"><#assign paginationData><@pagination.doPagination "list", topic.id/></#assign>${paginationData}</td>
+                    <td valign="middle" align="left"><#assign paginationData><@pagination.doPagination "list", topic.id/></#assign>${paginationData}</td>
                     
 					<td width="8%" align="left" valign="bottom" nowrap="nowrap">
-					   <#if moderator && !isTeamForum>
-                            <a href="${JForumContext.encodeURL("/posts/recommend/${topic.id}")}" rel="nofollow" class="icon_recommend nav"><img src="${contextPath}/images/transp.gif" alt="" /></a>
+					   <#if moderator && !topicRecommended>
+                            <a href="${contextPath}/post/recommend.action?topicId=${topic.id}" rel="nofollow" class="icon_recommend nav" target="_blank"><img src="${contextPath}/images/transp.gif" alt="" /></a>
                         </#if>
 						<#if topic.status == STATUS_LOCKED>
 							<span class="icon_reply_locked"><img src="${contextPath}/images/transp.gif" alt="" /></span>
@@ -221,15 +230,6 @@
 				</#list>
 				<!-- END OF POST LISTING -->
 		
-				<tr align="center">
-					<td class="catbottom" colspan="2" height="28">
-						<table cellspacing="0" cellpadding="0" border="0">
-							<tr>
-								<td align="center"><span class="gensmall">&nbsp;</span></td>
-							</tr>
-						</table>
-					</td>
-				</tr>
 			</table>
 		
 			<table cellspacing="2" cellpadding="2" width="100%" align="center" border="0">
@@ -241,7 +241,7 @@
 						</span>
 					</td>
 
-					<td valign="middle" align="right">${paginationData}</td>
+					<td valign="middle" align="left">${paginationData}</td>
 					<td width="8%" align="left" valign="bottom" nowrap="nowrap">
                     <#if topic.status == STATUS_LOCKED>
                         <span class="icon_reply_locked"><img src="${contextPath}/images/transp.gif" alt="" /></span>
@@ -395,9 +395,34 @@
 <a name="quick"></a>
 
 <script type="text/javascript">
+$(document).ready(function (){ 
+$("#main").find(".postbody img").each(function(){
+    var img = $(this);
+    var src = img.attr("src");
+    var index = src.lastIndexOf("/");
+    var srcSub = src.substr(index);
+    var shouldZoom = (srcSub.match(/\d+_\d+_\d\./) != null) && (srcSub.indexOf("_0.") < 0);
+    var width = img.attr("width");
+    var height = img.attr("height");
+
+    if (shouldZoom) {
+          var zoomSrc = src.replace(/(.+)_\d\.(.+)/i, "$1_0.$2");
+          img.attr("title", "点击查看原始大小图片");
+          img.css("cursor", "url(${contextPath}/images/zoom.cur), pointer");
+          img.click(function(){window.open(zoomSrc);});
+    }
+    if(width>800){
+     img.attr("width", 800);
+     img.attr("height", height/width*800);
+     img.attr("title", "点击查看原始大小图片");
+     img.css("cursor", "url(${contextPath}/images/zoom.cur), pointer");
+     img.click(function(){window.open(src);});
+    }
+});
+});
 $(document).ready(function() {
 	limitURLSize();
-
+<#--
 	<#if moderatorCanEdit || canEditSomeMessage>
 		$(".edit_area").editable("${contextPath}/jforum${extension}?module=ajax&action=savePost", {
 			submit: '${I18n.getMessage("Update")}',
@@ -437,6 +462,7 @@ $(document).ready(function() {
 			</#if>
 		});
 	</#if>
+-->
 });
 </script>
 

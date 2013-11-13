@@ -1,5 +1,5 @@
 <#include "/templates/default/header.htm" />
-<#assign currentChannel="team" />
+<@navHeader "team" />
 <#import "/templates/macros/pagination.ftl" as pagination>
 <#import "/templates/macros/presentation.ftl" as presentation/>
 
@@ -81,7 +81,7 @@
 				<form action="${JForumContext.encodeURL("/jforum")}" method="post" name="formModeration" id="formModeration" accept-charset="${encoding}">
 				<input type="hidden" name="action" value="doModeration" />
 				<input type="hidden" name="module" value="moderation" />
-				<input type="hidden" name="returnUrl" value="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /><#if (start > 0)><@s.param name="start" value="${start}" /></#if></@s.url>" />
+				<input type="hidden" name="returnUrl" value="<@s.url namespace="/team" action="forum"><@s.param name="teamId" value="${team.id}" /><#if (start > 0)><@s.param name="start" value="${start}" /></#if></@s.url>" />
 				<input type="hidden" name="forum_id" value="${team.id}" />
 				<input type="hidden" name="log_type" value="0"/>
 				<input type="hidden" name="log_description">
@@ -115,9 +115,9 @@
                         <tr class="sep1"><td colspan="6"></td></tr>
                         <#assign sepTrDisplayed = true />
                     </#if>
-					<tr class="bg_small_yellow">
-						<td ${class1} valign="middle"  align="center" width="20"><@presentation.folderImage topic/></td>
-						<td ${class1} width="100%">
+					<tr>
+						<td ${class1} valign="middle"  align="center" width="35"><@presentation.folderImage topic/></td>
+						<td ${class1} width="60%">
 							<#if topic.hasAttach() && attachmentsEnabled><img src="${contextPath}/templates/${templateName}/images/icon_clip.gif" align="middle" alt="[Clip]" /></#if>
 							<span class="topictitle">
 							<a href="${JForumContext.encodeURL("/posts/list/${topic.id}")}">
@@ -171,7 +171,7 @@
 					<td class="catbottom" valign="middle"  align="right" colspan="<#if moderator && openModeration?default(false)>7<#else>6</#if>" height="28">
 						<table cellspacing="0" cellpadding="0" border="0">
 							<tr>
-								<td align="center"><span class="gensmall">&nbsp;<@presentation.moderationButtons/></span></td>
+								<td align="center"><span class="gensmall">&nbsp;<@presentation.moderationButtons /></span></td>
 							</tr>
 						</table>
 					</td>

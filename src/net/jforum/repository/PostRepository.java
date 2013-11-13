@@ -58,124 +58,136 @@ import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
 import net.jforum.view.forum.common.PostCommon;
 
+import org.jboss.cache.Node;
+
 /**
  * Repository for the post in the top n topics for each forum.
  * 
  * @author Sean Mitchell
  * @author Rafael Steil
- * @version $Id: PostRepository.java,v 1.13 2006/08/23 02:13:48 rafaelsteil Exp $
+ * @version $Id: PostRepository.java,v 1.13 2006/08/23 02:13:48 rafaelsteil Exp
+ *          $
  */
-public class PostRepository implements Cacheable
-{
-	private static final int CACHE_SIZE = SystemGlobals.getIntValue(ConfigKeys.POSTS_CACHE_SIZE);
-	private static final String FQN = "posts";
-	private static CacheEngine cache;
-	
-	/**
-	 * @see net.jforum.cache.Cacheable#setCacheEngine(net.jforum.cache.CacheEngine)
-	 */
-	public void setCacheEngine(CacheEngine engine)
-	{
-		cache = engine;
-	}
-	
-	public static int size()
-	{
-		Map m = (Map)cache.get(FQN);
-		return (m != null ? m.size() : 0);
-	}
-	
-	public static int size(int topicId)
-	{
-		List posts = (List)cache.get(FQN, Integer.toString(topicId));
-		return (posts == null ? 0 : posts.size());
-	}
-	
-	public static Collection cachedTopics()
-	{
-		Map m = (Map)cache.get(FQN);
-		if (m == null) {
-			return new ArrayList();
-		}
-		
-		return m.keySet();
-	}
-		
-	public static List selectAllByTopicByLimit(int topicId, int start, int count)  
-	{
-		String tid = Integer.toString(topicId);
-		
-		List posts = (List)cache.get(FQN, tid);
-		if (posts == null || posts.size() == 0) {
-			PostDAO pm = DataAccessDriver.getInstance().newPostDAO();
-			posts = pm.selectAllByTopic(topicId);
-			
-			for (Iterator iter = posts.iterator(); iter.hasNext(); ) {
-				PostCommon.preparePostForDisplay((Post)iter.next());
-			}
-	
-			Map topics = (Map)cache.get(FQN);
-			if (topics == null || topics.size() == 0 || topics.size() < CACHE_SIZE) {
-				cache.add(FQN, tid, posts);
-			}
-			else {
-				if (!(topics instanceof LinkedHashMap)) {
-					topics = new LinkedHashMap(topics) {
-						protected boolean removeEldestEntry(java.util.Map.Entry eldest) {
-							return this.size() > CACHE_SIZE;
-						}
-					};
-				}
-				
-				topics.put(tid, posts);
-				cache.add(FQN, topics);
-			}
-		}
-		
-		int size = posts.size();
-		return posts.subList(start, (size < start + count) ? size : start + count);
-   }
-	
-	public static void remove(int topicId, int postId)
-	{
-		synchronized (FQN) {
-			String tid = Integer.toString(topicId);
-			
-			List posts = (List)cache.get(FQN, tid);
-			
-			if (posts != null) {
-				Post p = new Post();
-				p.setId(postId);
-				posts.remove(p);
-				
-				cache.add(FQN, tid, posts);
-			}
-		}
-	}
-	
-	public static void update(int topicId, Post p)
-	{
-		String tid = Integer.toString(topicId);
-		List posts = (List)cache.get(FQN, tid);
-		if (posts != null && posts.contains(p)) {
-			posts.set(posts.indexOf(p), p);
-			cache.add(FQN, tid, posts);
-		}
-	}
-	
-	public static void append(int topicId, Post p)
-	{
-		String tid = Integer.toString(topicId);
-		List posts = (List)cache.get(FQN, tid);
-		if (posts != null && !posts.contains(p)) {
-			posts.add(p);
-			cache.add(FQN, tid, posts);
-		}
-	}
-	
-	public static void clearCache(int topicId)
-	{
-		cache.remove(FQN, Integer.toString(topicId));
-	}
-}
+public class PostRepository implements Cacheable {
+    private static final int CACHE_SIZE = SystemGlobals.getIntValue(ConfigKeys.POSTS_CACHE_SIZE);
+    private static final String FQN = "posts";
+    private static CacheEngine cache;
 
+    /**
+     * @see net.jforum.cache.Cacheable#setCacheEngine(net.jforum.cache.CacheEngine)
+     */
+    public void setCacheEngine(CacheEngine engine) {
+        cache = engine;
+    }
+
+    public static int size() {
+        Object data = cache.get(FQN);
+        Map map = null;
+        if (data instanceof Node) {
+            Node node = (Node) data;
+            map = node.getChildren();
+        } else if (data instanceof Map) {
+            map = (Map) data;
+        }
+        return (map != null ? map.size() : 0);
+    }
+
+    public static int size(int topicId) {
+        List posts = (List) cache.get(FQN, Integer.toString(topicId));
+        return (posts == null ? 0 : posts.size());
+    }
+
+    public static Collection cachedTopics() {
+        Object data = cache.get(FQN);
+        Map map = null;
+        if (data instanceof Node) {
+            Node node = (Node) data;
+            map = node.getChildren();
+        } else if (data instanceof Map) {
+            map = (Map) data;
+        }
+        if (map == null) {
+            return new ArrayList();
+        }
+
+        return map.keySet();
+    }
+
+    public static List<Post> selectAllByTopicByLimit(int topicId, int start, int count) {
+        String tid = Integer.toString(topicId);
+
+        List posts = (List) cache.get(FQN, tid);
+        if (posts == null || posts.size() == 0) {
+            PostDAO pm = DataAccessDriver.getInstance().newPostDAO();
+            posts = pm.selectAllByTopic(topicId);
+
+            for (Iterator iter = posts.iterator(); iter.hasNext();) {
+                PostCommon.preparePostForDisplay((Post) iter.next());
+            }
+
+            Object data = cache.get(FQN);
+            Map topics = null;
+            if (data instanceof Node) {
+                Node node = (Node) data;
+                topics = node.getChildren();
+            } else if (data instanceof Map) {
+                topics = (Map) data;
+            }
+            if (topics == null || topics.size() == 0 || topics.size() < CACHE_SIZE) {
+                cache.add(FQN, tid, posts);
+            } else {
+                if (!(topics instanceof LinkedHashMap)) {
+                    topics = new LinkedHashMap(topics) {
+                        protected boolean removeEldestEntry(java.util.Map.Entry eldest) {
+                            return this.size() > CACHE_SIZE;
+                        }
+                    };
+                }
+
+                topics.put(tid, posts);
+                cache.add(FQN, topics);
+            }
+        }
+
+        int size = posts.size();
+        return posts.subList(start, (size < start + count) ? size : start + count);
+    }
+
+    public static void remove(int topicId, int postId) {
+        synchronized (FQN) {
+            String tid = Integer.toString(topicId);
+
+            List posts = (List) cache.get(FQN, tid);
+
+            if (posts != null) {
+                Post p = new Post();
+                p.setId(postId);
+                posts.remove(p);
+
+                cache.add(FQN, tid, posts);
+            }
+        }
+    }
+
+    public static void update(int topicId, Post p) {
+        String tid = Integer.toString(topicId);
+        List posts = (List) cache.get(FQN, tid);
+        if (posts != null && posts.contains(p)) {
+            posts.set(posts.indexOf(p), p);
+            cache.add(FQN, tid, posts);
+        }
+    }
+
+    public static void append(int topicId, Post p) {
+        String tid = Integer.toString(topicId);
+        List posts = (List) cache.get(FQN, tid);
+        if (posts != null && !posts.contains(p)) {
+            posts.add(p);
+            cache.add(FQN, tid, posts);
+        }
+    }
+
+    public static void clearCache(int topicId) {
+        cache.remove(FQN, Integer.toString(topicId));
+    }
+}

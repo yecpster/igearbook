@@ -96,6 +96,14 @@ public class ModerationHelper {
             status = this.lockUnlockTopics(Topic.STATUS_LOCKED);
         } else if (request.getParameter("topicUnlock") != null) {
             status = this.lockUnlockTopics(Topic.STATUS_UNLOCKED);
+        } else if (request.getParameter("topicSticky") != null) {
+            status = this.setTopicsType(Topic.TYPE_STICKY);
+        } else if (request.getParameter("topicGood") != null) {
+            status = this.setTopicsType(Topic.TYPE_GOOD);
+        } else if (request.getParameter("topicUnsetSticky") != null) {
+            status = this.setTopicsType(-Topic.TYPE_STICKY);
+        } else if (request.getParameter("topicUnsetGood") != null) {
+            status = this.setTopicsType(-Topic.TYPE_GOOD);
         }
 
         if (status == ModerationHelper.FAILURE) {
@@ -196,6 +204,55 @@ public class ModerationHelper {
 
                 ForumRepository.reloadForum(forumId);
             }
+        }
+        return SUCCESS;
+    }
+
+    private int setTopicsType(int topicType) {
+        String[] topics = JForumExecutionContext.getRequest().getParameterValues("topic_id");
+
+        List<Integer> forumsList = Lists.newArrayList();
+        TopicDAO tm = DataAccessDriver.getInstance().newTopicDAO();
+
+        List<Topic> topicsToUpdate = Lists.newArrayList();
+
+        if (topics != null && topics.length > 0) {
+            ModerationLog log = this.buildModerationLogFromRequest();
+
+            for (int i = 0; i < topics.length; i++) {
+                Topic t = tm.selectById(Integer.parseInt(topics[i]));
+                int forumId = t.getForumId();
+                if (!forumsList.contains(forumId)) {
+                    forumsList.add(forumId);
+                }
+
+                topicsToUpdate.add(t);
+            }
+            for (int forumId : forumsList) {
+                if (!SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(forumId))) {
+                    return FAILURE;
+                }
+            }
+
+            for (Topic topic : topicsToUpdate) {
+                log.setTopicId(topic.getId());
+                log.setPosterUser(topic.getPostedBy());
+                this.saveModerationLog(log);
+            }
+            for (Topic topic : topicsToUpdate) {
+                if (topicType < 0 && ((topic.getType() == -topicType) || (topic.getType() == (Topic.TYPE_STICKY + Topic.TYPE_GOOD)))) {
+                    topic.setType(topic.getType() + topicType);
+                } else if (topicType > 0 && (topic.getType() == Topic.TYPE_STICKY || topic.getType() == Topic.TYPE_GOOD)
+                        && topic.getType() != topicType) {
+                    topic.setType(topic.getType() + topicType);
+                } else if (topicType > 0 && topic.getType() != (Topic.TYPE_STICKY + Topic.TYPE_GOOD)) {
+                    topic.setType(topicType);
+                }
+
+                tm.update(topic);
+                TopicRepository.clearCache(topic.getForumId());
+            }
+
         }
         return SUCCESS;
     }

@@ -95,7 +95,7 @@ public interface TopicDAO
 	 * @param forumId The forum id to select the topics
 	 * @return <code>ArrayList</code> with all topics found. Each entry is a <code>net.jforum.Topic</code> object
 	 */
-	public List selectAllByForum(int forumId) ;
+	public List<Topic> selectAllByForum(int forumId) ;
 	
 	public List selectTopicTitlesByIds(Collection idList) ;
 	
@@ -108,7 +108,7 @@ public interface TopicDAO
      * @param startFrom int
      * @param count int
 	 */
-	public List selectAllByForumByLimit(int forumId, int startFrom, int count) ;
+	public List<Topic> selectAllByForumByLimit(int forumId, int startFrom, int count) ;
 	
 	public List<Topic> selectByForumByTypeByLimit(int forumId, int type, int startFrom, int count) ;
 
@@ -332,7 +332,7 @@ public interface TopicDAO
 	 * value is an {@link net.jforum.entities.User} instance with minimum
 	 * data filled
 	 */
-	public Map topicPosters(int topicId) ;
+	public Map<Integer, User> topicPosters(int topicId) ;
 	
 	/**
 	 * @param args

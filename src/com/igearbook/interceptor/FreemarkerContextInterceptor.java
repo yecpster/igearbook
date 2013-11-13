@@ -64,7 +64,9 @@ public class FreemarkerContextInterceptor extends AbstractInterceptor {
 
         Object startupTime = ServletActionContext.getServletContext().getAttribute("startupTime");
         context.put("startupTime", startupTime);
-
+        Object debug = ServletActionContext.getServletContext().getAttribute("debug");
+        context.put("debug", debug);
+        
         ControllerUtils utils = new ControllerUtils();
         utils.refreshSession();
 

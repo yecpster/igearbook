@@ -1,6 +1,8 @@
 <#include "header.htm"/>
+<@navHeader "bbs" />
 <#import "../macros/pagination.ftl" as pagination>
 
+<script type="text/javascript" src="${contextPath}/templates/${templateName}/js/jquery.js?${startupTime}"></script>
 <script type="text/javascript" src="${contextPath}/templates/${templateName}/js/pagination.js?${startupTime}"></script>
 
 <table cellspacing="0" cellpadding="10" width="100%" align="center" border="0">
@@ -63,8 +65,16 @@
 							${I18n.getMessage("ModerationLog.typeDeleted")}
 						<#elseif log.type == 2>
 							${I18n.getMessage("ModerationLog.typeEdited")}
-						<#else>
+						<#elseif log.type == 3>
 							${I18n.getMessage("ModerationLog.typeLockUnlock")}
+					    <#elseif log.type == 4>
+                                                                                置顶
+                        <#elseif log.type == 5>
+                                                                                精华
+                        <#elseif log.type == 6>
+                                                                               取消置顶
+                        <#elseif log.type == 7>
+                                                                                取消精华
 						</#if>
 					</td>
 					<td class="row1" valign="top">${log.description?html}</td>

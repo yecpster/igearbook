@@ -199,7 +199,7 @@ public class I18n
 		
 		messagesMap.put(localeName, p);
 
-		watchForChanges(localeName);
+		//watchForChanges(localeName);
 	}
 
 	/**

@@ -363,13 +363,14 @@ public class UserAction extends Command {
         userSession.setStartTime(new Date(System.currentTimeMillis()));
 
         SessionFacade.add(userSession);
-
-        // Finalizing.. show to user the congrats page
-        JForumExecutionContext.setRedirect(this.request.getContextPath() + "/user/registrationComplete"
-                + SystemGlobals.getValue(ConfigKeys.SERVLET_EXTENSION));
+        this.registrationComplete();
+//        // Finalizing.. show to user the congrats page
+//        JForumExecutionContext.setRedirect(this.request.getContextPath() + "/user/registrationComplete"
+//                + SystemGlobals.getValue(ConfigKeys.SERVLET_EXTENSION));
+        
     }
 
-    public void registrationComplete() {
+    private void registrationComplete() {
         int userId = SessionFacade.getUserSession().getUserId();
 
         ForumRepository.setLastRegisteredUser(DataAccessDriver.getInstance().newUserDAO().selectById(userId));

@@ -1,35 +1,7 @@
 <#include "header.htm"/>
-<#assign currentChannel="index" />
+<@navHeader "bbs" />
 <link rel="alternate" type="application/rss+xml" title="RSS" href="${contextPath}/rss/forums${extension}" />
 <#--<script type="text/javascript" src="${contextPath}/templates/${templateName}/js/application.js?${startupTime}"></script>-->
-
-<div id="forum_tab_show" class="clearfix">
-  <div id="slides">
-    <#if recommendTopic?exists>
-    <a href="${JForumContext.encodeURL("/posts/list/${recommendTopic.topicId}")}" title="${recommendTopic.title?default("")}" target="_blank">
-    <img src="${recommendTopic.imageUrl?default("")}" width="370" height="180">
-    <h4>${recommendTopic.title?default("")}</h4>
-    <p>${recommendTopic.desc?default("")}...</p>
-    </a>
-    </#if>
-  </div>
-  <div id="new_topics" class="box middle" >
-    <h4>${I18n.getMessage("ForumBase.recentTopics")}</h4>
-    <ul>
-        <#list recentTopics as topic>
-        <li><a href="${JForumContext.encodeURL("/posts/list/${topic.id}")}" target="_blank">${topic.title?html} </a></li>
-        </#list>
-    </ul>
-  </div>
-  <div class="last">
-    <h4>${I18n.getMessage("ForumBase.hottestTopics")}</h4>
-    <ul>
-      <#list hotTopics as topic>
-      <li><a href="${JForumContext.encodeURL("/posts/list/${topic.id}")}" target="_blank">${topic.title?html}</a></li>
-      </#list>
-    </ul>
-  </div>
-</div>
 
 <table width="100%" align="center">
 	<tr>
@@ -184,28 +156,4 @@
 		</td>
 	</tr>
 </table>
-<#--
-<script type="text/javascript">
-  var current_index = 0;
-  var slideArray = [<#list recommends as r>"\u003Ca href=\"${JForumContext.encodeURL("/posts/list/${r.topicId}")}\" title=\"${r.title}\" target='_blank'\u003E\u003Cimg src=\"${r.imageUrl}\" width=\"370\" height=\"180\"\u003E\u003C/a\u003E"<#if r_has_next>,</#if></#list>];
-  Event.observe(window,'load',function() {
-    show_slide(0);
-    new PeriodicalExecuter(show_slide, 411);
-  });
-  var desc = "<p>xxx...</p>";
-  function show_slide(s_index) {
-    if(typeof(s_index) != 'number') s_index = current_index + 1;
-    if(s_index >= slideArray.length) s_index = 0;
-    $("slides").innerHTML = slideArray[s_index];
-    var s_pagination = slideArray.inject("<span class='pagination'>", function(memo, value, i) {
-      return memo + (s_index == i ? "<span class='current'>" + (i + 1) + "</span>" : "<a href='#' onclick='show_slide(" + i + ");return false;'>" + (i + 1) + "</a>");
-    }) + "</span>"+desc;
-
-
-    $("slides").insert(s_pagination);
-
-    current_index = s_index;
-  }
-</script>
--->
 <#include "bottom.htm"/>

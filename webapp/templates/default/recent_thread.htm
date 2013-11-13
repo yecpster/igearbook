@@ -1,8 +1,8 @@
 <#include "header.htm"/>
 <#import "../macros/pagination.ftl" as pagination>
 <#import "../macros/presentation.ftl" as presentation/>
-<#assign currentChannel="recentTopic" />
-
+<@navHeader "bbs" />
+<script type="text/javascript" src="${contextPath}/templates/${templateName}/js/jquery.js?${startupTime}"></script>
 <link rel="alternate" type="application/rss+xml" title="RSS" href="${contextPath}/rss/recentTopics${extension}" />
 
 <table cellspacing="0" cellpadding="10" width="100%" align="center" border="0">

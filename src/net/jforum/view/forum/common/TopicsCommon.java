@@ -188,6 +188,7 @@ public class TopicsCommon {
         // Topic Types
         context.put("TOPIC_ANNOUNCE", new Integer(Topic.TYPE_ANNOUNCE));
         context.put("TOPIC_STICKY", new Integer(Topic.TYPE_STICKY));
+        context.put("TOPIC_GOOD", new Integer(Topic.TYPE_GOOD));
         context.put("TOPIC_NORMAL", new Integer(Topic.TYPE_NORMAL));
 
         // Topic Status
@@ -210,6 +211,7 @@ public class TopicsCommon {
         // Topic Types
         context.put("TOPIC_ANNOUNCE", new Integer(Topic.TYPE_ANNOUNCE));
         context.put("TOPIC_STICKY", new Integer(Topic.TYPE_STICKY));
+        context.put("TOPIC_GOOD", new Integer(Topic.TYPE_GOOD));
         context.put("TOPIC_NORMAL", new Integer(Topic.TYPE_NORMAL));
 
         // Topic Status

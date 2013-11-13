@@ -9,6 +9,11 @@
 					<img class="icon_folder_announce" src="${contextPath}/images/transp.gif" alt="" />
 				<#elseif topic.type == TOPIC_STICKY>
 					<img class="icon_folder_sticky" src="${contextPath}/images/transp.gif" alt="" />
+			    <#elseif topic.type == TOPIC_GOOD>
+                    <img class="icon_folder_good" src="${contextPath}/images/transp.gif" alt="" />
+                <#elseif topic.type == (TOPIC_STICKY+TOPIC_GOOD)>
+                    <img class="icon_folder_sticky" src="${contextPath}/images/transp.gif" alt="" />
+                    <img class="icon_folder_good" src="${contextPath}/images/transp.gif" alt="" />
 				<#else>
 					<#if topic.isHot()>
 						<img class="icon_folder_hot" src="${contextPath}/images/transp.gif" alt="" />
@@ -24,7 +29,12 @@
 				<#if topic.type == TOPIC_ANNOUNCE>
 					<img class="icon_folder_announce_new" src="${contextPath}/images/transp.gif" alt="" />
 				<#elseif topic.type == TOPIC_STICKY>
-					<img class="icon_folder_sticky_new" src="${contextPath}/images/transp.gif" alt="" />
+					<img class="icon_folder_sticky" src="${contextPath}/images/transp.gif" alt="" />
+			    <#elseif topic.type == TOPIC_GOOD>
+                    <img class="icon_folder_good" src="${contextPath}/images/transp.gif" alt="" />
+                <#elseif topic.type == (TOPIC_STICKY+TOPIC_GOOD)>
+                    <img class="icon_folder_sticky" src="${contextPath}/images/transp.gif" alt="" />
+                    <img class="icon_folder_good" src="${contextPath}/images/transp.gif" alt="" />
 				<#else>
 					<#if topic.isHot()>
 						<img class="icon_folder_new_hot" src="${contextPath}/images/transp.gif" alt="" />
@@ -77,6 +87,10 @@
 			<input type="submit" name="topicLock" value="&nbsp;&nbsp;${I18n.getMessage("Lock")}&nbsp;&nbsp;" class="liteoption" onclick="return lockUnlock();" />
 			<input type="submit" name="topicUnlock" value="&nbsp;&nbsp;${I18n.getMessage("Unlock")}&nbsp;&nbsp;" class="liteoption" onclick="return lockUnlock();" />
 		</#if>
+		<input type="submit" name="topicSticky" value="&nbsp;&nbsp;置顶&nbsp;&nbsp;" class="liteoption" onclick="return validateModerationSetSticky();" />
+	    <input type="submit" name="topicUnsetSticky" value="&nbsp;&nbsp;取消置顶&nbsp;&nbsp;" class="liteoption" onclick="return validateModerationUnSetSticky();" />
+	    <input type="submit" name="topicGood" value="&nbsp;&nbsp;设置精华&nbsp;&nbsp;" class="liteoption" onclick="return validateModerationSetGood();" />
+        <input type="submit" name="topicUnsetGood" value="&nbsp;&nbsp;取消精华&nbsp;&nbsp;" class="liteoption" onclick="return validateModerationUnSetGood();" />
 	</#if>
 </#macro>
 

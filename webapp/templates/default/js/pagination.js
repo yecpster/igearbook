@@ -1,5 +1,5 @@
 /***********************************************
-* Drop Down/ Overlapping Content- © Dynamic Drive (www.dynamicdrive.com)
+* Drop Down/ Overlapping Content- ï¿½ Dynamic Drive (www.dynamicdrive.com)
 * This notice must stay intact for legal use.
 * Visit http://www.dynamicdrive.com/ for full source code
 ***********************************************/
@@ -32,9 +32,9 @@ function overlayclose(subobj){
 document.getElementById(subobj).style.display="none"
 }
 
-function goToAnotherPage(max, recordsPerPage, contextPath, moduleName, action, id, extension)
+function goToAnotherPage(max, recordsPerPage, contextPath, moduleName, action, id, extension, pageToGo)
 {
-	var page = document.getElementById("pageToGo").value * 1;
+	var page =  pageToGo * 1;
 
 	if (!isNaN(page) && page <= max && page > 0) {
 		var path = contextPath + "/" + moduleName + "/" + action + "/" + ((page - 1) * recordsPerPage) + "/";

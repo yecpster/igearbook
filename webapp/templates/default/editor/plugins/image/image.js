@@ -113,7 +113,6 @@ KindEditor.plugin('image', function(K) {
 						localUrlBox.val('');
 						return;
 					}
-					alert(3);
 					// insert remote image
 					var url = K.trim(urlBox.val()),
 						width = widthBox.val(),
@@ -212,7 +211,6 @@ KindEditor.plugin('image', function(K) {
 			},
 			afterError : function(html) {
 				dialog.hideLoading();
-				alert(3444444);
 				self.errorDialog(html);
 			}
 		});

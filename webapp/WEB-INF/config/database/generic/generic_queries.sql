@@ -63,7 +63,7 @@ UserModel.selectAll = SELECT user_email, user_id, user_avatar, user_posts, user_
 	user_website, user_viewemail FROM jforum_users ORDER BY user_id
 
 UserModel.selectAllByLimit = SELECT user_email, user_id, user_avatar, user_posts, user_regdate, username, deleted, user_karma, user_from, user_website, user_viewemail \
-	FROM jforum_users ORDER BY username LIMIT ?, ?
+	FROM jforum_users ORDER BY user_id LIMIT ?, ?
 
 UserModel.selectAllByGroup = SELECT user_email, u.user_id, user_avatar, user_posts, user_regdate, username, deleted, user_karma, user_from, \
 	user_website, user_viewemail \
@@ -215,11 +215,24 @@ PostModel.countUserPosts = SELECT COUNT(1) AS total FROM jforum_posts where user
 PostModel.setForumByTopic = UPDATE jforum_posts SET forum_id = ? WHERE topic_id = ?
 PostModel.deleteByTopic = SELECT post_id, user_id FROM jforum_posts WHERE topic_id = ?
 
-PostModel.saveRecommend = INSERT INTO jforum_recommendation (recommend_type, image_url, topic_id, topic_title, topic_desc, create_user_id, last_update_user_id, create_time, last_update_time) \
+
+# #############
+# RecommendModel
+# #############
+RecommendModel.addNew = INSERT INTO jforum_recommendation (recommend_type, image_url, topic_id, topic_title, topic_desc, create_user_id, last_update_user_id, create_time, last_update_time) \
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
-    
-PostModel.selectRecommendByLimit = SELECT recommend_id, recommend_type, image_url, topic_id, topic_title, topic_desc, create_user_id, last_update_user_id, create_time, last_update_time \
-    FROM jforum_recommendation ORDER BY recommend_id DESC LIMIT ?
+RecommendModel.update = UPDATE jforum_recommendation set image_url=?, topic_title=?, topic_desc=?, last_update_user_id=?, last_update_time=? \
+    WHERE recommend_id = ?
+RecommendModel.delete = DELETE FROM jforum_recommendation WHERE recommend_id = ?
+RecommendModel.selectByTypeByLimit = SELECT recommend_id, recommend_type, image_url, topic_id, topic_title, topic_desc, create_user_id, last_update_user_id, create_time, last_update_time \
+    FROM jforum_recommendation where recommend_type = ? ORDER BY recommend_id DESC LIMIT ?, ?
+RecommendModel.selectAllByTypeByLimit = SELECT recommend_id, recommend_type, image_url, topic_id, topic_title, topic_desc, create_user_id, last_update_user_id, create_time, last_update_time \
+    FROM jforum_recommendation ORDER BY recommend_id DESC LIMIT ?, ?
+RecommendModel.selectByTopicId = SELECT recommend_id, recommend_type, image_url, topic_id, topic_title, topic_desc, create_user_id, last_update_user_id, create_time, last_update_time \
+    FROM jforum_recommendation where topic_id = ?
+RecommendModel.selectById = SELECT recommend_id, recommend_type, image_url, topic_id, topic_title, topic_desc, create_user_id, last_update_user_id, create_time, last_update_time \
+    FROM jforum_recommendation where recommend_id = ?
+
 
 # #############
 # PollModel

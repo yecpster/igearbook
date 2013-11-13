@@ -102,6 +102,8 @@ import net.jforum.view.forum.common.ViewCommon;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.igearbook.util.HtmlUtil;
+
 import freemarker.template.SimpleHash;
 
 /**
@@ -165,7 +167,7 @@ public class PostAction extends Command {
             moderatorCanEdit = true;
         }
 
-        List helperList = PostCommon.topicPosts(postDao, moderatorCanEdit, us.getUserId(), topic.getId(), start, count);
+        List<Post> helperList = PostCommon.topicPosts(postDao, moderatorCanEdit, us.getUserId(), topic.getId(), start, count);
 
         // Ugly assumption:
         // Is moderation pending for the topic?
@@ -205,6 +207,8 @@ public class PostAction extends Command {
             userVotes = DataAccessDriver.getInstance().newKarmaDAO().getUserVotes(topic.getId(), us.getUserId());
         }
 
+        Recommendation recommend = postDao.selectRecommendByTopicId(topicId);
+
         this.setTemplateName(TemplateKeys.POSTS_LIST);
         this.context.put("attachmentsEnabled", pc.canAccess(SecurityConstants.PERM_ATTACHMENTS_ENABLED, Integer.toString(topic.getForumId())));
         this.context.put("canDownloadAttachments", pc.canAccess(SecurityConstants.PERM_ATTACHMENTS_DOWNLOAD));
@@ -216,6 +220,7 @@ public class PostAction extends Command {
         this.context.put("moderatorCanEdit", moderatorCanEdit);
         this.context.put("allCategories", ForumCommon.getAllCategoriesAndForums(false));
         this.context.put("topic", topic);
+        this.context.put("topicRecommended", recommend != null);
         this.context.put("poll", poll);
         this.context.put("canVoteOnPoll", canVoteOnPoll);
         this.context.put("rank", new RankingRepository());
@@ -227,21 +232,34 @@ public class PostAction extends Command {
         this.context.put("moderationLoggingEnabled", SystemGlobals.getBoolValue(ConfigKeys.MODERATION_LOGGING_ENABLED));
         this.context.put("needCaptcha", SystemGlobals.getBoolValue(ConfigKeys.CAPTCHA_POSTS));
 
-        Map topicPosters = topicDao.topicPosters(topic.getId());
+        Map<Integer, User> topicPosters = topicDao.topicPosters(topic.getId());
 
-        for (Iterator iter = topicPosters.values().iterator(); iter.hasNext();) {
-            ViewCommon.prepareUserSignature((User) iter.next());
+        for (User user : topicPosters.values()) {
+            ViewCommon.prepareUserSignature(user);
         }
 
         this.context.put("users", topicPosters);
         this.context.put("anonymousPosts", pc.canAccess(SecurityConstants.PERM_ANONYMOUS_POST, Integer.toString(topic.getForumId())));
         this.context.put("watching", topicDao.isUserSubscribed(topicId, SessionFacade.getUserSession().getUserId()));
-        this.context.put("pageTitle", topic.getTitle());
         this.context.put("isAdmin", pc.canAccess(SecurityConstants.PERM_ADMINISTRATION));
         this.context.put("readonly", !pc.canAccess(SecurityConstants.PERM_REPLY, Integer.toString(topic.getForumId())));
         this.context.put("replyOnly", !pc.canAccess(SecurityConstants.PERM_NEW_POST, Integer.toString(topic.getForumId())));
-
         this.context.put("isModerator", us.isModerator(topic.getForumId()));
+
+        String pageTitle = String.format("%s - %s - %s", topic.getTitle(), forum.getName(), SystemGlobals.getValue(ConfigKeys.FORUM_PAGE_TITLE));
+        String description = HtmlUtil.removeAllHTML(helperList.get(0).getText());
+        if (StringUtils.isNotBlank(description)) {
+            description = description.trim();
+            description = description.replaceAll("\\s+", " ");
+            if (description.length() > 150) {
+                description = description.substring(0, 150);
+            }
+        } else {
+            description = pageTitle;
+        }
+        this.context.put("pageTitle", pageTitle);
+        this.context.put("metaDescription", description);
+        this.context.put("metaKeywords", description);
 
         ViewCommon.contextToPagination(start, topic.getTotalReplies() + 1, count);
 
@@ -485,7 +503,7 @@ public class PostAction extends Command {
 
         PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
         postDao.saveRecommend(rtopic);
-        TopicRepository.loadRecommendTopics();
+        TopicRepository.loadRecommendTopics(Recommendation.TYPE_INDEX_IMG);
         JForumExecutionContext.setRedirect(request.getContextPath());
     }
 
@@ -1191,7 +1209,7 @@ public class PostAction extends Command {
                 int anonymousUser = SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID);
 
                 if (u.getId() != anonymousUser) {
-                    SessionFacade.getTopicsReadTime().put(new Integer(t.getId()), new Long(p.getTime().getTime()));
+                    SessionFacade.getTopicsReadTime().put(t.getId(), p.getTime().getTime());
                 }
 
                 if (SystemGlobals.getBoolValue(ConfigKeys.POSTS_CACHE_ENABLED)) {
@@ -1311,9 +1329,14 @@ public class PostAction extends Command {
         } else {
             // Ok, all posts were removed. Time to say goodbye
             TopicsCommon.deleteTopic(p.getTopicId(), p.getForumId(), false);
+            Forum forum = ForumRepository.getForum(p.getForumId());
+            if (forum.getType() == Forum.TYPE_TEAM) {
+                JForumExecutionContext.setRedirect(this.request.getContextPath() + "/team/forum.action?teamId=" + forum.getId());
+            } else {
+                JForumExecutionContext.setRedirect(this.request.getContextPath() + "/forums/show/" + p.getForumId()
+                        + SystemGlobals.getValue(ConfigKeys.SERVLET_EXTENSION));
+            }
 
-            JForumExecutionContext.setRedirect(this.request.getContextPath() + "/forums/show/" + p.getForumId()
-                    + SystemGlobals.getValue(ConfigKeys.SERVLET_EXTENSION));
         }
 
         this.request.addOrReplaceParameter("log_original_message", p.getText());

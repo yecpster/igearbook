@@ -1,7 +1,21 @@
 <#include "/templates/default/header.htm" />
-<#assign currentChannel="team" />
+<@navHeader "team" />
 <link href="${contextPath}/templates/${templateName}/styles/team.css?${startupTime}" media="screen" rel="stylesheet" type="text/css" />
 
+
+<div id="group_nav" class="main">
+  <div class="crumbs">
+    <a href="${contextPath}/team/list.action">群组首页</a>
+    <span class="arrow">→</span>
+    <a href="${contextPath}/team/show.action?teamId=${teamId}">${team.name?html}</a>
+    <span class="arrow">→</span>
+             修改群组公告
+  </div>
+  <div class="left" style="margin: 0 10px;">
+    <div class="logo"><img src="${team.logo?default("")}" alt="${team.name}" height="48" width="48"></div>
+  </div>
+  <div>${team.description?default("")}</div>
+</div>
 
 <@s.form namespace="/team" action="saveAnnounce" method="post">
 <@s.if test="team!=null">
@@ -10,12 +24,8 @@
 
 
 <fieldset class="groups_new">
-<h3>修改群组公告：</h3>
 
 <ul>
-    <li><label>群组名称</label>
-        <@s.textfield cssClass="text" size="30" name="team.name" disabled="true" />
-    </li>
     <li><label>公告</label>
         <@s.textarea name="announcement" cols="30" rows="15"  />
     </li>
@@ -25,5 +35,4 @@
 
 <@s.token />
 </@s.form>
-
 <#include "/templates/default/bottom.htm" />

@@ -616,7 +616,7 @@ public class ForumRepository implements Cacheable {
         return (User) cache.get(FQN, LAST_USER);
     }
 
-    public static void setLastRegisteredUser(User user) {
+    public static synchronized void setLastRegisteredUser(User user) {
         cache.add(FQN, LAST_USER, user);
     }
 
@@ -624,7 +624,7 @@ public class ForumRepository implements Cacheable {
         return (Integer) cache.get(FQN, TOTAL_USERS);
     }
 
-    public static void incrementTotalUsers() {
+    public static synchronized void incrementTotalUsers() {
         Integer i = (Integer) cache.get(FQN, TOTAL_USERS);
 
         if (i == null) {

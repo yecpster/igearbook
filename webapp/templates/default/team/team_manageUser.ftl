@@ -1,7 +1,21 @@
 <#include "/templates/default/header.htm" />
-<#assign currentChannel="team" />
+<@navHeader "team" />
 
-<br />
+
+<table cellspacing="2" cellpadding="2" width="100%" border="0">
+   <tr>
+       <td valign="middle" align="left" colspan="${colspan?default("0")}">
+           <span class="nav">
+               <a class="nav" href="${contextPath}/team/list.action">群组首页</a> 
+               &raquo; 
+               <a class="nav" href="${contextPath}/team/show.action?teamId=${teamId}">${team.name?html}</a>
+               &raquo;   管理会员
+            </span>
+       </td>
+   </tr>
+</table>
+
+
 <table cellspacing="1" cellpadding="3" width="100%" border="0">
     <#if warns?exists>
         <#assign message = "" />

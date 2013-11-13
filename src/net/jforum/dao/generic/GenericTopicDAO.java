@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import net.jforum.JForumExecutionContext;
 import net.jforum.SessionFacade;
@@ -445,7 +446,7 @@ public class GenericTopicDAO extends AutoKeys implements TopicDAO
 	/**
 	 * @see net.jforum.dao.TopicDAO#selectAllByForum(int)
 	 */
-	public List selectAllByForum(int forumId)
+	public List<Topic> selectAllByForum(int forumId)
 	{
 		return this.selectAllByForumByLimit(forumId, 0, Integer.MAX_VALUE);
 	}
@@ -453,7 +454,7 @@ public class GenericTopicDAO extends AutoKeys implements TopicDAO
 	/**
 	 * @see net.jforum.dao.TopicDAO#selectAllByForumByLimit(int, int, int)
 	 */
-	public List selectAllByForumByLimit(int forumId, int startFrom, int count)
+	public List<Topic> selectAllByForumByLimit(int forumId, int startFrom, int count)
 	{
 		String sql = SystemGlobals.getSql("TopicModel.selectAllByForumByLimit");
 
@@ -1118,9 +1119,9 @@ public class GenericTopicDAO extends AutoKeys implements TopicDAO
 	/**
 	 * @see net.jforum.model.UserModel#topicPosters(int)
 	 */
-	public Map topicPosters(int topicId)
+	public Map<Integer, User> topicPosters(int topicId)
 	{
-		Map m = new HashMap();
+		Map<Integer, User> m = Maps.newHashMap();
 		
 		PreparedStatement p = null;
 		ResultSet rs = null;

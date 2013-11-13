@@ -1,5 +1,5 @@
 <#include "/templates/default/header.htm" />
-<#assign currentChannel="team" />
+<@navHeader "team" />
 <#import "/templates/macros/pagination.ftl" as pagination>
 <#import "/templates/macros/presentation.ftl" as presentation/>
 <link href="${contextPath}/templates/${templateName}/styles/team.css?${startupTime}" media="screen" rel="stylesheet" type="text/css" />
@@ -82,8 +82,14 @@
         <tr onmouseover="$(this).addClassName(&#39;mouse_over&#39;);" onmouseout="$(this).removeClassName(&#39;mouse_over&#39;);" class="">
           <td>
             <#if topic.type == TOPIC_STICKY>
-            <img alt="置顶" src="${contextPath}/images/team/top.gif" title="置顶">
+                <img alt="置顶" src="${contextPath}/images/team/top.gif" title="置顶">
+            <#elseif topic.type == TOPIC_GOOD>
+                <img alt="精华" src="${contextPath}/images/team/good.gif" title="精华">
+            <#elseif topic.type == (TOPIC_GOOD+TOPIC_STICKY)>
+                <img alt="置顶" src="${contextPath}/images/team/top.gif" title="置顶">
+                <img alt="精华" src="${contextPath}/images/team/good.gif" title="精华">
             </#if>
+            
             <a href="${JForumContext.encodeURL("/posts/list/${topic.id}")}" title="${topic.title?html}">${topic.title?html}</a>
             <#if topic.paginate>
               <div class="topic_page"><@pagination.littlePostPagination topic.id, postsPerPage, topic.totalReplies/>
@@ -106,7 +112,11 @@
         </tr>
         </#list>
         <tr>
-          <td colspan="4" style="text-align:right;">&gt; <a href="<@s.url namespace="/team" action="forum"><@s.param name="teamId" value="${team.id}" /></@s.url>">更多讨论</a></td>
+          <td colspan="4" style="text-align:right;">
+          <#if logged && moderator || session.isAdmin()>
+          &gt; <a href="<@s.url namespace="/team" action="moderation"><@s.param name="teamId" value="${team.id}" /></@s.url>">管理论坛</a>&nbsp;&nbsp;&nbsp;&nbsp; 
+          </#if>
+          &gt; <a href="<@s.url namespace="/team" action="forum"><@s.param name="teamId" value="${team.id}" /></@s.url>">更多讨论</a></td>
         </tr>
       </tbody>
     </table>

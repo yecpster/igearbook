@@ -1,5 +1,5 @@
 <#include "/templates/default/header.htm" />
-<#assign currentChannel="team" />
+<@navHeader "team" />
 <link href="${contextPath}/templates/${templateName}/styles/team.css?${startupTime}" media="screen" rel="stylesheet" type="text/css" />
 <link href="${contextPath}/templates/${templateName}/styles/validation_style.css?${startupTime}" media="screen" rel="stylesheet" type="text/css" />
 <link href="${contextPath}/templates/${templateName}/styles/tooltips.css?${startupTime}" media="screen" rel="stylesheet" type="text/css" />

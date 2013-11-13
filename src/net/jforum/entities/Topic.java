@@ -56,6 +56,7 @@ public class Topic implements Serializable
 	public static final int TYPE_NORMAL = 0;
 	public static final int TYPE_STICKY = 1;
 	public static final int TYPE_ANNOUNCE = 2;
+	public static final int TYPE_GOOD = 3;
 
 	public static final int STATUS_UNLOCKED = 0;
 	public static final int STATUS_LOCKED = 1;

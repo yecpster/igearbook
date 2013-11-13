@@ -1,7 +1,8 @@
 <#include "header.htm"/>
+<@navHeader "bbs" />
 <#setting datetime_format = "dd/MM/yyyy"/>
 <#import "../macros/pagination.ftl" as pagination/>
-
+<script type="text/javascript" src="${contextPath}/templates/${templateName}/js/jquery.js?${startupTime}"></script>
 <#include "karma_search.inc.htm"> 
 <#if (users.size() > 0) >	
 <table class="forumline" cellspacing="1" cellpadding="3" width="100%" border="0">

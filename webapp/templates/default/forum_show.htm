@@ -1,8 +1,9 @@
 <#include "header.htm"/>
-
+<@navHeader "bbs" />
 <#import "../macros/pagination.ftl" as pagination>
 <#import "../macros/presentation.ftl" as presentation/>
 
+<script type="text/javascript" src="${contextPath}/templates/${templateName}/js/jquery.js?${startupTime}"></script>
 <script type="text/javascript" src="${contextPath}/templates/${templateName}/js/pagination.js?${startupTime}"></script>
 
 <#if logged>
@@ -69,7 +70,7 @@
 
                     </form>
                     
-                    <td class="nav" nowrap="nowrap" align="right">
+                    <td class="nav" nowrap="nowrap" align="left">
                         <#assign paginationData><@pagination.doPagination action, forum.id/></#assign>
                         ${paginationData}
                     </td>
@@ -185,7 +186,6 @@
 				</tr>
 
 				<!-- TOPICS LISTING -->
-				<#assign sepTrDisplayed = false />
 				<#list topics as topic>
 				    <#assign hasAnnounce = false />
 				    <#if topic.type == TOPIC_ANNOUNCE>
@@ -203,11 +203,7 @@
 						</#if>
 					</#if>
                     
-                    <#if (topic.type != TOPIC_ANNOUNCE) && (topic_index<topics.size()) && !sepTrDisplayed >
-                        <tr class="sep1"><td colspan="6"></td></tr>
-                        <#assign sepTrDisplayed = true />
-                    </#if>
-					<tr class="bg_small_yellow">
+					<tr>
 						<td ${class1} valign="middle"  align="center" width="20"><@presentation.folderImage topic/></td>
 						<td ${class1} width="100%">
 							<#if topic.hasAttach() && attachmentsEnabled><img src="${contextPath}/templates/${templateName}/images/icon_clip.gif" align="middle" alt="[Clip]" /></#if>
@@ -282,7 +278,7 @@
 						<a class="nav" href="${JForumContext.encodeURL("/forums/list")}">${I18n.getMessage("ForumListing.forumIndex")}</a> &raquo;  <a class="nav" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">${forum.name?html}</a></span>
 					</td>
 
-					<td nowrap="nowrap" align="right" class="nav">${paginationData}</td>
+					<td nowrap="nowrap" align="left" class="nav">${paginationData}</td>
 					<#if !readonly && !replyOnly>
                         <td valign="middle"  align="left" width="50">
                             <a href="${JForumContext.encodeURL("/jforum${extension}?module=posts&amp;action=insert&amp;forum_id=${forum.id}","")}" rel="nofollow" class="icon_new_topic"><img src="${contextPath}/images/transp.gif" alt="" /></a>

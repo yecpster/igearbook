@@ -62,6 +62,7 @@ import net.jforum.dao.PollDAO;
 import net.jforum.dao.PostDAO;
 import net.jforum.dao.PrivateMessageDAO;
 import net.jforum.dao.RankingDAO;
+import net.jforum.dao.RecommendationDAO;
 import net.jforum.dao.SmilieDAO;
 import net.jforum.dao.SummaryDAO;
 import net.jforum.dao.TopicDAO;
@@ -72,233 +73,213 @@ import net.jforum.dao.generic.security.GenericGroupSecurityDAO;
 
 /**
  * @author Rafael Steil
- * @version $Id: GenericDataAccessDriver.java,v 1.16 2007/07/28 20:07:18 rafaelsteil Exp $
+ * @version $Id: GenericDataAccessDriver.java,v 1.16 2007/07/28 20:07:18
+ *          rafaelsteil Exp $
  */
-public class GenericDataAccessDriver extends DataAccessDriver 
-{
-	private static GroupDAO groupDao = new GenericGroupDAO();
-	private static PostDAO postDao = new GenericPostDAO();
-	private static PollDAO pollDao = new GenericPollDAO();
-	private static RankingDAO rankingDao = new GenericRankingDAO();
-	private static TopicDAO topicDao = new GenericTopicDAO();
-	private static UserDAO userDao = new GenericUserDAO();
-	private static TreeGroupDAO treeGroupDao = new GenericTreeGroupDAO();
-	private static SmilieDAO smilieDao = new GenericSmilieDAO();
-	private static GroupSecurityDAO groupSecurityDao = new GenericGroupSecurityDAO();
-	private static PrivateMessageDAO privateMessageDao = new GenericPrivateMessageDAO();
-	private static UserSessionDAO userSessionDao = new GenericUserSessionDAO();
-	private static KarmaDAO karmaDao = new GenericKarmaDAO();
-	private static BookmarkDAO bookmarkDao = new GenericBookmarkDAO();
-	private static AttachmentDAO attachmentDao = new GenericAttachmentDAO();
-	private static ModerationDAO moderationDao = new GenericModerationDAO();
-	private static ForumDAO forumDao = new GenericForumDAO();
-	private static CategoryDAO categoryDao = new GenericCategoryDAO();
-	private static ConfigDAO configDao = new GenericConfigDAO();
-	private static BannerDAO bannerDao = new GenericBannerDAO();
+public class GenericDataAccessDriver extends DataAccessDriver {
+    private static GroupDAO groupDao = new GenericGroupDAO();
+    private static PostDAO postDao = new GenericPostDAO();
+    private static RecommendationDAO recommendationDao = new GenericRecommendationDAO();
+    private static PollDAO pollDao = new GenericPollDAO();
+    private static RankingDAO rankingDao = new GenericRankingDAO();
+    private static TopicDAO topicDao = new GenericTopicDAO();
+    private static UserDAO userDao = new GenericUserDAO();
+    private static TreeGroupDAO treeGroupDao = new GenericTreeGroupDAO();
+    private static SmilieDAO smilieDao = new GenericSmilieDAO();
+    private static GroupSecurityDAO groupSecurityDao = new GenericGroupSecurityDAO();
+    private static PrivateMessageDAO privateMessageDao = new GenericPrivateMessageDAO();
+    private static UserSessionDAO userSessionDao = new GenericUserSessionDAO();
+    private static KarmaDAO karmaDao = new GenericKarmaDAO();
+    private static BookmarkDAO bookmarkDao = new GenericBookmarkDAO();
+    private static AttachmentDAO attachmentDao = new GenericAttachmentDAO();
+    private static ModerationDAO moderationDao = new GenericModerationDAO();
+    private static ForumDAO forumDao = new GenericForumDAO();
+    private static CategoryDAO categoryDao = new GenericCategoryDAO();
+    private static ConfigDAO configDao = new GenericConfigDAO();
+    private static BannerDAO bannerDao = new GenericBannerDAO();
     private static SummaryDAO summaryDao = new GenericSummaryDAO();
     private static MailIntegrationDAO mailIntegrationDao = new GenericMailIntegrationDAO();
     private static ApiDAO apiDAO = new GenericApiDAO();
     private static BanlistDAO banlistDao = new GenericBanlistDAO();
     private static ModerationLogDAO moderationLogDao = new GenericModerationLogDAO();
     private static LuceneDAO luceneDao = new GenericLuceneDAO();
-    
-	/**
-	 * @see net.jforum.dao.DataAccessDriver#getForumModel()
-	 */
-	public ForumDAO newForumDAO() 
-	{
-		return forumDao;	
-	}
 
-	/**
-	 * @see net.jforum.dao.DataAccessDriver#getGroupModel()
-	 */
-	public GroupDAO newGroupDAO() 
-	{
-		return groupDao;
-	}
+    /**
+     * @see net.jforum.dao.DataAccessDriver#getForumModel()
+     */
+    public ForumDAO newForumDAO() {
+        return forumDao;
+    }
 
-	/**
-	 * @see net.jforum.dao.DataAccessDriver#getPostModel()
-	 */
-	public PostDAO newPostDAO() 
-	{
-		return postDao;
-	}
+    /**
+     * @see net.jforum.dao.DataAccessDriver#getGroupModel()
+     */
+    public GroupDAO newGroupDAO() {
+        return groupDao;
+    }
 
-	/**
-	 * @see net.jforum.dao.DataAccessDriver#getPollModel()
-	 */
-	public PollDAO newPollDAO() 
-	{
-		return pollDao;
-	}
+    /**
+     * @see net.jforum.dao.DataAccessDriver#getPostModel()
+     */
+    public PostDAO newPostDAO() {
+        return postDao;
+    }
 
-	/**
-	 * @see net.jforum.dao.DataAccessDriver#getRankingModel()
-	 */
-	public RankingDAO newRankingDAO() 
-	{	
-		return rankingDao;
-	}
+    public RecommendationDAO newRecommendationDAO() {
+        return recommendationDao;
+    }
 
-	/**
-	 * @see net.jforum.dao.DataAccessDriver#getTopicModel()
-	 */
-	public TopicDAO newTopicDAO() 
-	{
-		return topicDao;
-	}
+    /**
+     * @see net.jforum.dao.DataAccessDriver#getPollModel()
+     */
+    public PollDAO newPollDAO() {
+        return pollDao;
+    }
 
-	/**
-	 * @see net.jforum.dao.DataAccessDriver#getUserModel()
-	 */
-	public UserDAO newUserDAO() 
-	{
-		return userDao;
-	}
+    /**
+     * @see net.jforum.dao.DataAccessDriver#getRankingModel()
+     */
+    public RankingDAO newRankingDAO() {
+        return rankingDao;
+    }
 
-	/**
-	 * @see net.jforum.dao.DataAccessDriver#newCategoryDAO()
-	 */
-	public CategoryDAO newCategoryDAO() 
-	{
-		return categoryDao;
-	}
+    /**
+     * @see net.jforum.dao.DataAccessDriver#getTopicModel()
+     */
+    public TopicDAO newTopicDAO() {
+        return topicDao;
+    }
 
-	/**
-	 * @see net.jforum.dao.DataAccessDriver#newTreeGroupDAO()
-	 */
-	public TreeGroupDAO newTreeGroupDAO() 
-	{
-		return treeGroupDao;
-	}
-	
-	/** 
-	 * @see net.jforum.dao.DataAccessDriver#newSmilieDAO()
-	 */
-	public SmilieDAO newSmilieDAO() 
-	{
-		return smilieDao;
-	}
-	
-	/** 
-	 * @see net.jforum.dao.DataAccessDriver#newGroupSecurityDAO()
-	 */
-	public GroupSecurityDAO newGroupSecurityDAO() 
-	{
-		return groupSecurityDao;
-	}
+    /**
+     * @see net.jforum.dao.DataAccessDriver#getUserModel()
+     */
+    public UserDAO newUserDAO() {
+        return userDao;
+    }
 
-	/** 
-	 * @see net.jforum.dao.DataAccessDriver#newPrivateMessageDAO()
-	 */
-	public PrivateMessageDAO newPrivateMessageDAO() 
-	{
-		return privateMessageDao;
-	}
-	
-	/** 
-	 * @see net.jforum.dao.DataAccessDriver#newUserSessionDAO()
-	 */
-	public UserSessionDAO newUserSessionDAO()
-	{
-		return userSessionDao;
-	}
-	
-	/** 
-	 * @see net.jforum.dao.DataAccessDriver#newConfigDAO()
-	 */
-	public ConfigDAO newConfigDAO()
-	{
-		return configDao;
-	}
-	
-	/** 
-	 * @see net.jforum.dao.DataAccessDriver#newKarmaDAO()
-	 */
-	public KarmaDAO newKarmaDAO()
-	{
-		return karmaDao;
-	}
-	
-	/** 
-	 * @see net.jforum.dao.DataAccessDriver#newBookmarkDAO()
-	 */
-	public BookmarkDAO newBookmarkDAO()
-	{
-		return bookmarkDao;
-	}
-	
-	/** 
-	 * @see net.jforum.dao.DataAccessDriver#newAttachmentDAO()
-	 */
-	public AttachmentDAO newAttachmentDAO()
-	{
-		return attachmentDao;
-	}
-	
-	/** 
-	 * @see net.jforum.dao.DataAccessDriver#newModerationDAO()
-	 */
-	public ModerationDAO newModerationDAO()
-	{
-		return moderationDao;
-	}
+    /**
+     * @see net.jforum.dao.DataAccessDriver#newCategoryDAO()
+     */
+    public CategoryDAO newCategoryDAO() {
+        return categoryDao;
+    }
+
+    /**
+     * @see net.jforum.dao.DataAccessDriver#newTreeGroupDAO()
+     */
+    public TreeGroupDAO newTreeGroupDAO() {
+        return treeGroupDao;
+    }
+
+    /**
+     * @see net.jforum.dao.DataAccessDriver#newSmilieDAO()
+     */
+    public SmilieDAO newSmilieDAO() {
+        return smilieDao;
+    }
+
+    /**
+     * @see net.jforum.dao.DataAccessDriver#newGroupSecurityDAO()
+     */
+    public GroupSecurityDAO newGroupSecurityDAO() {
+        return groupSecurityDao;
+    }
+
+    /**
+     * @see net.jforum.dao.DataAccessDriver#newPrivateMessageDAO()
+     */
+    public PrivateMessageDAO newPrivateMessageDAO() {
+        return privateMessageDao;
+    }
+
+    /**
+     * @see net.jforum.dao.DataAccessDriver#newUserSessionDAO()
+     */
+    public UserSessionDAO newUserSessionDAO() {
+        return userSessionDao;
+    }
+
+    /**
+     * @see net.jforum.dao.DataAccessDriver#newConfigDAO()
+     */
+    public ConfigDAO newConfigDAO() {
+        return configDao;
+    }
+
+    /**
+     * @see net.jforum.dao.DataAccessDriver#newKarmaDAO()
+     */
+    public KarmaDAO newKarmaDAO() {
+        return karmaDao;
+    }
+
+    /**
+     * @see net.jforum.dao.DataAccessDriver#newBookmarkDAO()
+     */
+    public BookmarkDAO newBookmarkDAO() {
+        return bookmarkDao;
+    }
+
+    /**
+     * @see net.jforum.dao.DataAccessDriver#newAttachmentDAO()
+     */
+    public AttachmentDAO newAttachmentDAO() {
+        return attachmentDao;
+    }
+
+    /**
+     * @see net.jforum.dao.DataAccessDriver#newModerationDAO()
+     */
+    public ModerationDAO newModerationDAO() {
+        return moderationDao;
+    }
 
     /**
      * @see net.jforum.dao.DataAccessDriver#newBannerDAO()
      */
-	public BannerDAO newBannerDAO()
-	{
-		return bannerDao;
-	}
-    
+    public BannerDAO newBannerDAO() {
+        return bannerDao;
+    }
+
     /**
      * @see net.jforum.dao.DataAccessDriver#newSummaryDAO()
      */
-    public SummaryDAO newSummaryDAO()
-    {
+    public SummaryDAO newSummaryDAO() {
         return summaryDao;
     }
-    
+
     /**
      * @see net.jforum.dao.DataAccessDriver#newMailIntegrationDAO()
      */
-    public MailIntegrationDAO newMailIntegrationDAO()
-    {
-    	return mailIntegrationDao;
+    public MailIntegrationDAO newMailIntegrationDAO() {
+        return mailIntegrationDao;
     }
-    
+
     /**
      * @see net.jforum.dao.DataAccessDriver#newApiDAO()
      */
-    public ApiDAO newApiDAO()
-    {
-    	return apiDAO;
+    public ApiDAO newApiDAO() {
+        return apiDAO;
     }
-    
+
     /**
      * @see net.jforum.dao.DataAccessDriver#newBanlistDAO()
      */
-    public BanlistDAO newBanlistDAO()
-    {
-    	return banlistDao;
+    public BanlistDAO newBanlistDAO() {
+        return banlistDao;
     }
-    
+
     /**
      * @see net.jforum.dao.DataAccessDriver#newModerationLogDAO()
      */
-    public ModerationLogDAO newModerationLogDAO()
-    {
-    	return moderationLogDao;
+    public ModerationLogDAO newModerationLogDAO() {
+        return moderationLogDao;
     }
-    
+
     /**
      * @see net.jforum.dao.DataAccessDriver#newLuceneDAO()
      */
-    public LuceneDAO newLuceneDAO()
-    {
-    	return luceneDao;
+    public LuceneDAO newLuceneDAO() {
+        return luceneDao;
     }
 }

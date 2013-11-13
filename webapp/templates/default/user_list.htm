@@ -1,8 +1,9 @@
 <#include "header.htm"/>
 <#import "../macros/pagination.ftl" as pagination/>
-<#assign currentChannel="userList" />
+<@navHeader "userList" />
 
 <script type="text/javascript" src="${contextPath}/templates/${templateName}/js/pagination.js?${startupTime}"></script>
+<script type="text/javascript" src="${contextPath}/templates/${templateName}/js/jquery.js?${startupTime}"></script>
 <script type="text/javascript">
 <!--
 <#include "js/utils.js"/>

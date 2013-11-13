@@ -47,15 +47,26 @@ ol li {
   margin: 0 0 0.25em 30px;
   padding: 0;
 }
-
+html.win.chrome * {
+    text-shadow:none !important;
+}
 div#nav div.wrapper {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  font-size: 13px;
-  padding-bottom: 6px;
-  background: #6293bb url(../images/shadow.png) repeat-x bottom left;
+	padding: 0;
+	width: 100%;
+  -khtml-border-top-left-radius: 5px;
+-khtml-border-top-right-radius: 5px;
+-moz-border-radius-topleft: 5px;
+-moz-border-radius-topright: 5px;
+-webkit-border-top-left-radius: 5px;
+-webkit-border-top-right-radius: 5px;
+border-top-left-radius: 5px;
+border-top-right-radius: 5px;
+-webkit-box-shadow: 0px -3px 3px rgba(0, 0, 0, .03);
+-moz-box-shadow: 0px -3px 3px rgba(0, 0, 0, .03);
+background: #dfecde url(../images/sf-menu.gif) repeat-x bottom;
+border-top: 1px solid #fff;
+position: relative;
+z-index: 51;
 }
 div#nav ul {
   width: 100%;
@@ -70,9 +81,21 @@ div#nav li {
   margin: 0;
   padding: 0 10px;
   line-height: 1em;
-  background-image: url(../images/line_white.gif);
+  /*background-image: url(../images/line_white.gif);*/
   background-position: right center;
   background-repeat: no-repeat;
+}
+div#nav li.first {
+margin-left: 12px;
+}
+div#nav li.selected {
+background: url(../images/top-tab-right.gif) no-repeat top right;
+}
+div#nav li.selected a {
+background: url(../images/top-tab-left.gif) no-repeat top left;
+color: #454;
+cursor: default;
+font-size: 13px;
 }
 div#nav li.last {
   background: none;
@@ -84,14 +107,14 @@ div#nav a:visited {
   display: inline-block;
   /* hide from ie/mac \*/
   display: block;
-  /* end hide */
-  font-weight: bold;
+  /* end hide
+  font-weight: bold; */
   text-decoration: none;
   
   margin: 0;
   padding: 7px 13px;
   
-  color: white;
+  color: #445544;
 }
 div#nav .subnav a,
 div#nav .subnav a:link,
@@ -100,8 +123,8 @@ div#nav .subnav a:visited {
   display: inline-block;
   padding: 7px 6px;
 }
-div#nav a:hover, div#nav a.selected {
-  background-color: #3671a5;
+div#nav a:hover{
+  background-color: rgb(166,188,166);
 }
 
 div#content {
@@ -112,40 +135,53 @@ div#content {
   text-align: left;
 }
 div#main {
+  position: relative;
   width: 100%;
   padding-top: 5px;
+  margin-top: 26px;
 }
 div#nav {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
   text-align: left;
+  clear: both;
+  padding-top: 0.7em;
+  padding-top: 8.4px;
+  position: relative;
+  z-index: 2;
+  margin: 0;
+padding: 0;
+border: 0;
+outline: 0;
 }
 
 body {
   margin: 0;
   padding: 0;
-  
-  background: white;
-  
+  width: 100%;
+  background: #eeefee url(../images/body.gif) repeat-x top;
   text-align: center;
 }
+
 div#page {
   width: 1000px;
   
   margin:  0 auto;
   padding: 0;
-  
-  background: white;
-  text-align: center;
 }
 
 div#header {
   padding: 0;
   margin: 0;
-  color: white;
-  background-color: white;
+}
+div#top_nav{
+/*border-top: 3px solid #567556;
+border-top: 1px solid #dd4b39;
+background: #dfecde url(../images/top.gif) repeat-x bottom;*/
+background-color: #2d2d2d;
+}
+#header .inner {
+width: 1000px;
+margin: 0 auto;
+position: relative;
 }
 div#branding {
   float: left;
@@ -155,12 +191,24 @@ div#branding {
 }
 div#content {
   width: 100%;
-  margin-top: 35px;
+  margin-top: 0;
+  
+  background: white;
+  overflow: hidden;
+  padding-bottom: 10px;
+  -webkit-box-shadow: 0 3px 5px rgba(0, 0, 0, .1);
+  -khtml-border-bottom-left-radius: 5px;
+  -khtml-border-bottom-right-radius: 5px;
+  -moz-border-radius-bottomleft: 5px;
+  -moz-border-radius-bottomright: 5px;
+  -webkit-border-bottom-left-radius: 5px;
+  -webkit-border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 div#footer {
   color: black;
-  background-color: white;  
 }
 div#footer p {
   font-size: 0.8em;
@@ -170,7 +218,7 @@ div#footer p {
 }
 
 a {
-    color: #006699;
+    color: #265827;
     text-decoration: none;
 }
 
@@ -191,14 +239,14 @@ div#user_nav a.nobg {
 }
 
 div#user_nav a.welcome {
-    color: #E28822;
+    color: #fff;
     font-weight: bold;
     padding-right: 10px;
 }
 
 div#user_nav a:hover.welcome {
     text-decoration: none;
-    color: #E28822;
+    color: #fff;
     background-color: transparent;
 }
 
@@ -216,7 +264,7 @@ div#user_nav a:hover.new_reply {
 div#user_nav a {
     text-decoration: none;
     padding:2px 6px 1px 6px;
-    color: gray;
+    color: #ccc;
     line-height: 1em;
     background-image: url(../images/line_gray.gif);
     background-position: right center;
@@ -282,33 +330,35 @@ div#header {
 .wrapper {
     padding: 3px 0;
     float: left;
-    font-size: 14px;
+    font-size: 13px;
     width: 660px;
     text-align: center;
     overflow: hidden;
 }
 
-
 #forum_tab_show div {
-    border: 1px solid #ccc;
-    height: 295px;
-    width: 370px;
+    border: 0px solid #ccc;
+    height: 395px;
+    width: 380px;
     float: left;
-    margin: 0 7px 3px 2px;
+    margin: 0 3px 3px 0px;
     overflow: hidden;
     position: relative;
 }
 #forum_tab_show div.middle {
-    width: 300px;
+    width: 304px;
+    border: 1px solid #ccc;
 }
 #forum_tab_show div.last {
-    width: 300px;
-    margin-right: 2px;
+    width: 304px;
+    margin-right: 0px;
+    border: 1px solid #ccc;
 }
 
 #forum_tab_show ul {
-    padding-top: 2px;
+    padding-top: 5px;
     list-style: none;
+    margin: 0;
 }
 #forum_tab_show h4{
 	margin: 3px 1px 0px 20px;
@@ -316,15 +366,46 @@ div#header {
 }
 
 #forum_tab_show ul li {
-    background: url(../images/board-tab-list.png) no-repeat left center;
-    margin-left: 15px;
-    padding-left: 20px;
-    margin-bottom: 9px;
-    width: 255px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    width: 285px;
     text-overflow: ellipsis; 
-    display: block; 
     overflow: hidden; 
     white-space: nowrap;
+    display: list-item;
+    text-align: -webkit-match-parent;
+}
+#forum_tab_show ul li a:hover{
+   color: black;
+background: #ddd;
+border-bottom: 1px solid #ded;
+position: relative;
+z-index: 40;
+}
+#forum_tab_show ul li a{
+display: block;
+font-size: 12px;
+line-height: 12px;
+padding: 3px 3px 3px 4px;
+border-bottom: 1px solid #eeefee;
+white-space: nowrap;
+text-overflow: ellipsis;
+overflow: hidden;
+color: #444;
+background: white;
+cursor: pointer;
+position: relative;
+z-index: 30;
+}
+#forum_tab_show .tab_wrapper {
+    width: 300px;
+    height: 78px;
+    margin-top: 1px;
+}
+#forum_tab_show .tab_wrapper div{
+    width: 147px;
+    height: 78px;
+    margin-bottom: 0px;
 }
 
 #slides span.pagination {
@@ -370,10 +451,10 @@ div#header {
 .pagination span.current {
     padding: 2px 5px 2px 5px;
     margin: 1px;
-    border: 1px solid #006699;
+    border: 1px solid #265827;
     font-size: 11px;
     font-weight: bold;
-    background-color: #006699;
+    background-color: #265827;
     color: #FFF;
 }
 .pagination span.disabled {

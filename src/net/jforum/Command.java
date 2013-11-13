@@ -44,6 +44,8 @@ package net.jforum;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletResponse;
+
 import net.jforum.context.RequestContext;
 import net.jforum.context.ResponseContext;
 import net.jforum.exceptions.ForumException;
@@ -114,8 +116,13 @@ public abstract class Command
 				this.getClass().getMethod(action, NO_ARGS_CLASS).invoke(this, NO_ARGS_OBJECT);
 			}
 			catch (NoSuchMethodException e) {
-			    context.put("action", "list");
-			    request.addOrReplaceParameter("action", "list");
+			    try {
+                    JForumExecutionContext.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
+                } catch (IOException e1) {
+                    throw new ForumException(e1);
+                }
+                // context.put("action", "list");
+                // request.addOrReplaceParameter("action", "list");
 				this.list();		
 			}
 			catch (Exception e)

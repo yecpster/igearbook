@@ -157,12 +157,6 @@ public class ForumAction extends Command {
 
             ForumRepository.updateMostUsersEverOnline(mostUsersEverOnline);
         }
-        List<Recommendation> recommends = TopicRepository.getRecommendTopics();
-        if (recommends != null && recommends.size() > 0) {
-            this.context.put("recommendTopic", recommends.get(0));
-        }
-        this.context.put("recentTopics", TopicRepository.getRecentTopics());
-        this.context.put("hotTopics", TopicRepository.getHottestTopics());
 
         this.context.put("mostUsersEverOnline", mostUsersEverOnline);
     }

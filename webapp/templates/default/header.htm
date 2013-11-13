@@ -7,9 +7,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN" dir="ltr">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>${pageTitle?default("JForum")?html}</title>
-    <meta name="description" content="${pageTitle?default("JForum")?html}" />
-    <meta name="keywords" content="" />
+    <title>${pageTitle?default("")?html}</title>
+    <meta name="description" content="${metaDescription?default("")?html}" />
+    <meta name="keywords" content="${metaKeywords?default("")?html}" />
     <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
      <#-- 
     <link href="/rss/forum" rel="alternate" title="ITeye" type="application/rss+xml" />
@@ -37,17 +37,17 @@ Please check your browser settings or use a Javascript-capable browser.</p>
 </noscript>
   </head>
   <body class="${language}">
-    <div id="page">
-      <div id="header">
-        <div class="clearfix">
+    <div id="header">
+        <div id="top_nav">
+        <div class="clearfix inner">
             <div id="user_nav">
                 <#-- logged begin -->
                 <#if logged>
                     <a href="${JForumContext.encodeURL("/user/edit/${session.userId}")}"  class="welcome">${I18n.getMessage("Admin.welcome")}${session.username}</a>
                     <#if !sso>
-                        <a href="${JForumContext.encodeURL("/user/logout")}" class="notabs">${I18n.getMessage("ForumBase.logout")}</a>
+                        <a href="${JForumContext.encodeURL("/user/logout")}" class="nobg">${I18n.getMessage("ForumBase.logout")}</a>
                     </#if>
-                    <a href="${JForumContext.encodeURL("/pm/inbox")}" target="_blank">
+                    <a href="${JForumContext.encodeURL("/pm/inbox")}" target="_blank" class="nobg">
                     <#if (session.privateMessages > 0)>
                         ${I18n.getMessage("ForumBase.newPm")}: (${session.privateMessages})
                     <#else>
@@ -55,31 +55,77 @@ Please check your browser settings or use a Javascript-capable browser.</p>
                      </#if>
                      </a>
                      <#if bookmarksEnabled>
-                          <a href="${JForumContext.encodeURL("/bookmarks/list/${session.userId}")}">${I18n.getMessage("Bookmarks.myBag")}</a>
+                          <a href="${JForumContext.encodeURL("/bookmarks/list/${session.userId}")}" class="nobg">${I18n.getMessage("Bookmarks.myBag")}</a>
                      </#if>
                 </#if>
                 <#-- logged end -->
                 
                 <#if !logged && !sso>
                     <a href="${JForumContext.encodeURL("/user/login")}" class="welcome" title="${I18n.getMessage("ForumBase.login")}">${I18n.getMessage("Admin.notYetLogin")}</a>
-                    <a href="${JForumContext.encodeURL("/user/login")}">${I18n.getMessage("ForumBase.login")}</a>
+                    <a href="${JForumContext.encodeURL("/user/login")}" class="nobg">${I18n.getMessage("ForumBase.login")}</a>
                     <a href="${JForumContext.encodeURL("/user/insert")}" class="nobg">${I18n.getMessage("ForumBase.register")}</a>
                 </#if>
                 <#if canAccessModerationLog?default(false)>
-                    <a href="${JForumContext.encodeURL("/moderation/showActivityLog")}">${I18n.getMessage("ModerationLog.moderationLog")}</a>
+                    <a href="${JForumContext.encodeURL("/moderation/showActivityLog")}" class="nobg">${I18n.getMessage("ModerationLog.moderationLog")}</a>
                 </#if>
                 <#if session?exists && session.isAdmin()>
-                    <a href="${JForumContext.encodeURL("/admBase/login")}" target="_blank">${I18n.getMessage("ForumBase.admin")}</a>
+                    <a href="${JForumContext.encodeURL("/admBase/login")}" target="_blank" class="nobg">${I18n.getMessage("ForumBase.admin")}</a>
                 </#if>
             </div>
         </div>
-        <div class="clearfix">
+        </div>
+        
+        <div class="clearfix inner">
           <div id="branding">
-            <a href="${homepageLink}" title="${pageTitle?default("Forum")?html}"><img alt="${pageTitle?default("Forum")?html}" src="${contextPath}/templates/${templateName}/images/logo3.png" /></a>
+            <a href="${homepageLink}" title="${pageTitle?default("Forum")?html}"><img alt="${pageTitle?default("Forum")?html}" src="${contextPath}/templates/${templateName}/images/logo3.png" height="70" /></a>
           </div>
+          <#--
           <div id="gg"><img src="${contextPath}/templates/${templateName}/images/topba.jpg" /></div>
+            -->
         </div>
       </div>
+    <div id="page">
 
       <div id="content" class="clearfix">
+
+<#macro navHeader currentChannel="">
+        <div id="nav">
+    <#assign indexClass="" />
+    <#assign searchClass="" />
+    <#assign recentTopicClass="" />
+    <#assign hotTopicClass="" />
+    <#assign userListClass="" />
+    <#assign teamClass="" />
+    <#assign bbsClass="" />
+    
+    <#if currentChannel=="index">
+        <#assign indexClass="selected" />
+    <#elseif currentChannel=="search">
+        <#assign searchClass="selected" />
+    <#elseif currentChannel=="recentTopic">
+        <#assign recentTopicClass="selected" />
+    <#elseif currentChannel=="hotTopic">
+        <#assign hotTopicClass="selected" />
+    <#elseif currentChannel=="userList">
+        <#assign userListClass="selected" />
+    <#elseif currentChannel=="team">
+        <#assign teamClass="selected" />
+    <#elseif currentChannel=="bbs">
+        <#assign bbsClass="selected" />
+    </#if>
+      <div class="wrapper">
+        <ul>
+          <li class="first ${indexClass}"><a href="${homepageLink}?${startupTime}">${I18n.getMessage("ForumBase.index")}</a></li>
+          <#--
+          <li><a href="${JForumContext.encodeURL("/recentTopics/list")}" class="${recentTopicClass}">${I18n.getMessage("ForumBase.recentTopics")}</a></li>
+          <li><a href="${JForumContext.encodeURL("/hottestTopics/list")}" class="${hotTopicClass}">${I18n.getMessage("ForumBase.hottestTopics")}</a></li>
+          -->
+          <li class="${bbsClass}"><a href="${JForumContext.encodeURL("/forums/list")}">${I18n.getMessage("ForumListing.forumIndex")}</a></li>
+          <li class="${teamClass}"><a href="${contextPath}/team/list.action">群组</a></li>
+          <li class="${userListClass}"><a href="${JForumContext.encodeURL("/user/list")}">${I18n.getMessage("ForumBase.usersList")}</a></li>
+          <li class="${searchClass}"><a href="${JForumContext.encodeURL("/search/filters")}">${I18n.getMessage("ForumBase.search")}</a></li>
+        </ul>
+      </div>
+    </div>
         <div id="main">
+</#macro>
