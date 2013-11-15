@@ -344,6 +344,12 @@
 
 						</td>
 					</tr>
+				<#elseif isTeamForum&&logged>
+					<tr>
+                        <td colspan="3" align="center">
+                            <span style="color: #ff0000;font-size: 14px;font-weight:bold;">只有群组成员才能发言 &gt;&nbsp;</span><a href="${contextPath}/team/join.action?teamId=${forum.id}">加入此群组</a>
+                        </td>
+                    </tr>
 				</#if>
 				
 				<#if isModerator || isAdmin>

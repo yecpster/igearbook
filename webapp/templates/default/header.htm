@@ -127,5 +127,9 @@ Please check your browser settings or use a Javascript-capable browser.</p>
         </ul>
       </div>
     </div>
+            <#if message?exists>
+            <div style="text-align:center;margin: 35px 0 0px 0;"><img src="${contextPath}/images/icon_pass.gif" />&nbsp;<span style="color: #008000;font-size: 12px;font-weight:bold;">${message}</span></div>
+            </#if>
         <div id="main">
+        
 </#macro>

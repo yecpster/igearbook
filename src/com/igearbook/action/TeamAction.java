@@ -153,7 +153,8 @@ public class TeamAction extends ActionSupport {
             SecurityRepository.clean();
             RolesRepository.clear();
         }
-
+        ActionContext context = ServletActionContext.getContext();
+        context.put("message", "你已经成功加入此群组");
         return SUCCESS;
     }
 
@@ -537,7 +538,7 @@ public class TeamAction extends ActionSupport {
         context.put("watching", fm.isUserSubscribed(teamId, userSession.getUserId()));
 
         // Pagination
-        int topicsPerPage = SystemGlobals.getIntValue(ConfigKeys.TOPICS_PER_PAGE);
+        int topicsPerPage = Integer.MAX_VALUE;//TODO
         int postsPerPage = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
         int totalTopics = team.getTotalTopics();
 

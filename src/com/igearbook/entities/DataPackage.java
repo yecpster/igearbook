@@ -14,12 +14,12 @@ public class DataPackage implements Serializable {
 
     public int currentPage;// 当前页
 
-    public Collection datas;// 封闭好的PO的集合
+    public Collection<Serializable> datas;// 封闭好的PO的集合
 
     /**
      * @return Returns the datas.
      */
-    public Collection getDatas() {
+    public Collection<Serializable> getDatas() {
         return datas;
     }
 
@@ -27,7 +27,7 @@ public class DataPackage implements Serializable {
      * @param datas
      *            The datas to set.
      */
-    public void setDatas(Collection datas) {
+    public void setDatas(Collection<Serializable> datas) {
         this.datas = datas;
     }
 

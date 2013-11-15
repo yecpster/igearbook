@@ -66,6 +66,7 @@ import net.jforum.dao.ForumDAO;
 import net.jforum.dao.KarmaDAO;
 import net.jforum.dao.PollDAO;
 import net.jforum.dao.PostDAO;
+import net.jforum.dao.RecommendationDAO;
 import net.jforum.dao.TopicDAO;
 import net.jforum.dao.UserDAO;
 import net.jforum.entities.Attachment;
@@ -207,7 +208,8 @@ public class PostAction extends Command {
             userVotes = DataAccessDriver.getInstance().newKarmaDAO().getUserVotes(topic.getId(), us.getUserId());
         }
 
-        Recommendation recommend = postDao.selectRecommendByTopicId(topicId);
+        RecommendationDAO recommendDao = DataAccessDriver.getInstance().newRecommendationDAO();
+        Recommendation recommend = recommendDao.selectByTopicId(topicId);
 
         this.setTemplateName(TemplateKeys.POSTS_LIST);
         this.context.put("attachmentsEnabled", pc.canAccess(SecurityConstants.PERM_ATTACHMENTS_ENABLED, Integer.toString(topic.getForumId())));
