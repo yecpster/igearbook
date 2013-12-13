@@ -41,7 +41,7 @@
     </span>
   </div>
   <div class="left" style="margin: 0 10px;">
-    <div class="logo"><img src="${team.logo?default("")}" alt="${team.name}" height="48" width="48"></div>
+    <div class="logo"><img src="${contextPath}${team.logo?default("")}" alt="${team.name}" height="48" width="48" /></div>
   </div>
   <div>${team.description?default("")}</div>
 </div>

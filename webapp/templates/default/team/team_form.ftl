@@ -38,7 +38,7 @@
     </li>
     <li><label>群组图标</label> 
         <@s.if test="team!=null">
-            <img src="${team.logo?default("")}" height="48" width="48">
+            <img src="${contextPath}${team.logo?default("")}" height="48" width="48">
         </@s.if>
         <@s.file name="upload"  cssClass="validate-file-png-jpg-gif" />
     </li>

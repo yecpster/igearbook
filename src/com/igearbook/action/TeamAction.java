@@ -56,10 +56,9 @@ import com.google.common.collect.Lists;
 import com.igearbook.util.DateUtil;
 import com.igearbook.util.ImageHelper;
 import com.opensymphony.xwork2.ActionContext;
-import com.opensymphony.xwork2.ActionSupport;
 
 @Namespace("/team")
-public class TeamAction extends ActionSupport {
+public class TeamAction extends BaseAction {
     private static final long serialVersionUID = 7587622153127430L;
 
     private static final int WIDTH_RANGE = 80;
@@ -82,38 +81,38 @@ public class TeamAction extends ActionSupport {
 
     @Action(value = "list", results = { @Result(name = SUCCESS, location = "team_list.ftl") })
     public String list() {
-        ActionContext context = ServletActionContext.getContext();
-        boolean canCreateTeam = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_CREATE);
+        final ActionContext context = ServletActionContext.getContext();
+        final boolean canCreateTeam = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_CREATE);
         context.put("canCreateTeam", canCreateTeam);
 
-        List<Category> allCategories = ForumRepository.getAllCategories(SessionFacade.getUserSession().getUserId());
-        List<Category> categories = Lists.newArrayList();
-        for (Category category : allCategories) {
+        final List<Category> allCategories = ForumRepository.getAllCategories(SessionFacade.getUserSession().getUserId());
+        final List<Category> categories = Lists.newArrayList();
+        for (final Category category : allCategories) {
             if (category.getType() == 1) {
                 categories.add(category);
             }
         }
         context.put("categories", categories);
 
-        List<Forum> rankTeams = Lists.newArrayList();
-        for (Category category : categories) {
+        final List<Forum> rankTeams = Lists.newArrayList();
+        for (final Category category : categories) {
             rankTeams.addAll(category.getForums());
         }
         Collections.sort(rankTeams, new Comparator<Forum>() {
             @Override
-            public int compare(Forum o1, Forum o2) {
+            public int compare(final Forum o1, final Forum o2) {
                 return o2.getTotalPosts() - o1.getTotalPosts();
             }
         });
         context.put("rankTeams", rankTeams);
 
-        List<Forum> hotTeams = Lists.newArrayList();
-        for (Category category : categories) {
+        final List<Forum> hotTeams = Lists.newArrayList();
+        for (final Category category : categories) {
             hotTeams.addAll(category.getForums());
         }
         Collections.sort(hotTeams, new Comparator<Forum>() {
             @Override
-            public int compare(Forum o1, Forum o2) {
+            public int compare(final Forum o1, final Forum o2) {
                 return o2.getLastPostId() - o1.getLastPostId();
             }
         });
@@ -122,29 +121,29 @@ public class TeamAction extends ActionSupport {
         return SUCCESS;
     }
 
-    //@Action(value = "moderation", results = { @Result(name = SUCCESS, location = "team_forum.ftl") })
+    // @Action(value = "moderation", results = { @Result(name = SUCCESS, location = "team_forum.ftl") })
     public String moderation() {
-        boolean canEditTeam = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
+        final boolean canEditTeam = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
         if (canEditTeam || SessionFacade.getUserSession().isAdmin()) {
-            ActionContext context = ServletActionContext.getContext();
+            final ActionContext context = ServletActionContext.getContext();
             context.put("openModeration", true);
             return this.show();
         } else {
-            return ERROR;
+            return PERMISSION;
         }
     }
 
     @Action(value = "join", results = { @Result(name = SUCCESS, location = "show", type = "chain") })
     public String joinTeam() {
-        boolean isTeamMember = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_USER, String.valueOf(teamId))
+        final boolean isTeamMember = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_USER, String.valueOf(teamId))
                 || SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_OWNER, String.valueOf(teamId))
                 || SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_USER_CANDIDATE, String.valueOf(teamId))
                 || SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
-        boolean isBanUser = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_USER_BAN2POST, String.valueOf(teamId));
+        final boolean isBanUser = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_USER_BAN2POST, String.valueOf(teamId));
         if (!isTeamMember && !isBanUser) {
-            int userId = SessionFacade.getUserSession().getUserId();
-            GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
-            UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
+            final int userId = SessionFacade.getUserSession().getUserId();
+            final GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
+            final UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
             Group teamUserGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER, teamId);
             if (teamUserGorup == null) {
                 teamUserGorup = this.createUserGroup(groupDao, teamId);
@@ -153,45 +152,45 @@ public class TeamAction extends ActionSupport {
             SecurityRepository.clean();
             RolesRepository.clear();
         }
-        ActionContext context = ServletActionContext.getContext();
+        final ActionContext context = ServletActionContext.getContext();
         context.put("message", "你已经成功加入此群组");
         return SUCCESS;
     }
 
     @Action(value = "manageUser", results = { @Result(name = SUCCESS, location = "team_manageUser.ftl") })
     public String manageUser() {
-        boolean isTeamOwner = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_OWNER, String.valueOf(teamId));
+        final boolean isTeamOwner = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_OWNER, String.valueOf(teamId));
         if (!isTeamOwner) {
-            return ERROR;
+            return PERMISSION;
         }
         this.team = ForumRepository.getForum(teamId);
         if (this.team == null) {
-            ForumDAO forumDao = DataAccessDriver.getInstance().newForumDAO();
+            final ForumDAO forumDao = DataAccessDriver.getInstance().newForumDAO();
             this.team = forumDao.selectById(teamId);
             ForumRepository.addForum(this.team);
         }
 
-        ActionContext context = ServletActionContext.getContext();
-        GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
-        UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
+        final ActionContext context = ServletActionContext.getContext();
+        final GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
+        final UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
 
-        int start = ViewCommon.getStartPage();
-        int usersPerPage = SystemGlobals.getIntValue(ConfigKeys.USERS_PER_PAGE);
-        Group teamUserGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER, teamId);
+        final int start = ViewCommon.getStartPage();
+        final int usersPerPage = SystemGlobals.getIntValue(ConfigKeys.USERS_PER_PAGE);
+        final Group teamUserGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER, teamId);
         contextToPagination(start, userDao.getTotalUsersByGroup(teamUserGorup.getId()), usersPerPage);
-        List<User> users = userDao.selectAllByGroup(teamUserGorup.getId(), start, Integer.MAX_VALUE);
+        final List<User> users = userDao.selectAllByGroup(teamUserGorup.getId(), start, Integer.MAX_VALUE);
 
         Group banUserGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER_BAN2POST, teamId);
         if (banUserGorup == null) {
             banUserGorup = this.createBanToPostUserGroup(groupDao, teamId);
         }
-        List<User> banUsers = userDao.selectAllByGroup(banUserGorup.getId(), 0, 100);
+        final List<User> banUsers = userDao.selectAllByGroup(banUserGorup.getId(), 0, 100);
 
-        Group moderatorsGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_MODERATION_FORUMS, teamId);
-        List<User> moderators = userDao.selectAllByGroup(moderatorsGorup.getId(), 0, 10);
+        final Group moderatorsGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_MODERATION_FORUMS, teamId);
+        final List<User> moderators = userDao.selectAllByGroup(moderatorsGorup.getId(), 0, 10);
 
-        Group ownerGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_OWNER, teamId);
-        List<User> owners = userDao.selectAllByGroup(ownerGorup.getId(), 0, 5);
+        final Group ownerGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_OWNER, teamId);
+        final List<User> owners = userDao.selectAllByGroup(ownerGorup.getId(), 0, 5);
 
         context.put("users", users);
         context.put("banUsers", banUsers);
@@ -203,17 +202,17 @@ public class TeamAction extends ActionSupport {
     @Action(value = "setAdmin", results = { @Result(name = SUCCESS, location = "manageUser.action", type = "redirect", params = { "teamId",
             "${teamId}" }) })
     public String setAdmin() {
-        boolean isTeamOwner = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_OWNER, String.valueOf(teamId));
-        boolean isUserValid = SecurityRepository.canAccess(this.userId, SecurityConstants.PERM_TEAMFORUM_USER, String.valueOf(teamId));
+        final boolean isTeamOwner = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_OWNER, String.valueOf(teamId));
+        final boolean isUserValid = SecurityRepository.canAccess(this.userId, SecurityConstants.PERM_TEAMFORUM_USER, String.valueOf(teamId));
         if (!isTeamOwner || !isUserValid) {
-            return ERROR;
+            return PERMISSION;
         }
 
-        GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
-        UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
+        final GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
+        final UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
 
-        Group teamUserGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER, teamId);
-        Group moderatorsGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_MODERATION_FORUMS, teamId);
+        final Group teamUserGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER, teamId);
+        final Group moderatorsGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_MODERATION_FORUMS, teamId);
         userDao.removeFromGroup(this.userId, new int[] { teamUserGorup.getId() });
         userDao.addToGroup(this.userId, new int[] { moderatorsGorup.getId() });
 
@@ -225,17 +224,17 @@ public class TeamAction extends ActionSupport {
     @Action(value = "cancelAdmin", results = { @Result(name = SUCCESS, location = "manageUser.action", type = "redirect", params = { "teamId",
             "${teamId}" }) })
     public String cancelAdmin() {
-        boolean isTeamOwner = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_OWNER, String.valueOf(teamId));
-        boolean isUserValid = SecurityRepository.canAccess(this.userId, SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
+        final boolean isTeamOwner = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_OWNER, String.valueOf(teamId));
+        final boolean isUserValid = SecurityRepository.canAccess(this.userId, SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
         if (!isTeamOwner || !isUserValid) {
-            return ERROR;
+            return PERMISSION;
         }
 
-        GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
-        UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
+        final GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
+        final UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
 
-        Group moderatorsGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_MODERATION_FORUMS, teamId);
-        Group teamUserGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER, teamId);
+        final Group moderatorsGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_MODERATION_FORUMS, teamId);
+        final Group teamUserGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER, teamId);
         userDao.removeFromGroup(this.userId, new int[] { moderatorsGorup.getId() });
         userDao.addToGroup(this.userId, new int[] { teamUserGorup.getId() });
 
@@ -247,25 +246,25 @@ public class TeamAction extends ActionSupport {
     @Action(value = "banPostUsers", results = { @Result(name = SUCCESS, location = "manageUser.action", type = "redirect", params = { "teamId",
             "${teamId}" }) })
     public String banPostUsers() {
-        boolean isTeamOwner = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_OWNER, String.valueOf(teamId));
+        final boolean isTeamOwner = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_OWNER, String.valueOf(teamId));
         if (!isTeamOwner) {
-            return ERROR;
+            return PERMISSION;
         }
         if (banPostUserIds == null || banPostUserIds.length == 0) {
             return SUCCESS;
         }
-        for (int banUserId : banPostUserIds) {
-            boolean isUserValid = SecurityRepository.canAccess(banUserId, SecurityConstants.PERM_TEAMFORUM_USER, String.valueOf(teamId));
+        for (final int banUserId : banPostUserIds) {
+            final boolean isUserValid = SecurityRepository.canAccess(banUserId, SecurityConstants.PERM_TEAMFORUM_USER, String.valueOf(teamId));
             if (!isUserValid) {
                 return ERROR;
             }
         }
-        GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
-        UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
+        final GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
+        final UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
 
-        Group teamUserGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER, teamId);
-        Group teamUserBanToPostGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER_BAN2POST, teamId);
-        for (int banUserId : banPostUserIds) {
+        final Group teamUserGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER, teamId);
+        final Group teamUserBanToPostGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER_BAN2POST, teamId);
+        for (final int banUserId : banPostUserIds) {
             userDao.removeFromGroup(banUserId, new int[] { teamUserGorup.getId() });
             userDao.addToGroup(banUserId, new int[] { teamUserBanToPostGorup.getId() });
         }
@@ -279,19 +278,19 @@ public class TeamAction extends ActionSupport {
     @Action(value = "unbanUser", results = { @Result(name = SUCCESS, location = "manageUser.action", type = "redirect", params = { "teamId",
             "${teamId}" }) })
     public String unbanPostUsers() {
-        boolean isTeamOwner = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_OWNER, String.valueOf(teamId));
+        final boolean isTeamOwner = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_OWNER, String.valueOf(teamId));
         if (!isTeamOwner) {
-            return ERROR;
+            return PERMISSION;
         }
-        boolean isUserValid = SecurityRepository.canAccess(userId, SecurityConstants.PERM_TEAMFORUM_USER_BAN2POST, String.valueOf(teamId));
+        final boolean isUserValid = SecurityRepository.canAccess(userId, SecurityConstants.PERM_TEAMFORUM_USER_BAN2POST, String.valueOf(teamId));
         if (!isUserValid) {
             return ERROR;
         }
-        GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
-        UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
+        final GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
+        final UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
 
-        Group teamUserGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER, teamId);
-        Group teamUserBanToPostGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER_BAN2POST, teamId);
+        final Group teamUserGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER, teamId);
+        final Group teamUserBanToPostGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER_BAN2POST, teamId);
         userDao.removeFromGroup(userId, new int[] { teamUserBanToPostGorup.getId() });
         userDao.addToGroup(userId, new int[] { teamUserGorup.getId() });
 
@@ -303,39 +302,39 @@ public class TeamAction extends ActionSupport {
 
     @Action(value = "show", results = { @Result(name = SUCCESS, location = "team_show.ftl") })
     public String show() {
-        ActionContext context = ServletActionContext.getContext();
-        ForumDAO fm = DataAccessDriver.getInstance().newForumDAO();
-        GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
-        UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
+        final ActionContext context = ServletActionContext.getContext();
+        final ForumDAO fm = DataAccessDriver.getInstance().newForumDAO();
+        final GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
+        final UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
 
         // The user can access this team?
-        Forum team = ForumRepository.getForum(teamId);
+        final Forum team = ForumRepository.getForum(teamId);
 
         if (team == null || team.getType() != 1 || !ForumRepository.isCategoryAccessible(team.getCategoryId())) {
             new ModerationHelper().denied(I18n.getMessage("ForumListing.denied"));
             return ERROR;
         }
 
-        int start = ViewCommon.getStartPage();
+        final int start = ViewCommon.getStartPage();
 
-        List<Topic> tmpTopics = TopicsCommon.topicsByForum(teamId, start);
+        final List<Topic> tmpTopics = TopicsCommon.topicsByForum(teamId, start);
 
-        TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
-        PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
-        List<Topic> topics = topicDao.selectByForumByTypeByLimit(teamId, Topic.TYPE_ANNOUNCE, 0, 1);
+        final TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
+        final PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
+        final List<Topic> topics = topicDao.selectByForumByTypeByLimit(teamId, Topic.TYPE_ANNOUNCE, 0, 1);
         if (topics.size() > 0) {
-            Topic announceTopic = topics.get(0);
-            Post announcePost = postDao.selectById(announceTopic.getFirstPostId());
-            String announcement = announcePost.getText();
+            final Topic announceTopic = topics.get(0);
+            final Post announcePost = postDao.selectById(announceTopic.getFirstPostId());
+            final String announcement = announcePost.getText();
             if (StringUtils.isNotBlank(announcement)) {
                 context.put("announcement", announcement);
             }
         }
 
         // Moderation
-        UserSession userSession = SessionFacade.getUserSession();
-        boolean isLogged = SessionFacade.isLogged();
-        boolean isModerator = userSession.isModerator(teamId);
+        final UserSession userSession = SessionFacade.getUserSession();
+        final boolean isLogged = SessionFacade.isLogged();
+        final boolean isModerator = userSession.isModerator(teamId);
         context.put("moderator", isLogged && isModerator);
 
         context.put("attachmentsEnabled", SecurityRepository.canAccess(SecurityConstants.PERM_ATTACHMENTS_ENABLED, Integer.toString(teamId))
@@ -352,27 +351,27 @@ public class TeamAction extends ActionSupport {
 
         context.put("watching", fm.isUserSubscribed(teamId, userSession.getUserId()));
 
-        boolean isTeamMember = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_USER, String.valueOf(teamId))
+        final boolean isTeamMember = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_USER, String.valueOf(teamId))
                 || SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_OWNER, String.valueOf(teamId))
                 || SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_USER_CANDIDATE, String.valueOf(teamId))
                 || SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
-        boolean isBanUser = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_USER_BAN2POST, String.valueOf(teamId));
-        boolean isTeamOwner = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_OWNER, String.valueOf(teamId));
+        final boolean isBanUser = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_USER_BAN2POST, String.valueOf(teamId));
+        final boolean isTeamOwner = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_OWNER, String.valueOf(teamId));
 
         context.put("isTeamMember", isTeamMember);
         context.put("isBanUser", isBanUser);
         context.put("isTeamOwner", isTeamOwner);
         context.put("avatarAllowExternalUrl", SystemGlobals.getBoolValue(ConfigKeys.AVATAR_ALLOW_EXTERNAL_URL));
 
-        Group ownerGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_OWNER, teamId);
-        List<User> owners = userDao.selectAllByGroup(ownerGorup.getId(), 0, 5);
-        Group teamUserGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER, teamId);
+        final Group ownerGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_OWNER, teamId);
+        final List<User> owners = userDao.selectAllByGroup(ownerGorup.getId(), 0, 5);
+        final Group teamUserGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER, teamId);
         int totalUsers = userDao.getTotalUsersByGroup(teamUserGorup.getId());
-        List<User> users = userDao.selectAllByGroup(teamUserGorup.getId(), 1, 9);
+        final List<User> users = userDao.selectAllByGroup(teamUserGorup.getId(), 1, 9);
 
-        Group moderatorsGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_MODERATION_FORUMS, teamId);
+        final Group moderatorsGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_MODERATION_FORUMS, teamId);
         totalUsers += userDao.getTotalUsersByGroup(moderatorsGorup.getId()) + 1;
-        List<User> moderators = userDao.selectAllByGroup(moderatorsGorup.getId(), 0, 10);
+        final List<User> moderators = userDao.selectAllByGroup(moderatorsGorup.getId(), 0, 10);
 
         context.put("teanOwner", owners.get(0));
         context.put("users", users);
@@ -380,9 +379,9 @@ public class TeamAction extends ActionSupport {
         context.put("totalUsers", totalUsers);
 
         // Pagination
-        int topicsPerPage = SystemGlobals.getIntValue(ConfigKeys.TOPICS_PER_PAGE);
-        int postsPerPage = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
-        int totalTopics = team.getTotalTopics();
+        final int topicsPerPage = SystemGlobals.getIntValue(ConfigKeys.TOPICS_PER_PAGE);
+        final int postsPerPage = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
+        final int totalTopics = team.getTotalTopics();
 
         contextToPagination(start, totalTopics, topicsPerPage);
         context.put("postsPerPage", new Integer(postsPerPage));
@@ -394,24 +393,25 @@ public class TeamAction extends ActionSupport {
 
     @Action(value = "editAnnounce", results = { @Result(name = SUCCESS, location = "team_announce_form.ftl") })
     public String editAnnounce() {
-        boolean canEditTeam = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
-        if (canEditTeam || SessionFacade.getUserSession().isAdmin()) {
-            ActionContext context = ServletActionContext.getContext();
+        final boolean canEditTeam = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
+        final UserSession userSession = SessionFacade.getUserSession();
+        if (canEditTeam || userSession.isAdmin() || userSession.isWebAdmin()) {
+            final ActionContext context = ServletActionContext.getContext();
             this.team = ForumRepository.getForum(teamId);
-            TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
-            PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
-            List<Topic> topics = topicDao.selectByForumByTypeByLimit(teamId, Topic.TYPE_ANNOUNCE, 0, 1);
+            final TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
+            final PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
+            final List<Topic> topics = topicDao.selectByForumByTypeByLimit(teamId, Topic.TYPE_ANNOUNCE, 0, 1);
             if (topics.size() > 0) {
-                Topic announceTopic = topics.get(0);
-                Post announcePost = postDao.selectById(announceTopic.getFirstPostId());
-                String announcement = announcePost.getText();
+                final Topic announceTopic = topics.get(0);
+                final Post announcePost = postDao.selectById(announceTopic.getFirstPostId());
+                final String announcement = announcePost.getText();
                 if (StringUtils.isNotBlank(announcement)) {
                     context.put("announcement", announcement);
                 }
             }
             return SUCCESS;
         } else {
-            return ERROR;
+            return PERMISSION;
         }
     }
 
@@ -419,21 +419,22 @@ public class TeamAction extends ActionSupport {
             "teamId", "${teamId}" }) })
     public String saveAnnounce() {
         teamId = team.getId();
-        boolean canEditTeam = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
-        if (!canEditTeam && !SessionFacade.getUserSession().isAdmin()) {
-            return ERROR;
+        final boolean canEditTeam = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
+        final UserSession userSession = SessionFacade.getUserSession();
+        if (!canEditTeam && !userSession.isAdmin() && !userSession.isWebAdmin()) {
+            return PERMISSION;
         }
         boolean newTopic = true;
-        UserSession us = SessionFacade.getUserSession();
-        User u = DataAccessDriver.getInstance().newUserDAO().selectById(us.getUserId());
+        final UserSession us = SessionFacade.getUserSession();
+        final User u = DataAccessDriver.getInstance().newUserDAO().selectById(us.getUserId());
 
-        TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
-        PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
+        final TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
+        final PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
 
         Topic t = null;
         Post p = null;
 
-        List<Topic> topics = topicDao.selectByForumByTypeByLimit(teamId, Topic.TYPE_ANNOUNCE, 0, 1);
+        final List<Topic> topics = topicDao.selectByForumByTypeByLimit(teamId, Topic.TYPE_ANNOUNCE, 0, 1);
         if (topics.size() > 0) {
             t = topics.get(0);
             newTopic = false;
@@ -458,7 +459,7 @@ public class TeamAction extends ActionSupport {
         p.setSignatureEnabled(false);
         p.setHtmlEnabled(false);
 
-        String ip = ServletActionContext.getRequest().getRemoteAddr();
+        final String ip = ServletActionContext.getRequest().getRemoteAddr();
         if (StringUtils.isNotBlank(ip)) {
             p.setUserIp(ip);
         } else {
@@ -468,9 +469,9 @@ public class TeamAction extends ActionSupport {
         p.setText(new SafeHtml().makeSafe(ServletActionContext.getRequest().getParameter("announcement")));
 
         // Check the elapsed time since the last post from the user
-        int delay = SystemGlobals.getIntValue(ConfigKeys.POSTS_NEW_DELAY);
+        final int delay = SystemGlobals.getIntValue(ConfigKeys.POSTS_NEW_DELAY);
         if (delay > 0) {
-            Long lastPostTime = (Long) SessionFacade.getAttribute(ConfigKeys.LAST_POST_TIME);
+            final Long lastPostTime = (Long) SessionFacade.getAttribute(ConfigKeys.LAST_POST_TIME);
             if (lastPostTime != null) {
                 if (System.currentTimeMillis() < (lastPostTime.longValue() + delay)) {
                     return I18n.getMessage("PostForm.tooSoon");
@@ -481,10 +482,10 @@ public class TeamAction extends ActionSupport {
         // Currently for announcement we always update the existing topic and
         // post.
         if (newTopic) {
-            int topicId = topicDao.addNew(t);
+            final int topicId = topicDao.addNew(t);
             t.setId(topicId);
             p.setTopicId(topicId);
-            int postId = postDao.addNew(p);
+            final int postId = postDao.addNew(p);
             t.setFirstPostId(postId);
             t.setLastPostId(postId);
         } else {
@@ -502,27 +503,27 @@ public class TeamAction extends ActionSupport {
         return SUCCESS;
     }
 
-    //@Action(value = "forum", results = { @Result(name = SUCCESS, location = "team_forum.ftl") })
+    // @Action(value = "forum", results = { @Result(name = SUCCESS, location = "team_forum.ftl") })
     public String forum() {
-        ActionContext context = ServletActionContext.getContext();
-        ForumDAO fm = DataAccessDriver.getInstance().newForumDAO();
+        final ActionContext context = ServletActionContext.getContext();
+        final ForumDAO fm = DataAccessDriver.getInstance().newForumDAO();
 
         // The user can access this team?
-        Forum team = ForumRepository.getForum(teamId);
+        final Forum team = ForumRepository.getForum(teamId);
 
         if (team == null || team.getType() != 1 || !ForumRepository.isCategoryAccessible(team.getCategoryId())) {
             new ModerationHelper().denied(I18n.getMessage("ForumListing.denied"));
             return ERROR;
         }
 
-        int start = ViewCommon.getStartPage();
+        final int start = ViewCommon.getStartPage();
 
-        List<Topic> tmpTopics = TopicsCommon.topicsByForum(teamId, start);
+        final List<Topic> tmpTopics = TopicsCommon.topicsByForum(teamId, start);
 
         // Moderation
-        UserSession userSession = SessionFacade.getUserSession();
-        boolean isLogged = SessionFacade.isLogged();
-        boolean isModerator = userSession.isModerator(teamId);
+        final UserSession userSession = SessionFacade.getUserSession();
+        final boolean isLogged = SessionFacade.isLogged();
+        final boolean isModerator = userSession.isModerator(teamId);
         context.put("moderator", isLogged && isModerator);
 
         context.put("attachmentsEnabled", SecurityRepository.canAccess(SecurityConstants.PERM_ATTACHMENTS_ENABLED, Integer.toString(teamId))
@@ -538,9 +539,9 @@ public class TeamAction extends ActionSupport {
         context.put("watching", fm.isUserSubscribed(teamId, userSession.getUserId()));
 
         // Pagination
-        int topicsPerPage = Integer.MAX_VALUE;//TODO
-        int postsPerPage = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
-        int totalTopics = team.getTotalTopics();
+        final int topicsPerPage = Integer.MAX_VALUE;// TODO
+        final int postsPerPage = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
+        final int totalTopics = team.getTotalTopics();
 
         contextToPagination(start, totalTopics, topicsPerPage);
         context.put("postsPerPage", new Integer(postsPerPage));
@@ -550,8 +551,8 @@ public class TeamAction extends ActionSupport {
         return SUCCESS;
     }
 
-    public static void contextToPagination(int start, int totalRecords, int recordsPerPage) {
-        ActionContext context = ServletActionContext.getContext();
+    public static void contextToPagination(final int start, final int totalRecords, final int recordsPerPage) {
+        final ActionContext context = ServletActionContext.getContext();
 
         context.put("totalPages", new Double(Math.ceil((double) totalRecords / (double) recordsPerPage)));
         context.put("recordsPerPage", new Integer(recordsPerPage));
@@ -561,7 +562,7 @@ public class TeamAction extends ActionSupport {
     }
 
     public static void topicListingBase() {
-        ActionContext context = ServletActionContext.getContext();
+        final ActionContext context = ServletActionContext.getContext();
 
         // Topic Types
         context.put("TOPIC_ANNOUNCE", new Integer(Topic.TYPE_ANNOUNCE));
@@ -574,7 +575,7 @@ public class TeamAction extends ActionSupport {
         context.put("STATUS_UNLOCKED", new Integer(Topic.STATUS_UNLOCKED));
 
         // Moderation
-        PermissionControl pc = SecurityRepository.get(SessionFacade.getUserSession().getUserId());
+        final PermissionControl pc = SecurityRepository.get(SessionFacade.getUserSession().getUserId());
 
         context.put("can_remove_posts", pc.canAccess(SecurityConstants.PERM_MODERATION_POST_REMOVE));
         context.put("can_move_topics", pc.canAccess(SecurityConstants.PERM_MODERATION_TOPIC_MOVE));
@@ -584,22 +585,23 @@ public class TeamAction extends ActionSupport {
 
     @Action(value = "insert", results = { @Result(name = SUCCESS, location = "team_form.ftl") })
     public String insert() {
-        boolean canCreateTeam = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_CREATE);
+        final boolean canCreateTeam = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_CREATE);
         if (canCreateTeam) {
             return SUCCESS;
         } else {
-            return ERROR;
+            return PERMISSION;
         }
     }
 
     @Action(value = "edit", results = { @Result(name = SUCCESS, location = "team_form.ftl") })
     public String edit() {
-        boolean canEditTeam = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
-        if (canEditTeam || SessionFacade.getUserSession().isAdmin()) {
+        final boolean canEditTeam = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
+        final UserSession userSession = SessionFacade.getUserSession();
+        if (canEditTeam || userSession.isAdmin() || userSession.isWebAdmin()) {
             this.team = ForumRepository.getForum(teamId);
             return SUCCESS;
         } else {
-            return ERROR;
+            return PERMISSION;
         }
     }
 
@@ -616,15 +618,16 @@ public class TeamAction extends ActionSupport {
     }
 
     private String editSave() {
-        boolean isModerator = SessionFacade.getUserSession().isModerator(team.getId());
-        if (!isModerator && !SessionFacade.getUserSession().isAdmin()) {
-            return ERROR;
+        final UserSession userSession = SessionFacade.getUserSession();
+        final boolean isModerator = userSession.isModerator(team.getId());
+        if (!isModerator && !userSession.isAdmin() && !userSession.isWebAdmin()) {
+            return PERMISSION;
         }
 
-        String logoUrl = this.doUpload();
+        final String logoUrl = this.doUpload();
 
-        ForumDAO forumDao = DataAccessDriver.getInstance().newForumDAO();
-        Forum teamUpdate = ForumRepository.getForum(team.getId());
+        final ForumDAO forumDao = DataAccessDriver.getInstance().newForumDAO();
+        final Forum teamUpdate = ForumRepository.getForum(team.getId());
         if (logoUrl != null) {
             teamUpdate.setLogo(logoUrl);
         }
@@ -638,26 +641,26 @@ public class TeamAction extends ActionSupport {
     }
 
     private String createSave() {
-        boolean canCreateTeam = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_CREATE);
+        final boolean canCreateTeam = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_CREATE);
         if (!canCreateTeam) {
-            return ERROR;
+            return PERMISSION;
         }
 
-        String logoUrl = this.doUpload();
+        final String logoUrl = this.doUpload();
 
-        CategoryDAO categoryDao = DataAccessDriver.getInstance().newCategoryDAO();
-        GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
-        UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
-        int userId = SessionFacade.getUserSession().getUserId();
+        final CategoryDAO categoryDao = DataAccessDriver.getInstance().newCategoryDAO();
+        final GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
+        final UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
+        final int userId = SessionFacade.getUserSession().getUserId();
 
         // Remove the create team entitlement if the team has been created.
-        Group teamCreateGorup = groupDao.selectByName(SecurityConstants.PERM_TEAMFORUM_CREATE);
+        final Group teamCreateGorup = groupDao.selectByName(SecurityConstants.PERM_TEAMFORUM_CREATE);
         userDao.removeFromGroup(userId, new int[] { teamCreateGorup.getId() });
 
-        ForumDAO forumDao = DataAccessDriver.getInstance().newForumDAO();
-        List<Category> categories = categoryDao.selecByType(1);
+        final ForumDAO forumDao = DataAccessDriver.getInstance().newForumDAO();
+        final List<Category> categories = categoryDao.selecByType(1);
         if (categories.size() == 1) {
-            Category category = categories.get(0);
+            final Category category = categories.get(0);
             team.setType(1);
             team.setIdCategories(category.getId());
             team.setLogo(logoUrl);
@@ -667,7 +670,7 @@ public class TeamAction extends ActionSupport {
             throw new RuntimeException("Team category not found!");
         }
 
-        int teamId = team.getId();
+        final int teamId = team.getId();
 
         // Create user group
         createUserGroup(groupDao, teamId);
@@ -678,37 +681,37 @@ public class TeamAction extends ActionSupport {
         // Create moderation group
         createModerationGroup(groupDao, teamId);
         // Create owner group
-        Group ownerGroup = createOwnerGroup(groupDao, teamId);
+        final Group ownerGroup = createOwnerGroup(groupDao, teamId);
         userDao.addToGroup(userId, new int[] { ownerGroup.getId() });
 
         // Create entitlement groups
-        GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
-        PermissionControl pc = new PermissionControl();
+        final GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
+        final PermissionControl pc = new PermissionControl();
         pc.setSecurityModel(gmodel);
 
-        Group defaultGroup = groupDao.selectById(SystemGlobals.getIntValue(ConfigKeys.DEFAULT_USER_GROUP));
-        int[] defaultGroupIds = { defaultGroup.getId() };
+        final Group defaultGroup = groupDao.selectById(SystemGlobals.getIntValue(ConfigKeys.DEFAULT_USER_GROUP));
+        final int[] defaultGroupIds = { defaultGroup.getId() };
         // Access
-        Group accessGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_FORUM, teamId);
+        final Group accessGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_FORUM, teamId);
         this.addRole(pc, SecurityConstants.PERM_FORUM, teamId, accessGroup);
         groupDao.updateChildGroups(accessGroup.getId(), defaultGroupIds);
-        int anonymousUserId = SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID);
+        final int anonymousUserId = SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID);
         userDao.addToGroup(anonymousUserId, new int[] { accessGroup.getId() });
 
         // Anonymous posts
-        Group anonymousPostsGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_ANONYMOUS_POST, teamId);
+        final Group anonymousPostsGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_ANONYMOUS_POST, teamId);
         this.addRole(pc, SecurityConstants.PERM_ANONYMOUS_POST, teamId, anonymousPostsGroup);
 
         // Permit to reply
-        Group replyGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_REPLY, teamId);
+        final Group replyGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_REPLY, teamId);
         this.addRole(pc, SecurityConstants.PERM_REPLY, teamId, replyGroup);
 
         // Permit to new post
-        Group newPostGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_NEW_POST, teamId);
+        final Group newPostGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_NEW_POST, teamId);
         this.addRole(pc, SecurityConstants.PERM_NEW_POST, teamId, newPostGroup);
 
         // HTML
-        Group htmlGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_HTML_DISABLED, teamId);
+        final Group htmlGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_HTML_DISABLED, teamId);
         this.addRole(pc, SecurityConstants.PERM_HTML_DISABLED, teamId, htmlGroup);
 
         SecurityRepository.clean();
@@ -720,18 +723,18 @@ public class TeamAction extends ActionSupport {
         if (upload == null) {
             return null;
         }
-        String savePath = SystemGlobals.getValue(ConfigKeys.ATTACHMENTS_STORE_DIR) + "/teamlogo/";
+        final String savePath = SystemGlobals.getValue(ConfigKeys.ATTACHMENTS_STORE_DIR) + "/teamlogo/";
 
-        int suffixIndex = uploadFileName.lastIndexOf(".");
-        String suffix = uploadFileName.substring(suffixIndex, uploadFileName.length());
-        String timeFileName = DateUtil.getStringTime();
-        String tmpFileSavePath = savePath + timeFileName + "_tmp" + suffix;
-        String fileSaveName = timeFileName + suffix;
-        String fileSavePath = savePath + fileSaveName;
+        final int suffixIndex = uploadFileName.lastIndexOf(".");
+        final String suffix = uploadFileName.substring(suffixIndex, uploadFileName.length());
+        final String timeFileName = DateUtil.getStringTime();
+        final String tmpFileSavePath = savePath + timeFileName + "_tmp" + suffix;
+        final String fileSaveName = timeFileName + suffix;
+        final String fileSavePath = savePath + fileSaveName;
         saveImage(upload, tmpFileSavePath);// save tmp file
         makeImage(tmpFileSavePath, fileSavePath, fileSaveName);
 
-        File tmpFile = new File(tmpFileSavePath);
+        final File tmpFile = new File(tmpFileSavePath);
         if (tmpFile.exists()) {
             tmpFile.delete();
         }
@@ -753,18 +756,18 @@ public class TeamAction extends ActionSupport {
      * @param formatName
      *            生成图片的格式
      */
-    public void makeImage(String oldFileUrl, String newUrl, String newFileName) {
+    public void makeImage(final String oldFileUrl, final String newUrl, final String newFileName) {
         // 读取图片
         BufferedImage bi = null;
         try {
             bi = ImageIO.read(new File(oldFileUrl));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException(e);
         }
 
         // 判断读入图片的宽和高
-        int oldWidth = bi.getWidth();
-        int oldHeight = bi.getHeight();
+        final int oldWidth = bi.getWidth();
+        final int oldHeight = bi.getHeight();
         if (oldWidth <= WIDTH_RANGE && oldHeight <= HEIGHT_RANGE)
             saveImage(upload, newUrl);
         else {
@@ -782,48 +785,48 @@ public class TeamAction extends ActionSupport {
      *            保存的路径
      * @throws Exception
      */
-    private void saveImage(File file, String savePath) {
+    private void saveImage(final File file, final String savePath) {
         FileOutputStream outputStream = null;
         FileInputStream fileIn = null;
         try {
             outputStream = new FileOutputStream(savePath);
             fileIn = new FileInputStream(file);
-            byte[] buffer = new byte[1024];
+            final byte[] buffer = new byte[1024];
             int len;
             while ((len = fileIn.read(buffer)) > 0) {
                 outputStream.write(buffer, 0, len);
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         } finally {
             try {
                 fileIn.close();
                 outputStream.close();
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 throw new RuntimeException(e);
             }
         }
 
     }
 
-    private void addRole(PermissionControl pc, String roleName, int forumId, Group group) {
-        Role role = new Role();
+    private void addRole(final PermissionControl pc, final String roleName, final int forumId, final Group group) {
+        final Role role = new Role();
         role.setName(roleName);
 
-        RoleValueCollection roleValues = new RoleValueCollection();
+        final RoleValueCollection roleValues = new RoleValueCollection();
 
-        RoleValue rv = new RoleValue();
+        final RoleValue rv = new RoleValue();
         rv.setValue(Integer.toString(forumId));
         roleValues.add(rv);
 
         pc.addRoleValue(group.getId(), role, roleValues);
     }
 
-    private Group createUserGroup(GroupDAO groupDao, int teamId) {
-        GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
-        PermissionControl pc = new PermissionControl();
+    private Group createUserGroup(final GroupDAO groupDao, final int teamId) {
+        final GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
+        final PermissionControl pc = new PermissionControl();
         pc.setSecurityModel(gmodel);
-        Group userGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER, teamId);
+        final Group userGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER, teamId);
         this.addRole(pc, SecurityConstants.PERM_TEAMFORUM_USER, teamId, userGroup);
         this.addRole(pc, SecurityConstants.PERM_REPLY, teamId, userGroup);
         this.addRole(pc, SecurityConstants.PERM_NEW_POST, teamId, userGroup);
@@ -831,29 +834,29 @@ public class TeamAction extends ActionSupport {
         return userGroup;
     }
 
-    private Group createUserCandidateGroup(GroupDAO groupDao, int teamId) {
-        GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
-        PermissionControl pc = new PermissionControl();
+    private Group createUserCandidateGroup(final GroupDAO groupDao, final int teamId) {
+        final GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
+        final PermissionControl pc = new PermissionControl();
         pc.setSecurityModel(gmodel);
-        Group userCandidateGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER_CANDIDATE, teamId);
+        final Group userCandidateGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER_CANDIDATE, teamId);
         this.addRole(pc, SecurityConstants.PERM_TEAMFORUM_USER_CANDIDATE, teamId, userCandidateGroup);
         return userCandidateGroup;
     }
 
-    private Group createBanToPostUserGroup(GroupDAO groupDao, int teamId) {
-        GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
-        PermissionControl pc = new PermissionControl();
+    private Group createBanToPostUserGroup(final GroupDAO groupDao, final int teamId) {
+        final GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
+        final PermissionControl pc = new PermissionControl();
         pc.setSecurityModel(gmodel);
-        Group userBan2PostGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER_BAN2POST, teamId);
+        final Group userBan2PostGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER_BAN2POST, teamId);
         this.addRole(pc, SecurityConstants.PERM_TEAMFORUM_USER_BAN2POST, teamId, userBan2PostGroup);
         return userBan2PostGroup;
     }
 
-    private Group createOwnerGroup(GroupDAO groupDao, int teamId) {
-        GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
-        PermissionControl pc = new PermissionControl();
+    private Group createOwnerGroup(final GroupDAO groupDao, final int teamId) {
+        final GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
+        final PermissionControl pc = new PermissionControl();
         pc.setSecurityModel(gmodel);
-        Group ownerGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_OWNER, teamId);
+        final Group ownerGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_OWNER, teamId);
         this.addRole(pc, SecurityConstants.PERM_TEAMFORUM_OWNER, teamId, ownerGroup);
         this.addRole(pc, SecurityConstants.PERM_CREATE_STICKY_ANNOUNCEMENT_TOPICS, teamId, ownerGroup);
         this.addRole(pc, SecurityConstants.PERM_MODERATION_FORUMS, teamId, ownerGroup);
@@ -867,11 +870,11 @@ public class TeamAction extends ActionSupport {
         return ownerGroup;
     }
 
-    private Group createModerationGroup(GroupDAO groupDao, int forumId) {
-        GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
-        PermissionControl pc = new PermissionControl();
+    private Group createModerationGroup(final GroupDAO groupDao, final int forumId) {
+        final GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
+        final PermissionControl pc = new PermissionControl();
         pc.setSecurityModel(gmodel);
-        Group moderationGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_MODERATION_FORUMS, forumId);
+        final Group moderationGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_MODERATION_FORUMS, forumId);
         this.addRole(pc, SecurityConstants.PERM_CREATE_STICKY_ANNOUNCEMENT_TOPICS, forumId, moderationGroup);
         this.addRole(pc, SecurityConstants.PERM_MODERATION_FORUMS, forumId, moderationGroup);
         this.addRole(pc, SecurityConstants.PERM_MODERATION_APPROVE_MESSAGES, forumId, moderationGroup);
@@ -888,7 +891,7 @@ public class TeamAction extends ActionSupport {
         return team;
     }
 
-    public void setTeam(Forum team) {
+    public void setTeam(final Forum team) {
         this.team = team;
     }
 
@@ -896,7 +899,7 @@ public class TeamAction extends ActionSupport {
         return teamId;
     }
 
-    public void setTeamId(int teamId) {
+    public void setTeamId(final int teamId) {
         this.teamId = teamId;
     }
 
@@ -904,11 +907,11 @@ public class TeamAction extends ActionSupport {
         return uploadContentType;
     }
 
-    public void setUploadContentType(String uploadContentType) {
+    public void setUploadContentType(final String uploadContentType) {
         this.uploadContentType = uploadContentType;
     }
 
-    public void setUpload(File upload) {
+    public void setUpload(final File upload) {
         this.upload = upload;
     }
 
@@ -920,7 +923,7 @@ public class TeamAction extends ActionSupport {
         return uploadFileName;
     }
 
-    public void setUploadFileName(String uploadFileName) {
+    public void setUploadFileName(final String uploadFileName) {
         this.uploadFileName = uploadFileName;
     }
 
@@ -928,7 +931,7 @@ public class TeamAction extends ActionSupport {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(final int userId) {
         this.userId = userId;
     }
 
@@ -936,7 +939,7 @@ public class TeamAction extends ActionSupport {
         return banPostUserIds;
     }
 
-    public void setBanPostUserIds(int[] banPostUserIds) {
+    public void setBanPostUserIds(final int[] banPostUserIds) {
         this.banPostUserIds = banPostUserIds;
     }
 

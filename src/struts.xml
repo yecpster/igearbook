@@ -56,8 +56,9 @@
     <default-interceptor-ref name="defaultStackIgearbook" />
 
     <global-results>
-      <result name="invalid.token" type="freemarker">/templates/default/invalid_token.ftl</result>
-      <result name="exception" type="freemarker">/templates/default/exception.ftl</result>
+      <result name="invalid.token" type="freemarker">/templates/default/common/invalid_token.ftl</result>
+      <result name="exception" type="freemarker">/templates/default/common/exception.ftl</result>
+      <result name="permission" type="freemarker">/templates/default/common/permission.ftl</result>
     </global-results>
     <global-exception-mappings>
       <exception-mapping exception="java.lang.Throwable" result="exception" />

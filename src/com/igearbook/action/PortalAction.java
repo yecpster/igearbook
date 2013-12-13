@@ -23,15 +23,14 @@ import org.apache.struts2.convention.annotation.Result;
 
 import com.google.common.collect.Lists;
 import com.opensymphony.xwork2.ActionContext;
-import com.opensymphony.xwork2.ActionSupport;
 
 @Namespace("/portal")
-public class PortalAction extends ActionSupport {
+public class PortalAction extends BaseAction {
     private static final long serialVersionUID = 7587622153127430L;
 
     @Action(value = "index", results = { @Result(name = SUCCESS, location = "portal_index.ftl") })
     public String index() {
-        ActionContext context = ServletActionContext.getContext();
+        final ActionContext context = ServletActionContext.getContext();
 
         context.put("topicsPerPage", new Integer(SystemGlobals.getIntValue(ConfigKeys.TOPICS_PER_PAGE)));
         context.put("totalMessages", new Integer(ForumRepository.getTotalMessages()));
@@ -40,23 +39,23 @@ public class PortalAction extends ActionSupport {
 
         // Online Users
         context.put("totalOnlineUsers", new Integer(SessionFacade.size()));
-        int aid = SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID);
+        final int aid = SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID);
 
-        List<UserSession> onlineUsersList = SessionFacade.getLoggedSessions();
+        final List<UserSession> onlineUsersList = SessionFacade.getLoggedSessions();
         // If there are only guest users, then just register
         // a single one. In any other situation, we do not
         // show the "guest" username
         if (onlineUsersList.size() == 0) {
-            UserSession us = new UserSession();
+            final UserSession us = new UserSession();
             us.setUserId(aid);
             us.setUsername(I18n.getMessage("Guest"));
 
             onlineUsersList.add(us);
         }
 
-        int registeredSize = SessionFacade.registeredSize();
-        int anonymousSize = SessionFacade.anonymousSize();
-        int totalOnlineUsers = registeredSize + anonymousSize;
+        final int registeredSize = SessionFacade.registeredSize();
+        final int anonymousSize = SessionFacade.anonymousSize();
+        final int totalOnlineUsers = registeredSize + anonymousSize;
 
         context.put("userSessions", onlineUsersList);
         context.put("totalOnlineUsers", totalOnlineUsers);
@@ -64,7 +63,7 @@ public class PortalAction extends ActionSupport {
         context.put("totalAnonymousUsers", anonymousSize);
 
         // Most users ever online
-        MostUsersEverOnline mostUsersEverOnline = ForumRepository.getMostUsersEverOnline();
+        final MostUsersEverOnline mostUsersEverOnline = ForumRepository.getMostUsersEverOnline();
 
         if (totalOnlineUsers > mostUsersEverOnline.getTotal()) {
             mostUsersEverOnline.setTotal(totalOnlineUsers);
@@ -75,37 +74,37 @@ public class PortalAction extends ActionSupport {
 
         context.put("mostUsersEverOnline", mostUsersEverOnline);
 
-        List<Recommendation> portalRecommends = TopicRepository.getRecommendTopics(Recommendation.TYPE_INDEX_IMG);
+        final List<Recommendation> portalRecommends = TopicRepository.getRecommendTopics(Recommendation.TYPE_INDEX_IMG);
         if (portalRecommends != null && portalRecommends.size() > 0) {
 
             context.put("recommendTopic", portalRecommends.get(0));
         }
         if (portalRecommends != null && portalRecommends.size() > 3) {
-            List<Recommendation> igearbookTopics = Lists.newArrayList();
+            final List<Recommendation> igearbookTopics = Lists.newArrayList();
             igearbookTopics.add(portalRecommends.get(1));
             igearbookTopics.add(portalRecommends.get(2));
             igearbookTopics.add(portalRecommends.get(3));
             context.put("igearbookTopics", igearbookTopics);
         }
-        List<Recommendation> teamRecommends = TopicRepository.getRecommendTopics(Recommendation.TYPE_INDEX_TEAM);
+        final List<Recommendation> teamRecommends = TopicRepository.getRecommendTopics(Recommendation.TYPE_INDEX_TEAM);
         context.put("teamRecommends", teamRecommends);
         context.put("recentTopics", TopicRepository.getRecentTopics());
         context.put("hotTopics", TopicRepository.getHottestTopics());
 
-        List<Category> allCategories = ForumRepository.getAllCategories(SessionFacade.getUserSession().getUserId());
-        List<Category> categories = Lists.newArrayList();
-        for (Category category : allCategories) {
+        final List<Category> allCategories = ForumRepository.getAllCategories(SessionFacade.getUserSession().getUserId());
+        final List<Category> categories = Lists.newArrayList();
+        for (final Category category : allCategories) {
             if (category.getType() == 1) {
                 categories.add(category);
             }
         }
-        List<Forum> hotTeams = Lists.newArrayList();
-        for (Category category : categories) {
+        final List<Forum> hotTeams = Lists.newArrayList();
+        for (final Category category : categories) {
             hotTeams.addAll(category.getForums());
         }
         Collections.sort(hotTeams, new Comparator<Forum>() {
             @Override
-            public int compare(Forum o1, Forum o2) {
+            public int compare(final Forum o1, final Forum o2) {
                 return o2.getLastPostId() - o1.getLastPostId();
             }
         });

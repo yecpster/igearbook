@@ -9,7 +9,7 @@ import com.opensymphony.xwork2.ActionSupport;
 public abstract class BaseAction extends ActionSupport {
     private static final long serialVersionUID = -7109541755686605891L;
 
-    public static final String PERMITION = "permition";
+    public static final String PERMISSION = "permission";
 
     protected ActionContext context = ServletActionContext.getContext();
 
@@ -20,7 +20,7 @@ public abstract class BaseAction extends ActionSupport {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(final int id) {
         this.id = id;
     }
 
@@ -28,12 +28,12 @@ public abstract class BaseAction extends ActionSupport {
         return start;
     }
 
-    public void setStart(int start) {
+    public void setStart(final int start) {
         this.start = start;
     }
 
     protected PaginationParams getPaginationParams() {
-        PaginationParams params = new PaginationParams();
+        final PaginationParams params = new PaginationParams();
         params.setStart(this.getStart());
         return params;
     }
