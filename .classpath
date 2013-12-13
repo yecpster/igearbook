@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src"/>
-	<classpathentry excluding="**/.svn/**" kind="src" output="tools/bin" path="tools/phpbb2jforum/src"/>
 	<classpathentry excluding="**/.svn/**" kind="src" output="tools/bin" path="tools/luceneIndexer"/>
-	<classpathentry excluding="**/.svn/**" kind="src" output="tools/bin" path="tools/phpbb2jforum/resource"/>
 	<classpathentry excluding="**/.svn/**" kind="src" output="tests/bin" path="tests/core"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>

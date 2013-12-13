@@ -2,9 +2,7 @@
     <wb-module deploy-name="iGearBook">
         <wb-resource deploy-path="/" source-path="/webapp" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/tools/phpbb2jforum/src"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/tools/luceneIndexer"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/tools/phpbb2jforum/resource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/tests/core"/>
         <property name="java-output-path" value="/iGearBook/webapp/WEB-INF/classes"/>
         <property name="context-root" value="iGearBook"/>
