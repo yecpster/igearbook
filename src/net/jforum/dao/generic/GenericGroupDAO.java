@@ -368,25 +368,25 @@ public class GenericGroupDAO extends AutoKeys implements net.jforum.dao.GroupDAO
     }
 
     @Override
-    public Group getEntitlementGroup(String permition, int moduleId) {
-        String groupName = String.format("%s_%s", permition, moduleId);
+    public Group getEntitlementGroup(String permission, int moduleId) {
+        String groupName = String.format("%s_%s", permission, moduleId);
         Group entitleGroup = selectByName(groupName);
         return entitleGroup;
     }
 
     @Override
-    public Group addNewEntitlementGroup(String permition, int moduleId) {
+    public Group addNewEntitlementGroup(String permission, int moduleId) {
         Group entitlementGroup = new Group();
-        entitlementGroup.setName(String.format("%s_%s", permition, moduleId));
+        entitlementGroup.setName(String.format("%s_%s", permission, moduleId));
         entitlementGroup.setType(1);
         this.addNew(entitlementGroup);
         return entitlementGroup;
     }
 
     @Override
-    public Group addNewEntitlementGroup(String permition) {
+    public Group addNewEntitlementGroup(String permission) {
         Group entitlementGroup = new Group();
-        entitlementGroup.setName(permition);
+        entitlementGroup.setName(permission);
         entitlementGroup.setType(1);
         this.addNew(entitlementGroup);
         return entitlementGroup;

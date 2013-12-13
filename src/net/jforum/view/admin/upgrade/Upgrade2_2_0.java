@@ -30,18 +30,18 @@ public class Upgrade2_2_0 extends GenericUpgradeService implements UpgradeServic
         RolesRepository.clear();
     }
 
-    private void createEntitlementGroup(String permition) {
+    private void createEntitlementGroup(String permission) {
         GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
         PermissionControl pc = new PermissionControl();
         pc.setSecurityModel(gmodel);
         GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
-        Group enGroup = groupDao.selectByName(permition);
+        Group enGroup = groupDao.selectByName(permission);
         if (enGroup == null) {
-            enGroup = groupDao.addNewEntitlementGroup(permition);
+            enGroup = groupDao.addNewEntitlementGroup(permission);
         }
         RoleCollection roles = gmodel.loadRoles(enGroup.getId());
         if (roles == null || roles.size() == 0) {
-            this.addRole(pc, permition, enGroup);
+            this.addRole(pc, permission, enGroup);
         }
     }
 

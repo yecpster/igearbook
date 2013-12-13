@@ -24,18 +24,18 @@ import net.jforum.view.install.ParseDBStructFile;
 import org.apache.commons.lang.StringUtils;
 
 public abstract class GenericUpgradeService implements UpgradeService {
-    protected Group createEntitlementGroupIfAbsent(String permition, int moduleId) {
+    protected Group createEntitlementGroupIfAbsent(String permission, int moduleId) {
         GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
         PermissionControl pc = new PermissionControl();
         pc.setSecurityModel(gmodel);
         GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
-        Group enGroup = groupDao.getEntitlementGroup(permition, moduleId);
+        Group enGroup = groupDao.getEntitlementGroup(permission, moduleId);
         if (enGroup == null) {
-            enGroup = groupDao.addNewEntitlementGroup(permition, moduleId);
+            enGroup = groupDao.addNewEntitlementGroup(permission, moduleId);
         }
         RoleCollection roles = gmodel.loadRoles(enGroup.getId());
         if (roles == null || roles.size() == 0) {
-            this.addRole(pc, permition, moduleId, enGroup);
+            this.addRole(pc, permission, moduleId, enGroup);
         }
         return enGroup;
     }

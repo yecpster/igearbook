@@ -121,7 +121,7 @@ public interface GroupDAO {
      */
     public void addNew(Group group);
 
-    public Group addNewEntitlementGroup(String permition, int moduleId);
+    public Group addNewEntitlementGroup(String permission, int moduleId);
     
     /**
      * Select the users associated to some group;
@@ -164,7 +164,7 @@ public interface GroupDAO {
      */
     public void updateChildGroups(int groupId, int[] childGroupIDs);
     
-    public Group getEntitlementGroup(String permition, int moduleId);
+    public Group getEntitlementGroup(String permission, int moduleId);
 
-    public Group addNewEntitlementGroup(String permition);
+    public Group addNewEntitlementGroup(String permission);
 }
