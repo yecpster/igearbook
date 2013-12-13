@@ -90,7 +90,7 @@ public class UserSession implements Serializable {
     public UserSession() {
     }
 
-    public UserSession(UserSession us) {
+    public UserSession(final UserSession us) {
         if (us.getStartTime() != null) {
             this.startTime = new Date(us.getStartTime().getTime());
         }
@@ -114,7 +114,7 @@ public class UserSession implements Serializable {
         return new Date(this.startTime.getTime() + this.sessionTime);
     }
 
-    public void setIp(String ip) {
+    public void setIp(final String ip) {
         this.ip = ip;
     }
 
@@ -128,7 +128,7 @@ public class UserSession implements Serializable {
      * @param startTime
      *            Start time in miliseconds
      */
-    public void setStartTime(Date startTime) {
+    public void setStartTime(final Date startTime) {
         this.startTime = startTime;
     }
 
@@ -143,7 +143,7 @@ public class UserSession implements Serializable {
      * @param privateMessages
      *            The privateMessages to set.
      */
-    public void setPrivateMessages(int privateMessages) {
+    public void setPrivateMessages(final int privateMessages) {
         this.privateMessages = privateMessages;
     }
 
@@ -153,7 +153,7 @@ public class UserSession implements Serializable {
      * @param lastVisit
      *            Time in miliseconds
      */
-    public void setLastVisit(Date lastVisit) {
+    public void setLastVisit(final Date lastVisit) {
         this.lastVisit = lastVisit;
     }
 
@@ -163,7 +163,7 @@ public class UserSession implements Serializable {
      * @param userId
      *            The user id
      */
-    public void setUserId(int userId) {
+    public void setUserId(final int userId) {
         this.userId = userId;
     }
 
@@ -173,19 +173,19 @@ public class UserSession implements Serializable {
      * @param username
      *            The username
      */
-    public void setUsername(String username) {
+    public void setUsername(final String username) {
         this.username = username;
     }
 
-    public void setSessionId(String sessionId) {
+    public void setSessionId(final String sessionId) {
         this.sessionId = sessionId;
     }
 
-    public void setSessionTime(long sessionTime) {
+    public void setSessionTime(final long sessionTime) {
         this.sessionTime = sessionTime;
     }
 
-    public void setLang(String lang) {
+    public void setLang(final String lang) {
         this.lang = lang;
     }
 
@@ -200,10 +200,9 @@ public class UserSession implements Serializable {
      * Enable or disable auto-login.
      * 
      * @param autoLogin
-     *            <code>true</code> or <code>false</code> to represent
-     *            auto-login status
+     *            <code>true</code> or <code>false</code> to represent auto-login status
      */
-    public void setAutoLogin(boolean autoLogin) {
+    public void setAutoLogin(final boolean autoLogin) {
         this.autoLogin = autoLogin;
     }
 
@@ -264,8 +263,7 @@ public class UserSession implements Serializable {
     /**
      * Gets auto-login status
      * 
-     * @return <code>true</code> if auto-login is enabled, or <code>false</code>
-     *         if disabled.
+     * @return <code>true</code> if auto-login is enabled, or <code>false</code> if disabled.
      */
     public boolean getAutoLogin() {
         return this.autoLogin;
@@ -298,6 +296,10 @@ public class UserSession implements Serializable {
         return SecurityRepository.canAccess(this.userId, SecurityConstants.PERM_SUPER_MODERATION);
     }
 
+    public boolean isWebAdmin() {
+        return SecurityRepository.canAccess(this.userId, SecurityConstants.PERM_WEB_ADMIN);
+    }
+
     /**
      * Checks if the user can moderate a forum
      * 
@@ -305,20 +307,17 @@ public class UserSession implements Serializable {
      *            the forum's id to check for moderation rights
      * @return <code>true</code> if the user has moderations rights
      */
-    public boolean isModerator(int forumId) {
-        PermissionControl pc = SecurityRepository.get(this.userId);
+    public boolean isModerator(final int forumId) {
+        final PermissionControl pc = SecurityRepository.get(this.userId);
 
         return pc.canAccess(SecurityConstants.PERM_SUPER_MODERATION)
                 || pc.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, Integer.toString(forumId));
     }
 
     /**
-     * Makes the user's session "anoymous" - eg, the user. This method sets the
-     * session's start and last visit time to the current datetime, the user id
-     * to the return of a call to
-     * <code>SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID)</code> and
-     * finally sets session attribute named "logged" to "0" will be considered a
-     * non-authenticated / anonymous user
+     * Makes the user's session "anoymous" - eg, the user. This method sets the session's start and last visit time to the current datetime, the user
+     * id to the return of a call to <code>SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID)</code> and finally sets session attribute named
+     * "logged" to "0" will be considered a non-authenticated / anonymous user
      */
     public void makeAnonymous() {
         this.registerBasicInfo();
@@ -330,9 +329,8 @@ public class UserSession implements Serializable {
     }
 
     /**
-     * Sets the startup and last visit time to now, as well set the user id to
-     * Anonymous. This method is usually called when the user hits the forum for
-     * the first time.
+     * Sets the startup and last visit time to now, as well set the user id to Anonymous. This method is usually called when the user hits the forum
+     * for the first time.
      */
     public void registerBasicInfo() {
         this.setStartTime(new Date(System.currentTimeMillis()));
@@ -341,15 +339,13 @@ public class UserSession implements Serializable {
     }
 
     /**
-     * Sets a new user session information using information from an
-     * <code>User</code> instance. This method sets the user id, username, the
-     * number of private messages, the session's start time ( set to the current
-     * date and time ) and the language.
+     * Sets a new user session information using information from an <code>User</code> instance. This method sets the user id, username, the number of
+     * private messages, the session's start time ( set to the current date and time ) and the language.
      * 
      * @param user
      *            The <code>User</code> instance to get data from
      */
-    public void dataToUser(User user) {
+    public void dataToUser(final User user) {
         this.setUserId(user.getId());
         this.setUsername(user.getUsername());
         this.setPrivateMessages(user.getPrivateMessagesCount());
@@ -385,7 +381,7 @@ public class UserSession implements Serializable {
                 userResponse = userResponse.toLowerCase();
             }
 
-            boolean result = this.imageCaptcha.validateResponse(userResponse).booleanValue();
+            final boolean result = this.imageCaptcha.validateResponse(userResponse).booleanValue();
             this.destroyCaptcha();
             return result;
         }
@@ -417,6 +413,7 @@ public class UserSession implements Serializable {
      *             Checks if it's a bot
      * @return <code>true</code> if this user session is from any robot
      */
+    @Deprecated
     public boolean isBot() {
         // return
         // Boolean.TRUE.equals(JForumExecutionContext.getRequest().getAttribute(ConfigKeys.IS_BOT));
@@ -426,7 +423,8 @@ public class UserSession implements Serializable {
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    public boolean equals(Object o) {
+    @Override
+    public boolean equals(final Object o) {
         if (!(o instanceof UserSession)) {
             return false;
         }
@@ -437,6 +435,7 @@ public class UserSession implements Serializable {
     /**
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         return this.sessionId.hashCode();
     }
@@ -445,7 +444,7 @@ public class UserSession implements Serializable {
         return isMobileUser;
     }
 
-    public void setMobileUser(boolean isMobileUser) {
+    public void setMobileUser(final boolean isMobileUser) {
         this.isMobileUser = isMobileUser;
     }
 

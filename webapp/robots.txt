@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /templates/
+Disallow: /tmp/
+Sitemap: http://www.igearbook.com/sitemap.xml

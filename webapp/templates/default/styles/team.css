@@ -1018,7 +1018,7 @@ div.crumbs {
 
 span#membership {
     position: absolute;
-    right: 300px;
+    right: 200px;
 }
 
 div#announcements {
@@ -1368,11 +1368,6 @@ span.gray {color: gray;}
 div.topic_page, a {
   color: #069;
   text-decoration: underline;
-}
-
-a:hover {
-  color: white;
-  background-color: #069;
 }
 
 div#main h3, div#local h3, div.post_actions, div.crumbs, tr.mouse_over, div.main div.nav span {

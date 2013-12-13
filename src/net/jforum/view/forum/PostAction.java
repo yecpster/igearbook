@@ -53,7 +53,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.jforum.Command;
@@ -456,57 +455,6 @@ public class PostAction extends Command {
 
     private boolean isReplyOnly(int forumId) {
         return !SecurityRepository.canAccess(SecurityConstants.PERM_NEW_POST, Integer.toString(forumId));
-    }
-
-    public void recommend() {
-        int topicId = this.request.getIntParameter("topic_id");
-        Recommendation rtopic = new Recommendation();
-        Topic t = TopicRepository.getTopic(new Topic(topicId));
-        if (t == null) {
-            t = DataAccessDriver.getInstance().newTopicDAO().selectRaw(topicId);
-        }
-        rtopic.setTitle(t.getTitle());
-        rtopic.setTopicId(t.getId());
-
-        this.context.put("action", "recommendSave");
-        this.context.put("rtopic", rtopic);
-        this.context.put("isEdit", false);
-        this.setTemplateName(TemplateKeys.POSTS_RECOMMEND);
-    }
-
-    public void recommendSave() {
-        String rtopic_idStr = this.request.getParameter("rtopic_id");
-        boolean isNew = StringUtils.isBlank(rtopic_idStr);
-        int topicId = this.request.getIntParameter("topic_id");
-        String title = this.request.getParameter("title");
-        String desc = this.request.getParameter("desc");
-        String imageUrl = this.request.getParameter("imageUrl");
-        String message = this.request.getParameter("message");
-        int userId = SessionFacade.getUserSession().getUserId();
-        User user = DataAccessDriver.getInstance().newUserDAO().selectById(userId);
-
-        if (StringUtils.isBlank(imageUrl)) {
-            Matcher matcher = IMGPT.matcher(message);
-            if (matcher.find()) {
-                imageUrl = matcher.group(1);
-            }
-        }
-
-        Recommendation rtopic = new Recommendation();
-        if (isNew) {
-            rtopic.setTitle(title);
-            rtopic.setDesc(desc);
-            rtopic.setImageUrl(imageUrl);
-            rtopic.setTopicId(topicId);
-            rtopic.setCreateBy(user);
-            rtopic.setCreateTime(new Date(System.currentTimeMillis()));
-            rtopic.setLastUpdateBy(user);
-        }
-
-        PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
-        postDao.saveRecommend(rtopic);
-        TopicRepository.loadRecommendTopics(Recommendation.TYPE_INDEX_IMG);
-        JForumExecutionContext.setRedirect(request.getContextPath());
     }
 
     public void reply() {

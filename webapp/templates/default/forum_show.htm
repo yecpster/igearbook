@@ -1,5 +1,10 @@
 <#include "header.htm"/>
-<@navHeader "bbs" />
+<#assign isTeamForum = (forum.type ==1) />
+<#if isTeamForum>
+    <@navHeader "team" />
+<#else>
+    <@navHeader "bbs" />
+</#if>
 <#import "../macros/pagination.ftl" as pagination>
 <#import "../macros/presentation.ftl" as presentation/>
 
@@ -21,8 +26,16 @@
 				<tr>
 					<td valign="bottom" align="left" colspan="2">
 					   <span class="nav">
-                            <a class="nav" href="${JForumContext.encodeURL("/forums/list")}">${I18n.getMessage("ForumListing.forumIndex")}</a> 
-                            &raquo; <a class="nav" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">${forum.name?html}</a>
+					        <#if isTeamForum>
+                            <a class="nav" href="${contextPath}/team/list.action">群组首页</a> 
+                            &raquo; 
+                            <a class="nav" href="${contextPath}/team/show.action?teamId=${forum.id}">${forum.name?html}</a>
+                            &raquo; 
+                            <span>群组论坛</span>
+                            <#else>
+                                <a class="nav" href="${JForumContext.encodeURL("/forums/list")}">${I18n.getMessage("ForumListing.forumIndex")} </a> 
+                                &raquo; <a class="nav" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">${forum.name?html} </a>
+                            </#if>
                         </span>
 
 						<#if rssEnabled>
@@ -275,7 +288,17 @@
 
 					<td valign="middle"  align="left" colspan="${colspan?default("0")}">
 						<span class="nav">
-						<a class="nav" href="${JForumContext.encodeURL("/forums/list")}">${I18n.getMessage("ForumListing.forumIndex")}</a> &raquo;  <a class="nav" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">${forum.name?html}</a></span>
+						      <#if isTeamForum>
+                            <a class="nav" href="${contextPath}/team/list.action">群组首页</a> 
+                            &raquo; 
+                            <a class="nav" href="${contextPath}/team/show.action?teamId=${forum.id}">${forum.name?html}</a>
+                            &raquo; 
+                            <span>群组论坛</span>
+                            <#else>
+                                <a class="nav" href="${JForumContext.encodeURL("/forums/list")}">${I18n.getMessage("ForumListing.forumIndex")} </a> 
+                                &raquo; <a class="nav" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">${forum.name?html} </a>
+                            </#if>
+                        </span>
 					</td>
 
 					<td nowrap="nowrap" align="left" class="nav">${paginationData}</td>
@@ -296,6 +319,7 @@
 			<table cellspacing="0" cellpadding="5" width="100%" border="0">
 				<tr>
 					<td align="left" class="gensmall">
+					<#--
 						<#if logged>
 							<#if !watching>
 								<#assign watchMessage = I18n.getMessage("ForumShow.watch")/>
@@ -306,6 +330,7 @@
 							</#if>
 							<img src="${contextPath}/templates/${templateName}/images/watch.gif" align="middle" alt="Watch" />&nbsp;${watchMessage}</a>
 						</#if>
+						-->
 					</td>
 					<td align="right"><@presentation.forumsComboTable/></td>
 				</tr>
@@ -314,7 +339,7 @@
 			<table cellspacing="0" cellpadding="0" width="100%" align="center" border="0">
 				<tr>
 					<td valign="top" align="left">
-						<#include "folder_descriptions.htm"/>
+						<#--<#include "folder_descriptions.htm"/>-->
 					</td>
 
 					<#assign moderators = forum.getModeratorList()/>

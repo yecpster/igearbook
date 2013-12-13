@@ -176,7 +176,7 @@ public class ForumAction extends Command {
         // The user can access this forum?
         Forum forum = ForumRepository.getForum(forumId);
 
-        if (forum == null || forum.getType() != 0 || !ForumRepository.isCategoryAccessible(forum.getCategoryId())) {
+        if (forum == null || !ForumRepository.isCategoryAccessible(forum.getCategoryId())) {
             new ModerationHelper().denied(I18n.getMessage("ForumListing.denied"));
             return;
         }

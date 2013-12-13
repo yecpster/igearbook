@@ -52,6 +52,7 @@ public class SecurityConstants {
     }
 
     public static final String PERM_ADMINISTRATION = "perm_administration";
+    public static final String PERM_WEB_ADMIN = "perm_web_admin";
     public static final String PERM_CATEGORY = "perm_category";
     public static final String PERM_FORUM = "perm_forum";
     public static final String PERM_ANONYMOUS_POST = "perm_anonymous_post";

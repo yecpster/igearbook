@@ -54,7 +54,7 @@ import java.util.Map;
 import net.jforum.cache.CacheEngine;
 import net.jforum.cache.Cacheable;
 import net.jforum.dao.DataAccessDriver;
-import net.jforum.dao.PostDAO;
+import net.jforum.dao.RecommendationDAO;
 import net.jforum.dao.TopicDAO;
 import net.jforum.entities.Recommendation;
 import net.jforum.entities.Topic;
@@ -177,9 +177,9 @@ public class TopicRepository implements Cacheable {
     }
 
     public synchronized static List<Recommendation> loadRecommendTopics(int type) {
-        PostDAO dao = DataAccessDriver.getInstance().newPostDAO();
+        RecommendationDAO dao = DataAccessDriver.getInstance().newRecommendationDAO();
 
-        List<Recommendation> l = dao.selectRecommendByTypeByLimit(type, 9);
+        List<Recommendation> l = dao.selectByTypeByLimit(type, 0, 9);
         cache.remove(FQN, RECOMMEND + type);
         cache.add(FQN, RECOMMEND + type, new LinkedList(l));
         return l;

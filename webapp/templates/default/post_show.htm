@@ -85,7 +85,7 @@
                             &raquo; 
                             <a class="nav" href="${contextPath}/team/show.action?teamId=${forum.id}">${forum.name?html}</a>
                             &raquo; 
-                            <a class="nav" href="${contextPath}/team/forum.action?teamId=${forum.id}">群组论坛</a>
+                            <a class="nav" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">群组论坛</a>
                         <#else>
                             <a class="nav" href="${JForumContext.encodeURL("/forums/list")}">${I18n.getMessage("ForumListing.forumIndex")} </a> 
                             &raquo; <a class="nav" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">${forum.name} </a>
@@ -236,8 +236,17 @@
 				<tr>
 					<td valign="middle" align="left" colspan="${colspan?default("0")}">
 						<span class="nav">
-						<a class="nav" href="${JForumContext.encodeURL("/forums/list")}">${I18n.getMessage("ForumListing.forumIndex")} </a> 
-            			&raquo; <a class="nav" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">${forum.name} </a>
+						<#if isTeamForum>
+                            <a class="nav" href="${contextPath}/team/list.action">群组首页</a> 
+                            &raquo; 
+                            <a class="nav" href="${contextPath}/team/show.action?teamId=${forum.id}">${forum.name?html}</a>
+                            &raquo; 
+                            <a class="nav" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">群组论坛</a>
+                        <#else>
+                            <a class="nav" href="${JForumContext.encodeURL("/forums/list")}">${I18n.getMessage("ForumListing.forumIndex")} </a> 
+                            &raquo; <a class="nav" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">${forum.name} </a>
+                        </#if>
+                        &raquo; ${topic.title?html}
 						</span>
 					</td>
 
@@ -347,7 +356,7 @@
 				<#elseif isTeamForum&&logged>
 					<tr>
                         <td colspan="3" align="center">
-                            <span style="color: #ff0000;font-size: 14px;font-weight:bold;">只有群组成员才能发言 &gt;&nbsp;</span><a href="${contextPath}/team/join.action?teamId=${forum.id}">加入此群组</a>
+                            <span style="color: #ff0000;font-size: 14px;font-weight:bold;">只有群组成员才能发言 &gt;&nbsp;</span><a href="${contextPath}/team/join.action?teamId=${forum.id}" title="点击加入"><span style="font-size: 14px;font-weight:bold;">加入此群组</span></a>
                         </td>
                     </tr>
 				</#if>
@@ -417,9 +426,9 @@ $("#main").find(".postbody img").each(function(){
           img.css("cursor", "url(${contextPath}/images/zoom.cur), pointer");
           img.click(function(){window.open(zoomSrc);});
     }
-    if(width>800){
-     img.attr("width", 800);
-     img.attr("height", height/width*800);
+    if(width>720){
+     img.attr("width", 720);
+     img.attr("height", height/width*720);
      img.attr("title", "点击查看原始大小图片");
      img.css("cursor", "url(${contextPath}/images/zoom.cur), pointer");
      img.click(function(){window.open(src);});

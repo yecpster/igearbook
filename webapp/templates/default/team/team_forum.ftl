@@ -1,9 +1,9 @@
 <#include "/templates/default/header.htm" />
 <@navHeader "team" />
-<#import "/templates/macros/pagination.ftl" as pagination>
+<#import "/templates/macros/paginationStruts.ftl" as pagination>
 <#import "/templates/macros/presentation.ftl" as presentation/>
 
-<script type="text/javascript" src="${contextPath}/templates/${templateName}/js/pagination.js?${startupTime}"></script>
+<script type="text/javascript" src="${contextPath}/templates/${templateName}/js/paginationStruts.js?${startupTime}"></script>
 
 <#if logged>
 	<script type="text/javascript" src="${contextPath}/templates/${templateName}/js/watch.js?${startupTime}"></script>
@@ -64,7 +64,7 @@
                     </form>
                     
                     <td class="nav" nowrap="nowrap" align="right">
-                        <#assign paginationData><@pagination.doPagination action, team.id/></#assign>
+                        <#assign paginationData><@pagination.doPagination "/team", "moderation" data /></#assign>
                         ${paginationData}
                     </td>
                     
@@ -102,7 +102,7 @@
 
 				<!-- TOPICS LISTING -->
 				<#assign sepTrDisplayed = false />
-				<#list topics as topic>
+				<#list data.list as topic>
 				    <#assign hasAnnounce = false />
 				    <#if topic.type == TOPIC_ANNOUNCE>
 				        <#assign hasAnnounce = true />

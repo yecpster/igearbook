@@ -58,6 +58,8 @@ import net.jforum.util.DbUtils;
 import net.jforum.util.preferences.SystemGlobals;
 
 import com.google.common.collect.Lists;
+import com.igearbook.entities.PaginationData;
+import com.igearbook.entities.PaginationParams;
 
 public class GenericRecommendationDAO extends AutoKeys implements net.jforum.dao.RecommendationDAO {
 
@@ -242,18 +244,17 @@ public class GenericRecommendationDAO extends AutoKeys implements net.jforum.dao
     }
 
     @Override
-    public List<Recommendation> selectAllByLimit(int startFrom, int count) {
-        List<Recommendation> l = Lists.newArrayList();
-
+    public PaginationData<Recommendation> selectAllByLimit(PaginationParams params) {
         String sql = SystemGlobals.getSql("RecommendModel.selectAllByLimit");
+        PaginationData<Recommendation> data = DbUtils.preparePagination(sql, params);
 
+        List<Recommendation> list = Lists.newArrayList();
         PreparedStatement p = null;
         ResultSet rs = null;
-
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(sql);
-            p.setInt(1, startFrom);
-            p.setInt(2, count);
+            p.setInt(1, params.getStart());
+            p.setInt(2, params.getRecordsPerPage());
 
             rs = p.executeQuery();
             Recommendation topic = null;
@@ -270,9 +271,10 @@ public class GenericRecommendationDAO extends AutoKeys implements net.jforum.dao
                 topic.setLastUpdateBy(userDao.selectById(rs.getInt("last_update_user_id")));
                 topic.setCreateTime(new Date(rs.getTimestamp("create_time").getTime()));
                 topic.setLastUpdateTime(new Date(rs.getTimestamp("last_update_time").getTime()));
-                l.add(topic);
+                list.add(topic);
             }
-            return l;
+            data.setList(list);
+            return data;
         } catch (SQLException e) {
             throw new DatabaseException(e);
         } finally {

@@ -162,11 +162,4 @@ public interface PostDAO {
 
     public List selectHotForRSS(int limit);
 
-    public int saveRecommend(Recommendation topic);
-
-    public void updateRecommend(Recommendation topic);
-
-    public List<Recommendation> selectRecommendByTypeByLimit(int type, int count);
-    
-    public Recommendation selectRecommendByTopicId(int topicId);
 }

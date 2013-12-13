@@ -122,7 +122,7 @@ public class TeamAction extends ActionSupport {
         return SUCCESS;
     }
 
-    @Action(value = "moderation", results = { @Result(name = SUCCESS, location = "team_forum.ftl") })
+    //@Action(value = "moderation", results = { @Result(name = SUCCESS, location = "team_forum.ftl") })
     public String moderation() {
         boolean canEditTeam = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
         if (canEditTeam || SessionFacade.getUserSession().isAdmin()) {
@@ -502,7 +502,7 @@ public class TeamAction extends ActionSupport {
         return SUCCESS;
     }
 
-    @Action(value = "forum", results = { @Result(name = SUCCESS, location = "team_forum.ftl") })
+    //@Action(value = "forum", results = { @Result(name = SUCCESS, location = "team_forum.ftl") })
     public String forum() {
         ActionContext context = ServletActionContext.getContext();
         ForumDAO fm = DataAccessDriver.getInstance().newForumDAO();

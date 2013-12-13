@@ -42,12 +42,20 @@
  */
 package net.jforum.util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import net.jforum.JForumExecutionContext;
 import net.jforum.entities.Group;
+import net.jforum.exceptions.DatabaseException;
+
+import com.igearbook.entities.PaginationData;
+import com.igearbook.entities.PaginationParams;
 
 /**
  * General utility methods to close statements and resultsets
@@ -142,5 +150,55 @@ public class DbUtils {
         }
 
         return sb.toString();
+    }
+
+    public static int getTotalRecords(String sql) {
+        int count = 0;
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        int from = sql.toLowerCase().indexOf("from");
+        int order = sql.toLowerCase().indexOf("order by");
+        String newSql = (order > 0) ? "select count(*) " + sql.substring(from, order) : "select count(*) " + sql.substring(from);
+        try {
+            statement = JForumExecutionContext.getConnection().prepareStatement(newSql);
+            rs = statement.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+            return count;
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        } finally {
+            DbUtils.close(rs, statement);
+        }
+    }
+
+    public static <T> PaginationData<T> preparePagination(String sql, PaginationParams params) {
+        PaginationData<T> data = new PaginationData<T>();
+        BigDecimal totalRecords = BigDecimal.ZERO;
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        int from = sql.toLowerCase().indexOf("from");
+        int order = sql.toLowerCase().indexOf("order by");
+        String newSql = (order > 0) ? "select count(*) " + sql.substring(from, order) : "select count(*) " + sql.substring(from);
+        try {
+            statement = JForumExecutionContext.getConnection().prepareStatement(newSql);
+            rs = statement.executeQuery();
+            if (rs.next()) {
+                totalRecords = BigDecimal.valueOf(rs.getInt(1));
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException(e);
+        } finally {
+            DbUtils.close(rs, statement);
+        }
+        BigDecimal recordsPerPage = BigDecimal.valueOf(params.getRecordsPerPage());
+        int totalPages = totalRecords.divide(recordsPerPage, RoundingMode.CEILING).intValue();
+        int currentPage = BigDecimal.valueOf(params.getStart() + 1).divide(recordsPerPage, RoundingMode.CEILING).intValue();
+        data.setTotalRecords(totalRecords.intValue());
+        data.setRecordsPerPage(recordsPerPage.intValue());
+        data.setCurrentPage(currentPage);
+        data.setTotalPages(totalPages);
+        return data;
     }
 }

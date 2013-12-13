@@ -114,9 +114,9 @@
         <tr>
           <td colspan="4" style="text-align:right;">
           <#if logged && moderator || session.isAdmin()>
-          &gt; <a href="<@s.url namespace="/team" action="moderation"><@s.param name="teamId" value="${team.id}" /></@s.url>">管理论坛</a>&nbsp;&nbsp;&nbsp;&nbsp; 
+          &gt; <a href="${JForumContext.encodeURL("/forums/moderation/${team.id}")}">管理论坛</a>&nbsp;&nbsp;&nbsp;&nbsp; 
           </#if>
-          &gt; <a href="<@s.url namespace="/team" action="forum"><@s.param name="teamId" value="${team.id}" /></@s.url>">更多讨论</a></td>
+          &gt; <a href="${JForumContext.encodeURL("/forums/show/${team.id}")}">更多讨论</a></td>
         </tr>
       </tbody>
     </table>

@@ -5,14 +5,14 @@
   <div id="slides">
     <#if recommendTopic?exists>
     <a href="${JForumContext.encodeURL("/posts/list/${recommendTopic.topicId}")}" title="${recommendTopic.title?default("")}" target="_blank">
-    <img src="${recommendTopic.imageUrl?default("")}" width="380" height="285">
+    <img src="${recommendTopic.imageUrl?default("")}" alt="${recommendTopic.title?default("")}-封面图片" width="380" height="285">
     <h4>${recommendTopic.title?default("")}</h4>
     <p>${recommendTopic.desc?default("")}...</p>
     </a>
     </#if>
   </div>
   <div id="new_topics" class="box middle" >
-    <h4>${I18n.getMessage("ForumBase.recentTopics")}</h4>
+    <h4>最近更新</h4>
     <ul>
         <#list recentTopics as topic>
         <li><a href="${JForumContext.encodeURL("/posts/list/${topic.id}")}" title="${topic.title?default("")}" target="_blank">${topic.title?html} </a></li>
@@ -38,11 +38,11 @@
       <div class="category"> 
       
         <div class="row index-group">
-        <h2 class="category-bar"><a href="${contextPath}/forums/show/1.page">装备网刀锋研究室</a></h2>
+        <h2 class="category-bar"><a href="${contextPath}/forums/show/1.page">装备网编辑推荐</a></h2>
          <#list igearbookTopics as recommendTopic>
           <div class="item">                        
             <a href="${JForumContext.encodeURL("/posts/list/${recommendTopic.topicId}")}" title="${recommendTopic.title?default("")}" class="index-group"> 
-            <img src="${recommendTopic.imageUrl?default("")}" width="246" height="184" alt="${recommendTopic.title?default("")}" />
+            <img src="${recommendTopic.imageUrl?default("")}" width="246" height="184" alt="${recommendTopic.title?default("")}-封面图片" />
             <h3>${recommendTopic.title?default("")}</h3>
             <p>${recommendTopic.desc?default("")}</p>
             </a>            
@@ -56,7 +56,7 @@
            <#if recommendTopic_index < 3>
            <div class="item">                        
             <a href="${JForumContext.encodeURL("/posts/list/${recommendTopic.topicId}")}" title="${recommendTopic.title?default("")}" class="index-group"> 
-            <img src="${recommendTopic.imageUrl?default("")}" width="246" height="184" alt="${recommendTopic.title?default("")}" />
+            <img src="${recommendTopic.imageUrl?default("")}" width="246" height="184" alt="${recommendTopic.title?default("")}-封面图片" />
             <h3>${recommendTopic.title?default("")}</h3>
             <p>${recommendTopic.desc?default("")}</p>
             </a>            

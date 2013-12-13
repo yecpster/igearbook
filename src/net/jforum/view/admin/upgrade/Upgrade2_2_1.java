@@ -13,6 +13,7 @@ import net.jforum.dao.AttachmentDAO;
 import net.jforum.dao.DataAccessDriver;
 import net.jforum.dao.ForumDAO;
 import net.jforum.dao.PostDAO;
+import net.jforum.dao.RecommendationDAO;
 import net.jforum.dao.TopicDAO;
 import net.jforum.entities.Attachment;
 import net.jforum.entities.Forum;
@@ -27,19 +28,16 @@ public class Upgrade2_2_1 extends GenericUpgradeService implements UpgradeServic
 
     @Override
     public void upgrade() {
-        ForumDAO forumDao = DataAccessDriver.getInstance().newForumDAO();
-        PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
-        AttachmentDAO am = DataAccessDriver.getInstance().newAttachmentDAO();
+        RecommendationDAO rpostDao = DataAccessDriver.getInstance().newRecommendationDAO();
 
-        Matcher macher = PT.matcher("");
         int foundCount = 0;
-        List<Recommendation> recommends = postDao.selectRecommendByTypeByLimit(Recommendation.TYPE_INDEX_IMG, Integer.MAX_VALUE);
+        List<Recommendation> recommends = rpostDao.selectByTypeByLimit(Recommendation.TYPE_INDEX_IMG, 0, Integer.MAX_VALUE);
         for (Recommendation recommend : recommends) {
             String text = recommend.getImageUrl();
-                System.out.println("Updating post: " + foundCount);
-                foundCount++;
-                recommend.setImageUrl(text.replaceAll("\\s.*", ""));
-                postDao.updateRecommend(recommend);
+            System.out.println("Updating post: " + foundCount);
+            foundCount++;
+            recommend.setImageUrl(text.replaceAll("\\s.*", ""));
+            rpostDao.update(recommend);
 
         }
         System.out.println("Updated post count: " + foundCount);

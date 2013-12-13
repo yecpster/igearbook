@@ -49,22 +49,22 @@ public class ImageAction extends BaseAction {
 
     @Action(value = "upload", interceptorRefs = {
             @InterceptorRef(value = "fileUpload", params = { "allowedExtensions ", ".gif,.jpg,.png", "allowedTypes",
-                    "image/png,image/gif,image/jpeg,image/pjpeg" }), @InterceptorRef("defaultStackIgearbook") }, results = { @Result(name = SUCCESS, location = "uploadJson.ftl") })
+                    "image/png,image/gif,image/jpeg,image/pjpeg", "maximumSize", "5242880" }), @InterceptorRef("defaultStackIgearbook") }, results = { @Result(name = SUCCESS, location = "uploadJson.ftl"),@Result(name = INPUT, location = "upload_input.ftl") })
     public String upload() {
-        Map<String, Object> data = Maps.newHashMap();
+        final Map<String, Object> data = Maps.newHashMap();
         try {
-            Map<String, Object> result = doUpload();
+            final Map<String, Object> result = doUpload();
             data.putAll(result);
             data.put("error", 0);
-        } catch (AttachmentException ae) {
+        } catch (final AttachmentException ae) {
             data.put("error", 1);
             data.put("message", ae.getMessage());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             data.put("error", 1);
             e.printStackTrace();
             data.put("message", "Unknown exception!");
         }
-        ActionContext context = ServletActionContext.getContext();
+        final ActionContext context = ServletActionContext.getContext();
         context.put("jsonMsg", JSONObject.toJSONString(data));
         return SUCCESS;
     }
@@ -73,9 +73,9 @@ public class ImageAction extends BaseAction {
         if (imgFile == null) {
             throw new AttachmentException("Attachment cannot be null!");
         }
-        int userId = SessionFacade.getUserSession().getUserId();
-        QuotaLimit ql = this.getQuotaLimit(userId);
-        long fileSize = imgFile.length();
+        final int userId = SessionFacade.getUserSession().getUserId();
+        final QuotaLimit ql = this.getQuotaLimit(userId);
+        final long fileSize = imgFile.length();
         if (ql != null) {
             if (ql.exceedsQuota(fileSize)) {
                 throw new AttachmentSizeTooBigException(I18n.getMessage("Attachments.tooBig", new Integer[] { ql.getSizeInBytes() / 1024,
@@ -83,38 +83,38 @@ public class ImageAction extends BaseAction {
             }
         }
 
-        String storyDir = SystemGlobals.getValue(ConfigKeys.ATTACHMENTS_STORE_DIR);
-        String fileDir = makeFileDir();
-        String origFileName = makeFileName();
-        String origFilePath = fileDir + origFileName;
+        final String storyDir = SystemGlobals.getValue(ConfigKeys.ATTACHMENTS_STORE_DIR);
+        final String fileDir = makeFileDir();
+        final String origFileName = makeFileName();
+        final String origFilePath = fileDir + origFileName;
 
         saveImage(imgFile, storyDir + origFilePath);
-        File origFile = new File(storyDir + origFilePath);
+        final File origFile = new File(storyDir + origFilePath);
         String filePath = origFilePath;
 
         if (shouldCreateThumb(origFile, 480, 320)) {
-            String fileName480 = makeThumbFileName(origFileName, 1);
-            String filePath480 = fileDir + fileName480;
+            final String fileName480 = makeThumbFileName(origFileName, 1);
+            final String filePath480 = fileDir + fileName480;
             createImageThumb(origFile, storyDir + filePath480, fileName480, 480, 320);
         }
         if (shouldCreateThumb(origFile, 800, 600)) {
-            String fileName800 = makeThumbFileName(origFileName, 2);
-            String filePath800 = fileDir + fileName800;
+            final String fileName800 = makeThumbFileName(origFileName, 2);
+            final String filePath800 = fileDir + fileName800;
             createImageThumb(origFile, storyDir + filePath800, fileName800, 800, 600);
             filePath = filePath800;
         }
 
-        String imgUrl = ServletActionContext.getRequest().getContextPath() + "/" + SystemGlobals.getValue(ConfigKeys.ATTACHMENTS_UPLOAD_DIR)
+        final String imgUrl = ServletActionContext.getRequest().getContextPath() + "/" + SystemGlobals.getValue(ConfigKeys.ATTACHMENTS_UPLOAD_DIR)
                 + filePath;
         BufferedImage bi = null;
         try {
             bi = ImageIO.read(new File(storyDir + filePath));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException(e);
         }
-        int width = bi.getWidth();
-        int height = bi.getHeight();
-        Map<String, Object> result = Maps.newHashMap();
+        final int width = bi.getWidth();
+        final int height = bi.getHeight();
+        final Map<String, Object> result = Maps.newHashMap();
         result.put("url", imgUrl);
         result.put("width", String.valueOf(width));
         result.put("height", String.valueOf(height));
@@ -124,13 +124,13 @@ public class ImageAction extends BaseAction {
     }
 
     private String makeFileDir() {
-        Calendar calendar = Calendar.getInstance();
+        final Calendar calendar = Calendar.getInstance();
 
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH) + 1;
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        final int year = calendar.get(Calendar.YEAR);
+        final int month = calendar.get(Calendar.MONTH) + 1;
+        final int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        StringBuffer dir = new StringBuffer(256);
+        final StringBuffer dir = new StringBuffer(256);
         dir.append('/').append(year).append('/').append(month).append('/').append(day).append('/');
 
         new File(SystemGlobals.getValue(ConfigKeys.ATTACHMENTS_STORE_DIR) + dir.toString()).mkdirs();
@@ -138,10 +138,10 @@ public class ImageAction extends BaseAction {
     }
 
     private String makeFileName() {
-        StringBuffer fileName = new StringBuffer(256);
+        final StringBuffer fileName = new StringBuffer(256);
 
-        int extensionIndex = imgFileFileName.lastIndexOf(".");
-        String extension = imgFileFileName.substring(extensionIndex, imgFileFileName.length()).toLowerCase();
+        final int extensionIndex = imgFileFileName.lastIndexOf(".");
+        final String extension = imgFileFileName.substring(extensionIndex, imgFileFileName.length()).toLowerCase();
         fileName.append(MD5.crypt(imgFileFileName + System.currentTimeMillis()));
         fileName.append('_').append(SessionFacade.getUserSession().getUserId());
         fileName.append('_').append(forumId);
@@ -151,16 +151,16 @@ public class ImageAction extends BaseAction {
         return fileName.toString();
     }
 
-    private String makeThumbFileName(String origFileName, int type) {
+    private String makeThumbFileName(final String origFileName, final int type) {
         return origFileName.replaceAll("_0\\.", String.format("_%s.", type));
     }
 
-    private QuotaLimit getQuotaLimit(int userId) {
+    private QuotaLimit getQuotaLimit(final int userId) {
         QuotaLimit ql = new QuotaLimit();
-        User u = DataAccessDriver.getInstance().newUserDAO().selectById(userId);
-        AttachmentDAO am = DataAccessDriver.getInstance().newAttachmentDAO();
-        for (Iterator<Group> iter = u.getGroupsList().iterator(); iter.hasNext();) {
-            QuotaLimit l = am.selectQuotaLimitByGroup(iter.next().getId());
+        final User u = DataAccessDriver.getInstance().newUserDAO().selectById(userId);
+        final AttachmentDAO am = DataAccessDriver.getInstance().newAttachmentDAO();
+        for (final Iterator<Group> iter = u.getGroupsList().iterator(); iter.hasNext();) {
+            final QuotaLimit l = am.selectQuotaLimitByGroup(iter.next().getId());
             if (l == null) {
                 continue;
             }
@@ -177,40 +177,40 @@ public class ImageAction extends BaseAction {
         return ql;
     }
 
-    private void saveImage(File file, String savePath) {
+    private void saveImage(final File file, final String savePath) {
         FileOutputStream outputStream = null;
         FileInputStream fileIn = null;
         try {
             outputStream = new FileOutputStream(savePath);
             fileIn = new FileInputStream(file);
-            byte[] buffer = new byte[1024];
+            final byte[] buffer = new byte[1024];
             int len;
             while ((len = fileIn.read(buffer)) > 0) {
                 outputStream.write(buffer, 0, len);
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         } finally {
             try {
                 fileIn.close();
                 outputStream.close();
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 throw new RuntimeException(e);
             }
         }
 
     }
 
-    private boolean shouldCreateThumb(File file, int width, int height) {
+    private boolean shouldCreateThumb(final File file, final int width, final int height) {
         BufferedImage bi = null;
         try {
             bi = ImageIO.read(file);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException(e);
         }
 
-        int oldWidth = bi.getWidth();
-        int oldHeight = bi.getHeight();
+        final int oldWidth = bi.getWidth();
+        final int oldHeight = bi.getHeight();
         if (oldWidth <= width && oldHeight <= height)
             return false;
         else {
@@ -219,16 +219,16 @@ public class ImageAction extends BaseAction {
 
     }
 
-    private void createImageThumb(File file, String newUrl, String newFileName, int width, int height) {
+    private void createImageThumb(final File file, final String newUrl, final String newFileName, final int width, final int height) {
         BufferedImage bi = null;
         try {
             bi = ImageIO.read(file);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException(e);
         }
 
-        int oldWidth = bi.getWidth();
-        int oldHeight = bi.getHeight();
+        final int oldWidth = bi.getWidth(null);
+        final int oldHeight = bi.getHeight(null);
         if (oldWidth <= width && oldHeight <= height)
             saveImage(file, newUrl);
         else {
@@ -241,7 +241,7 @@ public class ImageAction extends BaseAction {
         return imgFile;
     }
 
-    public void setImgFile(File imgFile) {
+    public void setImgFile(final File imgFile) {
         this.imgFile = imgFile;
     }
 
@@ -249,7 +249,7 @@ public class ImageAction extends BaseAction {
         return imgFileContentType;
     }
 
-    public void setImgFileContentType(String imgFileContentType) {
+    public void setImgFileContentType(final String imgFileContentType) {
         this.imgFileContentType = imgFileContentType;
     }
 
@@ -257,7 +257,7 @@ public class ImageAction extends BaseAction {
         return imgFileFileName;
     }
 
-    public void setImgFileFileName(String imgFileFileName) {
+    public void setImgFileFileName(final String imgFileFileName) {
         this.imgFileFileName = imgFileFileName;
     }
 
@@ -265,7 +265,7 @@ public class ImageAction extends BaseAction {
         return forumId;
     }
 
-    public void setForumId(int forumId) {
+    public void setForumId(final int forumId) {
         this.forumId = forumId;
     }
 
