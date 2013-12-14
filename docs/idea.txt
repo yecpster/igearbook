@@ -1,1 +1,0 @@
-1. modify add forum/category module, when add fourm/category, add new group(read, write ...), auto add permission to the group.
