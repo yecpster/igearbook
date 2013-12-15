@@ -20,7 +20,33 @@
 <#if logged>
 	<script type="text/javascript" src="${contextPath}/templates/${templateName}/js/watch.js?${startupTime}"></script>
 </#if>
-
+<#if logged && !session.isMobileUser()>
+<script type="text/javascript" charset="utf-8" src="${contextPath}/templates/${templateName}/editor/kindeditor.js"></script>
+<script type="text/javascript" charset="utf-8" src="${contextPath}/templates/${templateName}/editor/lang/zh_CN.js"></script>
+<link rel="stylesheet" href="${contextPath}/templates/${templateName}/editor/themes/simple/simple.css" />
+<script>
+        KindEditor.ready(function(K) {
+            window.editor = K.create('#messageEditor', {
+            width   : '600px',
+            height  : '130px',
+            themeType : 'simple',
+            allowPreviewEmoticons : true,
+            syncType: '',
+            allowImageRemote: false,
+            allowFlashUpload: false,
+            formatUploadUrl: false,
+            uploadJson : '${contextPath}/image/upload.action',
+            <#if forum?exists>
+            extraFileUploadParams : {
+                        forumId : '${forum.id}'
+                },
+            </#if>
+            items : ['undo', 'redo', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
+                    'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'emoticons', 'image', 'flash', 'link', 'fullscreen']
+            });
+        });
+</script>
+</#if>
 <script type="text/javascript">
 <!--
 <#include "js/karma.js">
@@ -78,7 +104,7 @@
 			
 			<table cellspacing="2" cellpadding="2" width="100%" border="0">
 				<tr>
-				    <td valign="middle" align="left" colspan="${colspan?default("0")}">
+				    <td valign="middle" align="left" colspan="2">
                         <span class="nav">
                         <#if isTeamForum>
                             <a class="nav" href="${contextPath}/team/list.action">群组首页</a> 
@@ -93,24 +119,32 @@
                         &raquo; ${topic.title?html}
                         </span>
                     </td>
-                    
-                    <td valign="middle" align="left"><#assign paginationData><@pagination.doPagination "list", topic.id/></#assign>${paginationData}</td>
-                    
-					<td width="8%" align="left" valign="bottom" nowrap="nowrap">
-					   <#if moderator && !topicRecommended>
+                    <td width="8%" align="left" valign="bottom" nowrap="nowrap">
+                       <#if moderator && !topicRecommended>
                             <a href="${contextPath}/post/recommend.action?topicId=${topic.id}" rel="nofollow" class="icon_recommend nav" target="_blank"><img src="${contextPath}/images/transp.gif" alt="" /></a>
                         </#if>
-						<#if topic.status == STATUS_LOCKED>
-							<span class="icon_reply_locked"><img src="${contextPath}/images/transp.gif" alt="" /></span>
-						<#else>
-							<#if !readonly>
-								<a href="${JForumContext.encodeURL("/posts/reply/${start}/${topic.id}")}" rel="nofollow" class="icon_reply nav"><img src="${contextPath}/images/transp.gif" alt="" /></a>
-							<#else>
-								<#assign colspan = "2"/>
-							</#if>
-						</#if>
-					</td>
+                        <#if topic.status == STATUS_LOCKED>
+                            <span class="icon_reply_locked"><img src="${contextPath}/images/transp.gif" alt="" /></span>
+                        <#else>
+                            <#if !readonly>
+                                <a href="${JForumContext.encodeURL("/posts/reply/${start}/${topic.id}")}" rel="nofollow" class="icon_reply nav"><img src="${contextPath}/images/transp.gif" alt="" /></a>
+                            <#else>
+                                <#assign colspan = "2"/>
+                            </#if>
+                        </#if>
+                    </td>
 				</tr>
+				<#if (totalRecords > recordsPerPage)>
+				<tr>
+				    <td width="25%">
+                      &nbsp;
+                    </td>
+                    <td valign="middle" align="left"><#assign paginationData><@pagination.doPagination "list", topic.id/></#assign>${paginationData}</td>
+                    <td width="8%" align="left" valign="bottom" nowrap="nowrap">
+                        &nbsp;
+                    </td>
+                </tr>
+                </#if>
 			</table>
 
 			<table class="forumline" cellspacing="1" cellpadding="3" width="100%" border="0">
@@ -231,40 +265,16 @@
 				<!-- END OF POST LISTING -->
 		
 			</table>
-		
-			<table cellspacing="2" cellpadding="2" width="100%" align="center" border="0">
+		  <#if (totalRecords > recordsPerPage)>
+			<table cellspacing="0" cellpadding="0" width="100%" border="0">
 				<tr>
-					<td valign="middle" align="left" colspan="${colspan?default("0")}">
-						<span class="nav">
-						<#if isTeamForum>
-                            <a class="nav" href="${contextPath}/team/list.action">群组首页</a> 
-                            &raquo; 
-                            <a class="nav" href="${contextPath}/team/show.action?teamId=${forum.id}">${forum.name?html}</a>
-                            &raquo; 
-                            <a class="nav" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">群组论坛</a>
-                        <#else>
-                            <a class="nav" href="${JForumContext.encodeURL("/forums/list")}">${I18n.getMessage("ForumListing.forumIndex")} </a> 
-                            &raquo; <a class="nav" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">${forum.name} </a>
-                        </#if>
-                        &raquo; ${topic.title?html}
-						</span>
-					</td>
-
-					<td valign="middle" align="left">${paginationData}</td>
-					<td width="8%" align="left" valign="bottom" nowrap="nowrap">
-                    <#if topic.status == STATUS_LOCKED>
-                        <span class="icon_reply_locked"><img src="${contextPath}/images/transp.gif" alt="" /></span>
-                    <#else>
-                        <#if !readonly>
-                            <a href="${JForumContext.encodeURL("/posts/reply/${start}/${topic.id}")}" rel="nofollow" class="icon_reply nav"><img src="${contextPath}/images/transp.gif" alt="" /></a>
-                        <#else>
-                            <#assign colspan = "2"/>
-                        </#if>
-                    </#if>
+				    <td width="25%">
+                      &nbsp;
                     </td>
-				</tr>
+                    <td valign="middle" align="left">${paginationData}</td>
+                </tr>
 			</table>
-			
+		</#if>
 			<table width="100%" align="center">
 				
 				<#if (logged || anonymousPosts) && topic.status != STATUS_LOCKED && !readonly>
@@ -312,17 +322,11 @@
 	
 						<table width="100%">
 							<tr>
-								<td align="center">
-									<img src="${contextPath}/templates/${templateName}/images/icon_mini_message.gif" align="middle" alt="Message" />
-									<span class="nav"><a href="javascript:activateQuickReply()">${I18n.getMessage("PostForm.quickReply")}</a></span>
-								</td>
-							</tr>
-							<tr>
-                                <td align="center">
-                                    <table>
+                                <td align="right">
+                                    <table style="margin-right:75px;">
                                         <tr>
                                             <td align="center">
-                                                <textarea class="post" id="messageEditor" name="message" rows="10" cols="80"></textarea>
+                                                <textarea class="post" id="messageEditor" name="message" rows="10" cols="80" style="width:600px;height:120px;"></textarea>
                                             </td>
                                         </tr>
                                         <#if needCaptcha?default(false)>
@@ -339,7 +343,7 @@
                                         </#if>
                                         <tr>
                                             <td align="right" valign="center">
-                                                <input type="submit" id="btnSubmit" value="${I18n.getMessage("PostForm.submit")}" class="mainoption" />
+                                                <input type="submit" id="btnSubmit" value="发表回复" class="submitBig" />
                                                 <img src="${contextPath}/images/transp.gif" id="icon_saving">
                                             </td>
                                         </tr>
@@ -357,6 +361,12 @@
 					<tr>
                         <td colspan="3" align="center">
                             <span style="color: #ff0000;font-size: 14px;font-weight:bold;">只有群组成员才能发言 &gt;&nbsp;</span><a href="${contextPath}/team/join.action?teamId=${forum.id}" title="点击加入"><span style="font-size: 14px;font-weight:bold;">加入此群组</span></a>
+                        </td>
+                    </tr>
+                <#elseif !logged>
+                    <tr>
+                        <td colspan="3" align="center">
+                            <span style="color: #ff0000;font-size: 14px;font-weight:bold;">需要登录才能发言 &gt;&nbsp;</span><a href="${JForumContext.encodeURL("/user/login")}" title="${I18n.getMessage("ForumBase.login")}"><span style="font-size: 14px;font-weight:bold;">${I18n.getMessage("ForumBase.login")}</span></a>
                         </td>
                     </tr>
 				</#if>

@@ -118,7 +118,8 @@ public class PostAction extends BaseAction {
             } else {
                 description = post.getSubject();
             }
-
+            final Forum forum = ForumRepository.getForum(topic.getForumId());
+            rtopic.setType(forum.getType() == Forum.TYPE_TEAM ? Recommendation.TYPE_INDEX_TEAM : Recommendation.TYPE_INDEX_IMG);
             rtopic.setTitle(topic.getTitle());
             rtopic.setTopicId(topic.getId());
             rtopic.setDesc(description);
@@ -166,11 +167,6 @@ public class PostAction extends BaseAction {
 
         final boolean isNew = (rtopic.getId() == 0);
         final int userId = SessionFacade.getUserSession().getUserId();
-        final Forum forum = ForumRepository.getForum(topic.getForumId());
-        int type = Recommendation.TYPE_INDEX_IMG;
-        if (forum.getType() == Forum.TYPE_TEAM) {
-            type = Recommendation.TYPE_INDEX_TEAM;
-        }
         final User user = DataAccessDriver.getInstance().newUserDAO().selectById(userId);
 
         final RecommendationDAO recommendDao = DataAccessDriver.getInstance().newRecommendationDAO();
@@ -181,13 +177,13 @@ public class PostAction extends BaseAction {
         if (isNew) {
             rtopic.setCreateBy(user);
             rtopic.setCreateTime(now);
-            rtopic.setType(type);
             recommendDao.addNew(rtopic);
         } else {
             recommendDao.update(rtopic);
         }
 
-        TopicRepository.loadRecommendTopics(type);
+        TopicRepository.loadRecommendTopics(Recommendation.TYPE_INDEX_TEAM);
+        TopicRepository.loadRecommendTopics(Recommendation.TYPE_INDEX_IMG);
         return SUCCESS;
     }
 

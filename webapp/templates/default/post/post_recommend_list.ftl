@@ -28,7 +28,7 @@
 			<tr align="center">
 			    <td class="row2"><span class="gen">${r_index+1}</span></td>
 			    <td class="row2"><#if r.type==0>
-			                         <span class="gen">论坛精华</span>
+			                         <span class="gen">编辑推荐</span>
 			                     <#elseif r.type==1>
 			                         <span class="gen">群组精华</span>
 			                     </#if>

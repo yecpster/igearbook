@@ -464,4 +464,15 @@ z-index: 30;
     color: #ddd;
 }
 
+input.buttonBig, input.submitBig {
+  background: #265827;
+  color: white;
+  cursor:pointer;
+  font-size: 1em;
+  height:26px;
+  padding:2px 5px;  
+  border:1px solid #d2f3fd;
+  vertical-align: middle;
+}
+
 @charset "utf-8";

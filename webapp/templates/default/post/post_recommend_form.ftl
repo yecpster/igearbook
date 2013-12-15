@@ -53,6 +53,14 @@
                         </span>
                     </td>
                 </tr>
+                <tr>
+                    <td class="row1" width="7%"><span class="gen"><b>推荐频道</b></span></td>
+                    <td class="row2" width="93%">
+                        <span class="gen">
+                            <@s.select label="Months" name="rtopic.type" list=r"#{'0':'编辑推荐', '1':'群组精华'}" value="rtopic.type" />
+                        </span>
+                    </td>
+                </tr>
                  <tr>
                     <td class="row1" valign="top"><span class="gen">
                         <span class="gen"><b>${I18n.getMessage("PostRecommendForm.desc")}</b></span>

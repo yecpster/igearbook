@@ -221,7 +221,7 @@ PostModel.deleteByTopic = SELECT post_id, user_id FROM jforum_posts WHERE topic_
 # #############
 RecommendModel.addNew = INSERT INTO jforum_recommendation (recommend_type, image_url, topic_id, topic_title, topic_desc, create_user_id, last_update_user_id, create_time, last_update_time) \
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
-RecommendModel.update = UPDATE jforum_recommendation set image_url=?, topic_title=?, topic_desc=?, last_update_user_id=?, last_update_time=? \
+RecommendModel.update = UPDATE jforum_recommendation set recommend_type=?, image_url=?, topic_title=?, topic_desc=?, last_update_user_id=?, last_update_time=? \
     WHERE recommend_id = ?
 RecommendModel.delete = DELETE FROM jforum_recommendation WHERE recommend_id = ?
 RecommendModel.selectByTypeByLimit = SELECT recommend_id, recommend_type, image_url, topic_id, topic_title, topic_desc, create_user_id, last_update_user_id, create_time, last_update_time \
