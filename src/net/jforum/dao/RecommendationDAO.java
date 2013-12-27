@@ -2,10 +2,9 @@ package net.jforum.dao;
 
 import java.util.List;
 
-import net.jforum.entities.Recommendation;
-
 import com.igearbook.entities.PaginationData;
 import com.igearbook.entities.PaginationParams;
+import com.igearbook.entities.Recommendation;
 
 public interface RecommendationDAO {
     public Recommendation selectById(int id);

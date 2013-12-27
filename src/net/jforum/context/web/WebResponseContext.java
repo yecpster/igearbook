@@ -42,17 +42,17 @@
  */
 package net.jforum.context.web;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Cookie;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URI;
+
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 import net.jforum.context.ResponseContext;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URI;
 
 /**
  * @author SergeMaslyukov

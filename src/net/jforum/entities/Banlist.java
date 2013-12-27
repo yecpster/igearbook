@@ -45,7 +45,7 @@ package net.jforum.entities;
 import java.io.Serializable;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Rafael Steil
@@ -93,7 +93,7 @@ public class Banlist implements Serializable
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(int id)
+	public void setId(final int id)
 	{
 		this.id = id;
 	}
@@ -101,7 +101,7 @@ public class Banlist implements Serializable
 	/**
 	 * @param userId the userId to set
 	 */
-	public void setUserId(int userId)
+	public void setUserId(final int userId)
 	{
 		this.userId = userId;
 	}
@@ -109,7 +109,7 @@ public class Banlist implements Serializable
 	/**
 	 * @param ip the ip to set
 	 */
-	public void setIp(String ip)
+	public void setIp(final String ip)
 	{
 		this.ip = ip;
 	}
@@ -117,12 +117,12 @@ public class Banlist implements Serializable
 	/**
 	 * @param email the email to set
 	 */
-	public void setEmail(String email)
+	public void setEmail(final String email)
 	{
 		this.email = email;
 	}
 	
-	public boolean matches(Banlist b)
+	public boolean matches(final Banlist b)
 	{
 		boolean status = false;
 		
@@ -141,33 +141,33 @@ public class Banlist implements Serializable
 		return status;
 	}
 
-	private boolean matchesEmail(Banlist b)
+	private boolean matchesEmail(final Banlist b)
 	{
 		return (!StringUtils.isEmpty(b.getEmail()) && b.getEmail().equals(this.getEmail()));
 	}
 
-	private boolean matchesUserId(Banlist b)
+	private boolean matchesUserId(final Banlist b)
 	{
 		return b.getUserId() > 0 && this.getUserId() > 0 && b.getUserId() == this.getUserId();
 	}
 
-	private boolean matchIp(Banlist b)
+	private boolean matchIp(final Banlist b)
 	{
 		boolean status = false;
 		
-		StringTokenizer userToken = new StringTokenizer(b.getIp(), ".");
-		StringTokenizer thisToken = new StringTokenizer(this.getIp(), ".");
+		final StringTokenizer userToken = new StringTokenizer(b.getIp(), ".");
+		final StringTokenizer thisToken = new StringTokenizer(this.getIp(), ".");
 		
 		if (userToken.countTokens() == thisToken.countTokens()) {
-			String[] userValues = this.tokenizerAsArray(userToken);
-			String[] thisValues = this.tokenizerAsArray(thisToken);
+			final String[] userValues = this.tokenizerAsArray(userToken);
+			final String[] thisValues = this.tokenizerAsArray(thisToken);
 			
 			status = this.compareIpValues(userValues, thisValues);
 		}
 		return status;
 	}
 
-	private boolean compareIpValues(String[] userValues, String[] thisValues)
+	private boolean compareIpValues(final String[] userValues, final String[] thisValues)
 	{
 		boolean helperStatus = true;
 		boolean onlyStars = true;
@@ -185,9 +185,9 @@ public class Banlist implements Serializable
 		return helperStatus && !onlyStars;
 	}
 
-	private String[] tokenizerAsArray(StringTokenizer token)
+	private String[] tokenizerAsArray(final StringTokenizer token)
 	{
-		String[] values = new String[token.countTokens()];
+		final String[] values = new String[token.countTokens()];
 		
 		for (int i = 0; token.hasMoreTokens(); i++) {
 			values[i] = token.nextToken();

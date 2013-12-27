@@ -49,8 +49,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Lists;
-
 import net.jforum.Command;
 import net.jforum.JForumExecutionContext;
 import net.jforum.SessionFacade;
@@ -60,11 +58,9 @@ import net.jforum.dao.ModerationDAO;
 import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
 import net.jforum.entities.MostUsersEverOnline;
-import net.jforum.entities.Recommendation;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.ForumRepository;
 import net.jforum.repository.SecurityRepository;
-import net.jforum.repository.TopicRepository;
 import net.jforum.security.SecurityConstants;
 import net.jforum.util.I18n;
 import net.jforum.util.preferences.ConfigKeys;
@@ -75,6 +71,8 @@ import net.jforum.view.forum.common.ForumCommon;
 import net.jforum.view.forum.common.PostCommon;
 import net.jforum.view.forum.common.TopicsCommon;
 import net.jforum.view.forum.common.ViewCommon;
+
+import com.google.common.collect.Lists;
 
 /**
  * @author Rafael Steil

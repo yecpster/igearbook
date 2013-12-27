@@ -42,15 +42,13 @@
  */
 package net.jforum.util;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import net.jforum.dao.DataAccessDriver;
 import net.jforum.dao.TreeGroupDAO;
-import net.jforum.entities.Group;
+
+import com.google.common.collect.Lists;
 
 /**
  * Implements a tree hierarchy of groups. This class process all group

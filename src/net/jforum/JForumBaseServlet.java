@@ -58,7 +58,7 @@ import net.jforum.util.bbcode.BBCodeHandler;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
@@ -84,7 +84,7 @@ public class JForumBaseServlet extends HttpServlet {
             SystemGlobals.loadQueries(SystemGlobals.getValue(ConfigKeys.SQL_QUERIES_GENERIC));
             SystemGlobals.loadQueries(SystemGlobals.getValue(ConfigKeys.SQL_QUERIES_DRIVER));
 
-            String filename = SystemGlobals.getValue(ConfigKeys.QUARTZ_CONFIG);
+            final String filename = SystemGlobals.getValue(ConfigKeys.QUARTZ_CONFIG);
             SystemGlobals.loadAdditionalDefaults(filename);
 
             ConfigLoader.createLoginAuthenticator();
@@ -92,16 +92,17 @@ public class JForumBaseServlet extends HttpServlet {
             ConfigLoader.listenForChanges();
             ConfigLoader.startSearchIndexer();
             ConfigLoader.startSummaryJob();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new ForumStartupException("Error while starting JForum", e);
         }
     }
 
-    public void init(ServletConfig config) throws ServletException {
+    @Override
+    public void init(final ServletConfig config) throws ServletException {
         super.init(config);
 
         try {
-            String appPath = config.getServletContext().getRealPath("");
+            final String appPath = config.getServletContext().getRealPath("");
             debug = "true".equals(config.getInitParameter("development"));
 
             DOMConfigurator.configure(appPath + "/WEB-INF/log4j.xml");
@@ -112,10 +113,10 @@ public class JForumBaseServlet extends HttpServlet {
             ConfigLoader.startCacheEngine();
 
             // Configure the template engine
-            Configuration templateCfg = new Configuration();
+            final Configuration templateCfg = new Configuration();
             templateCfg.setTemplateUpdateDelay(2);
             templateCfg.setSetting("number_format", "#");
-            long startupTime = new Date().getTime();
+            final long startupTime = new Date().getTime();
             templateCfg.setSharedVariable("startupTime", startupTime);
             templateCfg.setSharedVariable("debug", debug);
             config.getServletContext().setAttribute("startupTime", startupTime);
@@ -123,17 +124,17 @@ public class JForumBaseServlet extends HttpServlet {
             config.getServletContext().setAttribute("number_format", "#");
 
             // Create the default template loader
-            String defaultPath = SystemGlobals.getApplicationPath() + "/templates";
-            FileTemplateLoader defaultLoader = new FileTemplateLoader(new File(defaultPath));
+            final String defaultPath = SystemGlobals.getApplicationPath() + "/templates";
+            final FileTemplateLoader defaultLoader = new FileTemplateLoader(new File(defaultPath));
 
-            String extraTemplatePath = SystemGlobals.getValue(ConfigKeys.FREEMARKER_EXTRA_TEMPLATE_PATH);
+            final String extraTemplatePath = SystemGlobals.getValue(ConfigKeys.FREEMARKER_EXTRA_TEMPLATE_PATH);
 
             if (StringUtils.isNotBlank(extraTemplatePath)) {
                 // An extra template path is configured, we need a
                 // MultiTemplateLoader
-                FileTemplateLoader extraLoader = new FileTemplateLoader(new File(extraTemplatePath));
-                TemplateLoader[] loaders = new TemplateLoader[] { extraLoader, defaultLoader };
-                MultiTemplateLoader multiLoader = new MultiTemplateLoader(loaders);
+                final FileTemplateLoader extraLoader = new FileTemplateLoader(new File(extraTemplatePath));
+                final TemplateLoader[] loaders = new TemplateLoader[] { extraLoader, defaultLoader };
+                final MultiTemplateLoader multiLoader = new MultiTemplateLoader(loaders);
                 templateCfg.setTemplateLoader(multiLoader);
             } else {
                 // An extra template path is not configured, we only need the
@@ -150,7 +151,7 @@ public class JForumBaseServlet extends HttpServlet {
             }
 
             JForumExecutionContext.setTemplateConfig(templateCfg);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new ForumStartupException("Error while starting JForum", e);
         }
     }

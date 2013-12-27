@@ -63,7 +63,7 @@ import net.jforum.util.preferences.SystemGlobals;
 import net.jforum.util.preferences.TemplateKeys;
 import net.jforum.view.forum.common.ViewCommon;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
 

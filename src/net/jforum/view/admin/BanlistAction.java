@@ -44,14 +44,14 @@ package net.jforum.view.admin;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
 import net.jforum.dao.BanlistDAO;
 import net.jforum.dao.DataAccessDriver;
 import net.jforum.entities.Banlist;
 import net.jforum.exceptions.ForumException;
 import net.jforum.repository.BanlistRepository;
 import net.jforum.util.preferences.TemplateKeys;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Rafael Steil
@@ -66,11 +66,11 @@ public class BanlistAction extends AdminCommand
 	
 	public void insertSave()
 	{
-		String type = this.request.getParameter("type");
-		String value = this.request.getParameter("value");
+		final String type = this.request.getParameter("type");
+		final String value = this.request.getParameter("value");
 		
 		if (!StringUtils.isEmpty(type) && !StringUtils.isEmpty(value)) {
-			Banlist b = new Banlist();
+			final Banlist b = new Banlist();
 			
 			if ("email".equals(type)) {
 				b.setEmail(value);
@@ -85,7 +85,7 @@ public class BanlistAction extends AdminCommand
 				throw new ForumException("Unknown banlist type");
 			}
 			
-			BanlistDAO dao = DataAccessDriver.getInstance().newBanlistDAO();
+			final BanlistDAO dao = DataAccessDriver.getInstance().newBanlistDAO();
 			dao.insert(b);
 			
 			BanlistRepository.add(b);
@@ -96,13 +96,13 @@ public class BanlistAction extends AdminCommand
 	
 	public void delete() 
 	{
-		String[] banlist = this.request.getParameterValues("banlist_id");
+		final String[] banlist = this.request.getParameterValues("banlist_id");
 		
 		if (banlist != null && banlist.length > 0) {
-			BanlistDAO dao = DataAccessDriver.getInstance().newBanlistDAO();
+			final BanlistDAO dao = DataAccessDriver.getInstance().newBanlistDAO();
 			
 			for (int i = 0; i < banlist.length; i++) {
-				int current = Integer.parseInt(banlist[i]);
+				final int current = Integer.parseInt(banlist[i]);
 				dao.delete(current);
 				
 				BanlistRepository.remove(current);
@@ -115,11 +115,12 @@ public class BanlistAction extends AdminCommand
 	/**
 	 * @see net.jforum.Command#list()
 	 */
-	public void list()
+	@Override
+    public void list()
 	{
 		this.setTemplateName(TemplateKeys.BANLIST_LIST);
 		
-		List l = DataAccessDriver.getInstance().newBanlistDAO().selectAll();
+		final List l = DataAccessDriver.getInstance().newBanlistDAO().selectAll();
 		this.context.put("banlist", l);
 	}
 }

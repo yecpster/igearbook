@@ -66,7 +66,7 @@ import net.jforum.util.preferences.SystemGlobals;
 import net.jforum.util.preferences.TemplateKeys;
 import net.jforum.view.forum.common.PostCommon;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 
@@ -97,23 +97,23 @@ public class AjaxAction extends Command {
      * @return The status message
      */
     public void sendTestMail() {
-        String sender = this.request.getParameter("sender");
-        String host = this.request.getParameter("host");
-        String port = this.request.getParameter("port");
-        String auth = this.request.getParameter("auth");
-        String ssl = this.request.getParameter("ssl");
-        String username = this.request.getParameter("username");
-        String password = this.request.getParameter("password");
-        String to = this.request.getParameter("to");
+        final String sender = this.request.getParameter("sender");
+        final String host = this.request.getParameter("host");
+        final String port = this.request.getParameter("port");
+        final String auth = this.request.getParameter("auth");
+        final String ssl = this.request.getParameter("ssl");
+        final String username = this.request.getParameter("username");
+        final String password = this.request.getParameter("password");
+        final String to = this.request.getParameter("to");
 
         // Save the current values
-        String originalHost = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_HOST);
-        String originalAuth = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_AUTH);
-        String originalUsername = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_USERNAME);
-        String originalPassword = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_PASSWORD);
-        String originalSender = SystemGlobals.getValue(ConfigKeys.MAIL_SENDER);
-        String originalSSL = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_SSL);
-        String originalPort = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_PORT);
+        final String originalHost = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_HOST);
+        final String originalAuth = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_AUTH);
+        final String originalUsername = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_USERNAME);
+        final String originalPassword = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_PASSWORD);
+        final String originalSender = SystemGlobals.getValue(ConfigKeys.MAIL_SENDER);
+        final String originalSSL = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_SSL);
+        final String originalPort = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_PORT);
 
         // Now put the new ones
         SystemGlobals.setValue(ConfigKeys.MAIL_SMTP_HOST, host);
@@ -128,10 +128,10 @@ public class AjaxAction extends Command {
 
         // Send the test mail
         class TestSpammer extends Spammer {
-            public TestSpammer(String to) {
-                List l = new ArrayList();
+            public TestSpammer(final String to) {
+                final List l = new ArrayList();
 
-                User user = new User();
+                final User user = new User();
                 user.setEmail(to);
 
                 l.add(user);
@@ -142,20 +142,22 @@ public class AjaxAction extends Command {
                 this.prepareMessage("JForum Test Mail", null);
             }
 
+            @Override
             protected String processTemplate() throws Exception {
                 return ("Test mail from JForum Admin Panel. Sent at " + new Date());
             }
 
-            protected void createTemplate(String messageFile) throws Exception {
+            @Override
+            protected void createTemplate(final String messageFile) throws Exception {
             }
         }
 
-        Spammer s = new TestSpammer(to);
+        final Spammer s = new TestSpammer(to);
 
         try {
             s.dispatchMessages();
-        } catch (Exception e) {
-            status = StringEscapeUtils.escapeJavaScript(e.toString());
+        } catch (final Exception e) {
+            status = StringEscapeUtils.escapeEcmaScript(e.toString());
             logger.error(e.toString(), e);
         } finally {
             // Restore the original values
@@ -173,29 +175,29 @@ public class AjaxAction extends Command {
     }
 
     public void isPostIndexed() {
-        int postId = this.request.getIntParameter("post_id");
+        final int postId = this.request.getIntParameter("post_id");
 
         this.setTemplateName(TemplateKeys.AJAX_IS_POST_INDEXED);
 
-        LuceneManager manager = (LuceneManager) SearchFacade.manager();
-        Document doc = manager.luceneSearch().findDocumentByPostId(postId);
+        final LuceneManager manager = (LuceneManager) SearchFacade.manager();
+        final Document doc = manager.luceneSearch().findDocumentByPostId(postId);
 
         this.context.put("doc", doc);
     }
 
     public void loadPostContents() {
-        int postId = this.request.getIntParameter("id");
-        PostDAO dao = DataAccessDriver.getInstance().newPostDAO();
-        Post post = dao.selectById(postId);
+        final int postId = this.request.getIntParameter("id");
+        final PostDAO dao = DataAccessDriver.getInstance().newPostDAO();
+        final Post post = dao.selectById(postId);
         this.setTemplateName(TemplateKeys.AJAX_LOAD_POST);
         this.context.put("post", post);
     }
 
     public void savePost() {
-        PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
+        final PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
         Post post = postDao.selectById(this.request.getIntParameter("id"));
 
-        String originalMessage = post.getText();
+        final String originalMessage = post.getText();
 
         if (!PostCommon.canEditPost(post)) {
             post = PostCommon.preparePostForDisplay(post);
@@ -206,17 +208,17 @@ public class AjaxAction extends Command {
             post = PostCommon.preparePostForDisplay(post);
         }
 
-        boolean isModerator = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT, String.valueOf(post.getForumId()));
+        final boolean isModerator = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT, String.valueOf(post.getForumId()));
 
         if (SystemGlobals.getBoolValue(ConfigKeys.MODERATION_LOGGING_ENABLED) && isModerator
                 && post.getUserId() != SessionFacade.getUserSession().getUserId()) {
-            ModerationHelper helper = new ModerationHelper();
+            final ModerationHelper helper = new ModerationHelper();
 
             this.request.addParameter("log_original_message", originalMessage);
             this.request.addParameter("post_id", String.valueOf(post.getId()));
             this.request.addParameter("topic_id", String.valueOf(post.getTopicId()));
 
-            ModerationLog log = helper.buildModerationLogFromRequest();
+            final ModerationLog log = helper.buildModerationLogFromRequest();
             log.getPosterUser().setId(post.getUserId());
 
             helper.saveModerationLog(log);
@@ -244,8 +246,8 @@ public class AjaxAction extends Command {
         }
 
         post = PostCommon.preparePostForDisplay(post);
-        post.setSubject(StringEscapeUtils.escapeJavaScript(post.getSubject()));
-        post.setText(StringEscapeUtils.escapeJavaScript(post.getText()));
+        post.setSubject(StringEscapeUtils.escapeEcmaScript(post.getSubject()));
+        post.setText(StringEscapeUtils.escapeEcmaScript(post.getText()));
 
         this.setTemplateName(TemplateKeys.AJAX_PREVIEW_POST);
         this.context.put("post", post);
@@ -254,6 +256,7 @@ public class AjaxAction extends Command {
     /**
      * @see net.jforum.Command#list()
      */
+    @Override
     public void list() {
         this.ignoreAction();
     }

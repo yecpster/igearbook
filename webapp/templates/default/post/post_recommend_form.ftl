@@ -53,6 +53,8 @@
                         </span>
                     </td>
                 </tr>
+    
+                <#if session.isAdmin() || session.isWebAdmin()>
                 <tr>
                     <td class="row1" width="7%"><span class="gen"><b>推荐频道</b></span></td>
                     <td class="row2" width="93%">
@@ -61,6 +63,9 @@
                         </span>
                     </td>
                 </tr>
+                <#else>
+                    <@s.hidden name="rtopic.type" />
+                </#if>
                  <tr>
                     <td class="row1" valign="top"><span class="gen">
                         <span class="gen"><b>${I18n.getMessage("PostRecommendForm.desc")}</b></span>
@@ -202,7 +207,12 @@ $("#coverImgList").find("img").each(function() {
 }
 $(document).ready(function() {
     resizeImg();
-    $("input[type='radio'][name='coverImgType']").change(function(){
+    switchCoverImgType();
+    $("input[type='radio'][name='coverImgType']").change(
+        switchCoverImgType
+    );
+});
+function switchCoverImgType(){
         var coverImgType = $("input[type='radio'][name='coverImgType']:checked").val();
         if ("upload"==coverImgType){
             $("#coverImgList").hide("slow");
@@ -214,8 +224,6 @@ $(document).ready(function() {
             $("#uploadFile").removeClass("required");
         }
     }
-    );
-});
 
 </script>
 

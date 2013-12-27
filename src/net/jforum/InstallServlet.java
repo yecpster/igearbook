@@ -51,10 +51,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.jforum.context.ForumContext;
 import net.jforum.context.JForumContext;
 import net.jforum.context.RequestContext;
 import net.jforum.context.ResponseContext;
-import net.jforum.context.ForumContext;
 import net.jforum.context.web.WebRequestContext;
 import net.jforum.context.web.WebResponseContext;
 import net.jforum.exceptions.ExceptionWriter;

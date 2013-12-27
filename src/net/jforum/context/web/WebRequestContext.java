@@ -69,7 +69,7 @@ import net.jforum.util.legacy.commons.fileupload.servlet.ServletRequestContext;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Rafael Steil
@@ -77,7 +77,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class WebRequestContext extends HttpServletRequestWrapper implements RequestContext
 {
-	private Map query;
+	private final Map query;
 	
 	/**
 	 * Default constructor.
@@ -85,23 +85,23 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 	 * @param superRequest Original <code>HttpServletRequest</code> instance
 	 * @throws IOException
 	 */
-	public WebRequestContext(HttpServletRequest superRequest) throws IOException
+	public WebRequestContext(final HttpServletRequest superRequest) throws IOException
 	{
 		super(superRequest);
 
 		this.query = new HashMap();
 		boolean isMultipart = false;
 		
-		String requestType = superRequest.getMethod().toUpperCase();
-		String contextPath = superRequest.getContextPath();
+		final String requestType = superRequest.getMethod().toUpperCase();
+		final String contextPath = superRequest.getContextPath();
 		String requestUri = this.extractRequestUri(superRequest.getRequestURI(), contextPath);
-		String encoding = SystemGlobals.getValue(ConfigKeys.ENCODING);
-		String servletExtension = SystemGlobals.getValue(ConfigKeys.SERVLET_EXTENSION);
+		final String encoding = SystemGlobals.getValue(ConfigKeys.ENCODING);
+		final String servletExtension = SystemGlobals.getValue(ConfigKeys.SERVLET_EXTENSION);
 		
-		boolean isPost = "POST".equals(requestType);
-		boolean isGet = !isPost;
+		final boolean isPost = "POST".equals(requestType);
+		final boolean isGet = !isPost;
 		
-		boolean isQueryStringEmpty = (superRequest.getQueryString() == null 
+		final boolean isQueryStringEmpty = (superRequest.getQueryString() == null 
 			|| superRequest.getQueryString().length() == 0);
 		
 		if (isGet && isQueryStringEmpty && requestUri.endsWith(servletExtension)) {
@@ -117,7 +117,7 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 		}
 		
 		if (!isMultipart) {
-			boolean isAjax = "XMLHttpRequest".equals(superRequest.getHeader("X-Requested-With"));
+			final boolean isAjax = "XMLHttpRequest".equals(superRequest.getHeader("X-Requested-With"));
 			
 			if (!isAjax) {
 				superRequest.setCharacterEncoding(encoding);
@@ -134,10 +134,10 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 				containerEncoding = encoding;
 			}
 			
-			for (Enumeration e = superRequest.getParameterNames(); e.hasMoreElements(); ) {
-				String name = (String)e.nextElement();
+			for (final Enumeration e = superRequest.getParameterNames(); e.hasMoreElements(); ) {
+				final String name = (String)e.nextElement();
 				
-				String[] values = superRequest.getParameterValues(name);
+				final String[] values = superRequest.getParameterValues(name);
 				
 				if (values != null && values.length > 1) {
 					for (int i = 0; i < values.length; i++) {
@@ -150,7 +150,7 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 			}
 			
 			if (this.getModule() == null && this.getAction() == null) {
-				int index = requestUri.indexOf('?');
+				final int index = requestUri.indexOf('?');
 				
 				if (index > -1) {
 					requestUri = requestUri.substring(0, index);
@@ -165,20 +165,20 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 	 * @param requestUri
 	 * @param servletExtension
 	 */
-	private void parseFriendlyURL(String requestUri, String servletExtension) 
+	private void parseFriendlyURL(String requestUri, final String servletExtension) 
 	{
 		requestUri = requestUri.substring(0, requestUri.length() - servletExtension.length());
-		String[] urlModel = requestUri.split("/");
+		final String[] urlModel = requestUri.split("/");
 		
-		int moduleIndex = 1;
-		int actionIndex = 2;
-		int baseLen = 3;
+		final int moduleIndex = 1;
+		final int actionIndex = 2;
+		final int baseLen = 3;
 		
 		UrlPattern url = null;
 		
 		if (urlModel.length >= baseLen) {
 			// <moduleName>.<actionName>.<numberOfParameters>
-			StringBuffer sb = new StringBuffer(64)
+			final StringBuffer sb = new StringBuffer(64)
 				.append(urlModel[moduleIndex])
 				.append('.')
 				.append(urlModel[actionIndex])
@@ -204,10 +204,12 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 		}
 	}
 
-    public SessionContext getSessionContext(boolean create) {
+    @Override
+    public SessionContext getSessionContext(final boolean create) {
         return new WebSessionContext(this.getSession(true));
     }
 
+    @Override
     public SessionContext getSessionContext() {
         return new WebSessionContext(this.getSession());
     }
@@ -217,7 +219,7 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 	 * @param encoding String
 	 * @throws UnsupportedEncodingException
 	 */
-	private void handleMultipart(HttpServletRequest superRequest, String encoding) throws UnsupportedEncodingException
+	private void handleMultipart(final HttpServletRequest superRequest, final String encoding) throws UnsupportedEncodingException
 	{
 		String tmpPath = new StringBuffer(256)
 		    .append(SystemGlobals.getApplicationPath())
@@ -234,7 +236,7 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 				success = true;
 			}
 		}
-		catch (Exception e) {
+		catch (final Exception e) {
 			// We won't log it because the directory
 			// creation failed for some reason - a SecurityException
 			// or something else. We don't care about it, as the
@@ -246,14 +248,14 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 			tmpDir = new File(tmpPath);
 		}
 		
-		ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory(100 * 1024, tmpDir));
+		final ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory(100 * 1024, tmpDir));
 		upload.setHeaderEncoding(encoding);
 
 		try {
-			List items = upload.parseRequest(superRequest);
+			final List items = upload.parseRequest(superRequest);
 			
-			for (Iterator iter = items.iterator(); iter.hasNext(); ) {
-				FileItem item = (FileItem)iter.next();
+			for (final Iterator iter = items.iterator(); iter.hasNext(); ) {
+				final FileItem item = (FileItem)iter.next();
 			
 				if (item.isFormField()) {
 					this.addParameter(item.getFieldName(), item.getString(encoding));
@@ -268,7 +270,7 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 				}
 			}
 		}
-		catch (FileUploadException e) {
+		catch (final FileUploadException e) {
 			throw new MultipartHandlingException("Error while processing multipart content: " + e);
 		}
 	}
@@ -276,22 +278,23 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 	/**
 	 * @see javax.servlet.ServletRequestWrapper#getParameterValues(java.lang.String)
 	 */
-	public String[] getParameterValues(String name) 
+	@Override
+    public String[] getParameterValues(final String name) 
 	{
-		Object value = this.getObjectParameter(name);
+		final Object value = this.getObjectParameter(name);
 		
 		if (value instanceof String) {
 			return new String[] { (String)value };
 		}
 		
-		List l = (List)value;
+		final List l = (List)value;
 		
 		return l == null
 			? super.getParameterValues(name)
 			: (String[])l.toArray(new String[0]);
 	}
 	
-	private String extractRequestUri(String requestUri, String contextPath)
+	private String extractRequestUri(String requestUri, final String contextPath)
 	{
 		// First, remove the context path from the requestUri, 
 		// so we can work only with the important stuff
@@ -302,7 +305,7 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 		// Remove the "jsessionid" (or similar) from the URI
 		// Probably this is not the right way to go, since we're
 		// discarding the value...
-		int index = requestUri.indexOf(';');
+		final int index = requestUri.indexOf(';');
 		
 		if (index > -1) {
 			int lastIndex = requestUri.indexOf('?', index);
@@ -315,7 +318,7 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 				requestUri = requestUri.substring(0, index);
 			}
 			else {
-				String part1 = requestUri.substring(0, index);
+				final String part1 = requestUri.substring(0, index);
 				requestUri = part1 + requestUri.substring(lastIndex);
 			}
 		}
@@ -326,7 +329,8 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 	/**
 	 * @see javax.servlet.ServletRequest#getParameter(java.lang.String)
 	 */
-	public String getParameter(String parameter) 
+	@Override
+    public String getParameter(final String parameter) 
 	{
 		return (String)this.query.get(parameter);
 	}
@@ -338,7 +342,8 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 	 * @param parameter The parameter name to get the value
 	 * @return int
 	 */
-	public int getIntParameter(String parameter)
+	@Override
+    public int getIntParameter(final String parameter)
 	{
 		return Integer.parseInt(this.getParameter(parameter));
 	}
@@ -352,18 +357,20 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 	 * @param parameter String
 	 * @return Object
 	 */
-	public Object getObjectParameter(String parameter)
+	@Override
+    public Object getObjectParameter(final String parameter)
 	{
 		return this.query.get(parameter);
 	}
 	
-	public void addParameter(String name, Object value)
+	@Override
+    public void addParameter(final String name, final Object value)
 	{
 		if (!this.query.containsKey(name)) {
 			this.query.put(name, value);
 		}
 		else {
-			Object currentValue = this.getObjectParameter(name);
+			final Object currentValue = this.getObjectParameter(name);
 			List l;
 			
 			if (!(currentValue instanceof List)) {
@@ -379,7 +386,8 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 		}
 	}
 	
-	public void addOrReplaceParameter(String name, Object value)
+	@Override
+    public void addOrReplaceParameter(final String name, final Object value)
 	{
 		this.query.put(name, value);
 	}
@@ -410,12 +418,13 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 	 * 
 	 * @return String representing the action name
 	 */
-	public String getAction()
+	@Override
+    public String getAction()
 	{
 		return this.getParameter("action");
 	}
 	
-	public void changeAction(String newAction)
+	public void changeAction(final String newAction)
 	{
 		if (this.query.containsKey("action")) {
 			this.query.remove("action");
@@ -452,12 +461,13 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 	 * 
 	 * @return String representing the module name
 	 */
-	public String getModule()
+	@Override
+    public String getModule()
 	{
 		return this.getParameter("module");
 	}
 	
-	public Object getObjectRequestParameter(String parameter)
+	public Object getObjectRequestParameter(final String parameter)
 	{
 		return this.query.get(parameter);
 	}
@@ -465,10 +475,11 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 	/**
 	 * @see javax.servlet.http.HttpServletRequestWrapper#getContextPath()
 	 */
-	public String getContextPath() 
+	@Override
+    public String getContextPath() 
 	{
 		String contextPath = super.getContextPath();
-		String proxiedContextPath = SystemGlobals.getValue(ConfigKeys.PROXIED_CONTEXT_PATH);
+		final String proxiedContextPath = SystemGlobals.getValue(ConfigKeys.PROXIED_CONTEXT_PATH);
 		
 		if (!StringUtils.isEmpty(proxiedContextPath)) {
 			contextPath = proxiedContextPath;
@@ -480,7 +491,8 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
 	/**
 	 * @see javax.servlet.ServletRequestWrapper#getRemoteAddr()
 	 */
-	public String getRemoteAddr()
+	@Override
+    public String getRemoteAddr()
 	{
 		// We look if the request is forwarded
 		// If it is not call the older function.
@@ -491,7 +503,7 @@ public class WebRequestContext extends HttpServletRequestWrapper implements Requ
         }
         else {
         	// Process the IP to keep the last IP (real ip of the computer on the net)
-            StringTokenizer tokenizer = new StringTokenizer(ip, ",");
+            final StringTokenizer tokenizer = new StringTokenizer(ip, ",");
 
             // Ignore all tokens, except the last one
             for (int i = 0; i < tokenizer.countTokens() -1 ; i++) {

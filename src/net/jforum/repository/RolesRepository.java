@@ -44,7 +44,6 @@ package net.jforum.repository;
 
 import net.jforum.cache.CacheEngine;
 import net.jforum.cache.Cacheable;
-import net.jforum.dao.generic.security.SecurityCommon;
 import net.jforum.security.RoleCollection;
 import net.jforum.util.DbUtils;
 

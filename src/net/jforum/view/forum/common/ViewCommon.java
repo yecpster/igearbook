@@ -48,8 +48,6 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.commons.lang.StringUtils;
-
 import net.jforum.JForumExecutionContext;
 import net.jforum.context.RequestContext;
 import net.jforum.entities.User;
@@ -57,6 +55,9 @@ import net.jforum.exceptions.ForumException;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
 import net.jforum.util.preferences.TemplateKeys;
+
+import org.apache.commons.lang3.StringUtils;
+
 import freemarker.template.SimpleHash;
 
 /**
@@ -81,9 +82,9 @@ public final class ViewCommon
 	 * @param totalRecords  int
 	 * @param recordsPerPage int
 	 */
-	public static void contextToPagination(int start, int totalRecords, int recordsPerPage)
+	public static void contextToPagination(final int start, final int totalRecords, final int recordsPerPage)
 	{
-		SimpleHash context = JForumExecutionContext.getTemplateContext();
+		final SimpleHash context = JForumExecutionContext.getTemplateContext();
 		
 		context.put("totalPages", new Double(Math.ceil((double) totalRecords / (double) recordsPerPage)));
 		context.put("recordsPerPage", new Integer(recordsPerPage));
@@ -98,11 +99,11 @@ public final class ViewCommon
 	 */
 	public static String contextToLogin() 
 	{
-		RequestContext request = JForumExecutionContext.getRequest();
+		final RequestContext request = JForumExecutionContext.getRequest();
 		
-		String uri = request.getRequestURI();
-		String query = request.getQueryString();
-		String returnPath = query == null ? uri : uri + "?" + query;
+		final String uri = request.getRequestURI();
+		final String query = request.getQueryString();
+		final String returnPath = query == null ? uri : uri + "?" + query;
 		
 		return contextToLogin(returnPath);
 	}
@@ -120,7 +121,7 @@ public final class ViewCommon
 			String redirect = SystemGlobals.getValue(ConfigKeys.SSO_REDIRECT);
 			
 			if (!StringUtils.isEmpty(redirect)) {
-				URI redirectUri = URI.create(redirect);
+				final URI redirectUri = URI.create(redirect);
 				
 				if (!redirectUri.isAbsolute()) {
 					throw new ForumException("SSO redirect URL should start with a scheme");
@@ -129,7 +130,7 @@ public final class ViewCommon
 				try {
 					returnPath = URLEncoder.encode( ViewCommon.getForumLink() + returnPath, "UTF-8");
 				}
-				catch (UnsupportedEncodingException e) {}
+				catch (final UnsupportedEncodingException e) {}
 				
 				if (redirect.indexOf('?') == -1) {
 					redirect += "?";
@@ -154,7 +155,7 @@ public final class ViewCommon
 	 */
 	public static int getStartPage()
 	{
-		String s = JForumExecutionContext.getRequest().getParameter("start");
+		final String s = JForumExecutionContext.getRequest().getParameter("start");
 		int start;
 		
 		if (StringUtils.isEmpty(s)) {
@@ -187,12 +188,12 @@ public final class ViewCommon
 		return forumLink;
 	}
 	
-	public static String toUtf8String(String s)
+	public static String toUtf8String(final String s)
 	{
-		StringBuffer sb = new StringBuffer();
+		final StringBuffer sb = new StringBuffer();
 	
 		for (int i = 0; i < s.length(); i++) {
-			char c = s.charAt(i);
+			final char c = s.charAt(i);
 	
 			if ((c >= 0) && (c <= 255)) {
 				sb.append(c);
@@ -203,7 +204,7 @@ public final class ViewCommon
 				try {
 					b = Character.toString(c).getBytes("utf-8");
 				}
-				catch (Exception ex) {
+				catch (final Exception ex) {
 					System.out.println(ex);
 					b = new byte[0];
 				}
@@ -229,9 +230,9 @@ public final class ViewCommon
 	 * @param date the date to format
 	 * @return the string with the formated date
 	 */
-	public static String formatDate(Date date) 
+	public static String formatDate(final Date date) 
 	{
-		SimpleDateFormat df = new SimpleDateFormat(SystemGlobals.getValue(ConfigKeys.DATE_TIME_FORMAT));
+		final SimpleDateFormat df = new SimpleDateFormat(SystemGlobals.getValue(ConfigKeys.DATE_TIME_FORMAT));
 		return df.format(date);
 	}
 	
@@ -240,9 +241,9 @@ public final class ViewCommon
 	 * @param contents the string to parse
 	 * @return the new string
 	 */
-	public static String espaceHtml(String contents)
+	public static String espaceHtml(final String contents)
 	{
-		StringBuffer sb = new StringBuffer(contents);
+		final StringBuffer sb = new StringBuffer(contents);
 		
 		replaceAll(sb, "<", "&lt");
 		replaceAll(sb, ">", "&gt;");
@@ -257,7 +258,7 @@ public final class ViewCommon
 	 * @param with the new value
 	 * @return the new string
 	 */
-	public static String replaceAll(StringBuffer sb, String what, String with)
+	public static String replaceAll(final StringBuffer sb, final String what, final String with)
 	{
 		int pos = sb.indexOf(what);
 		
@@ -276,7 +277,7 @@ public final class ViewCommon
      * @param with String
      * @return String
 	 */
-	public static String replaceAll(String contents, String what, String with)
+	public static String replaceAll(final String contents, final String what, final String with)
 	{
 		return replaceAll(new StringBuffer(contents), what, with);
 	}
@@ -285,10 +286,10 @@ public final class ViewCommon
 	 * Parse the user's signature, to make it proper to visualization
 	 * @param u the user instance
 	 */
-	public static void prepareUserSignature(User u)
+	public static void prepareUserSignature(final User u)
 	{
 		if (u.getSignature() != null) {
-			StringBuffer sb = new StringBuffer(u.getSignature());
+			final StringBuffer sb = new StringBuffer(u.getSignature());
 			
 			replaceAll(sb, "\n", "<br />");
 			

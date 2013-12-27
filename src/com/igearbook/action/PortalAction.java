@@ -8,7 +8,6 @@ import net.jforum.SessionFacade;
 import net.jforum.entities.Category;
 import net.jforum.entities.Forum;
 import net.jforum.entities.MostUsersEverOnline;
-import net.jforum.entities.Recommendation;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.ForumRepository;
 import net.jforum.repository.TopicRepository;
@@ -22,6 +21,7 @@ import org.apache.struts2.convention.annotation.Namespace;
 import org.apache.struts2.convention.annotation.Result;
 
 import com.google.common.collect.Lists;
+import com.igearbook.entities.Recommendation;
 import com.opensymphony.xwork2.ActionContext;
 
 @Namespace("/portal")

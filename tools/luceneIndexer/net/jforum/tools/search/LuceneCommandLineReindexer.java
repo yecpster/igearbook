@@ -15,7 +15,7 @@ import net.jforum.search.SearchFacade;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.xml.DOMConfigurator;
 
 /**
@@ -28,9 +28,9 @@ public class LuceneCommandLineReindexer
 	private boolean recreate;
 	private String path;
 	
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
-		LuceneCommandLineReindexer reindexer = new LuceneCommandLineReindexer();
+		final LuceneCommandLineReindexer reindexer = new LuceneCommandLineReindexer();
 		reindexer.init(args);
 		
 		System.out.println("*** INITIALIZING \n");
@@ -43,14 +43,14 @@ public class LuceneCommandLineReindexer
 	
 	private void start()
 	{
-		LuceneReindexer reindexer = new LuceneReindexer(
+		final LuceneReindexer reindexer = new LuceneReindexer(
 			(LuceneSettings)SystemGlobals.getObjectValue(ConfigKeys.LUCENE_SETTINGS),
 			this.reindexerArgs, this.recreate);
 
 		reindexer.startProcess();
 	}
 	
-	private void init(String[] args)
+	private void init(final String[] args)
 	{
 		this.parseCmdArgs(args);
 		
@@ -69,26 +69,26 @@ public class LuceneCommandLineReindexer
 		ForumStartup.startDatabase();
 	}
 	
-	private void parseCmdArgs(String[] args)
+	private void parseCmdArgs(final String[] args)
 	{
-		StringBuffer description = new StringBuffer(512);
+		final StringBuffer description = new StringBuffer(512);
 		description.append("\n*** Going to reindex using the following options: \n");
 		
-		CmdLineParser parser = new CmdLineParser();
+		final CmdLineParser parser = new CmdLineParser();
 		
-		CmdLineParser.Option recreateOption = parser.addBooleanOption("recreateIndex");
-		CmdLineParser.Option typeOption = parser.addStringOption("type");
-		CmdLineParser.Option pathOption = parser.addStringOption("path");
-		CmdLineParser.Option firstPostIdOption = parser.addIntegerOption("firstPostId");
-		CmdLineParser.Option lastPostIdOption = parser.addIntegerOption("lastPostId");
-		CmdLineParser.Option fromDateOption = parser.addStringOption("fromDate");
-		CmdLineParser.Option toDateOption = parser.addStringOption("toDate");
-		CmdLineParser.Option avoidDuplicatedOption = parser.addBooleanOption("avoidDuplicatedRecords");
+		final CmdLineParser.Option recreateOption = parser.addBooleanOption("recreateIndex");
+		final CmdLineParser.Option typeOption = parser.addStringOption("type");
+		final CmdLineParser.Option pathOption = parser.addStringOption("path");
+		final CmdLineParser.Option firstPostIdOption = parser.addIntegerOption("firstPostId");
+		final CmdLineParser.Option lastPostIdOption = parser.addIntegerOption("lastPostId");
+		final CmdLineParser.Option fromDateOption = parser.addStringOption("fromDate");
+		final CmdLineParser.Option toDateOption = parser.addStringOption("toDate");
+		final CmdLineParser.Option avoidDuplicatedOption = parser.addBooleanOption("avoidDuplicatedRecords");
 		
 		try {
 			parser.parse(args);
 		}
-		catch (CmdLineParser.OptionException e) {
+		catch (final CmdLineParser.OptionException e) {
 			System.out.println(e.getMessage());
 			this.printUsage();
 		}
@@ -98,7 +98,7 @@ public class LuceneCommandLineReindexer
 		}
 		
 		// Type
-		String type = (String)parser.getOptionValue(typeOption);
+		final String type = (String)parser.getOptionValue(typeOption);
 		
 		if (StringUtils.isEmpty(type) || (!type.equals("date") && !type.equals("message"))) {
 			System.out.println("*** --type should be either date or message");
@@ -118,8 +118,8 @@ public class LuceneCommandLineReindexer
 		description.append("\t->App path: ").append(path).append('\n');
 		
 		// FirstPostId and LastPostId
-		int firstPostId = ((Integer)parser.getOptionValue(firstPostIdOption, new Integer(0))).intValue();
-		int lastPostId = ((Integer)parser.getOptionValue(lastPostIdOption, new Integer(0))).intValue();
+		final int firstPostId = ((Integer)parser.getOptionValue(firstPostIdOption, new Integer(0))).intValue();
+		final int lastPostId = ((Integer)parser.getOptionValue(lastPostIdOption, new Integer(0))).intValue();
 		
 		if ("message".equals(type)) {
 			if (firstPostId == 0 || lastPostId == 0 || lastPostId <= firstPostId) {
@@ -152,7 +152,7 @@ public class LuceneCommandLineReindexer
 		description.append("\t->Recreate the index? ").append(this.recreate ? "Yes" : "No").append('\n');
 		
 		// AvoidDuplicatedRecords
-		boolean avoidDuplicated = ((Boolean)parser.getOptionValue(avoidDuplicatedOption, Boolean.FALSE)).booleanValue();
+		final boolean avoidDuplicated = ((Boolean)parser.getOptionValue(avoidDuplicatedOption, Boolean.FALSE)).booleanValue();
 		description.append("\t->Avoid duplicated records? ").append(avoidDuplicated ? "Yes" : "No").append('\n');
 		
 		this.reindexerArgs = new LuceneReindexArgs(fromDate, toDate, firstPostId, 
@@ -162,7 +162,7 @@ public class LuceneCommandLineReindexer
 		System.out.println(description);
 	}
 	
-	private Date parseDate(String s)
+	private Date parseDate(final String s)
 	{
 		Date date = null;
 		
@@ -170,7 +170,7 @@ public class LuceneCommandLineReindexer
 			try {
 				date = new SimpleDateFormat("dd/MM/yyyy").parse(s);
 			}
-			catch (ParseException e) { }
+			catch (final ParseException e) { }
 		}
 		
 		return date;

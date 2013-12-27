@@ -5,12 +5,12 @@ package net.jforum;
 
 import junit.framework.TestCase;
 import net.jforum.cache.DefaultCacheEngine;
-import net.jforum.context.web.WebRequestContext;
-import net.jforum.context.web.WebResponseContext;
-import net.jforum.context.RequestContext;
-import net.jforum.context.ResponseContext;
 import net.jforum.context.ForumContext;
 import net.jforum.context.JForumContext;
+import net.jforum.context.RequestContext;
+import net.jforum.context.ResponseContext;
+import net.jforum.context.web.WebRequestContext;
+import net.jforum.context.web.WebResponseContext;
 import net.jforum.entities.UserSession;
 import net.jforum.http.FakeHttpRequest;
 import net.jforum.http.FakeHttpResponse;

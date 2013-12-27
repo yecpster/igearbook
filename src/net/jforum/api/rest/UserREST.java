@@ -5,9 +5,6 @@ package net.jforum.api.rest;
 
 import java.util.List;
 
-import freemarker.template.SimpleHash;
-import freemarker.template.Template;
-
 import net.jforum.Command;
 import net.jforum.JForumExecutionContext;
 import net.jforum.context.RequestContext;
@@ -20,6 +17,8 @@ import net.jforum.util.I18n;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
 import net.jforum.util.preferences.TemplateKeys;
+import freemarker.template.SimpleHash;
+import freemarker.template.Template;
 
 /**
  * @author Rafael Steil

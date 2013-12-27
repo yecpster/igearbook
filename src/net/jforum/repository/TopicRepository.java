@@ -56,11 +56,12 @@ import net.jforum.cache.Cacheable;
 import net.jforum.dao.DataAccessDriver;
 import net.jforum.dao.RecommendationDAO;
 import net.jforum.dao.TopicDAO;
-import net.jforum.entities.Recommendation;
 import net.jforum.entities.Topic;
 import net.jforum.entities.TopicTypeComparator;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
+
+import com.igearbook.entities.Recommendation;
 
 /**
  * Repository for the last n topics for each forum.

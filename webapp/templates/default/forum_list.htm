@@ -45,7 +45,7 @@
 						          <img src="${contextPath}/images/forumLogo/${forum.logo?default("")}" alt="${forum.name?default("")}" width="100px" height="55px" style="border:1px solid #000;" />
 						      </a>
 						</td>
-						<td class="row1" width="80%" height="50">
+						<td class="row1" width="35%" height="50">
 							<span class="forumlink"><a class="forumlink" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">${forum.name?html}</a></span><br />
 							<span class="genmed">
 								${forum.description?default("")}
@@ -67,7 +67,7 @@
 							</#if>
 							<span class="gensmall"><#if (total > 0)>${total}<#else>${I18n.getMessage("ForumListing.noMessages")}</#if></span>
 						</td>
-						<td class="row1" valign="middle" nowrap="nowrap" align="left" width="20%" height="50">
+						<td class="row1" valign="middle" align="left" width="55%" height="50">
 							<span class="postdetails">
 							<#if (lpi.postTimeMillis > 0)>
 							    <#assign startPage = ""/>

@@ -46,14 +46,14 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import net.jforum.JForumExecutionContext;
 import net.jforum.context.RequestContext;
 import net.jforum.security.PermissionControl;
 import net.jforum.security.Role;
 import net.jforum.security.RoleValue;
 import net.jforum.security.RoleValueCollection;
+
+import com.google.common.collect.Lists;
 
 /**
  * @author Rafael Steil

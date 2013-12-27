@@ -50,6 +50,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import net.jforum.SessionFacade;
 import net.jforum.repository.SecurityRepository;
 import net.jforum.security.SecurityConstants;
@@ -60,13 +68,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
- * Represents a single user in the system. An user is every person which uses
- * the forum. Well, every registered user. Anonymous users does not have a
- * specific ID, for example. This class contains all information about some user
- * configuration options and preferences.
+ * Represents a single user in the system. An user is every person which uses the forum. Well, every registered user. Anonymous users does not have a
+ * specific ID, for example. This class contains all information about some user configuration options and preferences.
  * 
  * @author Rafael Steil
  */
+@Entity
+@Table(name = "jforum_users")
 public class User implements Serializable {
     private static final long serialVersionUID = 7698867048764582802L;
 
@@ -116,9 +124,9 @@ public class User implements Serializable {
     private int deleted;
     private String firstName;
     private String lastName;
-    private Map<String, Object> extra = Maps.newHashMap();
+    private final Map<String, Object> extra = Maps.newHashMap();
 
-    public User(int userId) {
+    public User(final int userId) {
         this.id = userId;
     }
 
@@ -129,266 +137,172 @@ public class User implements Serializable {
         this.groupsList = Lists.newArrayList();
     }
 
-    public void addExtra(String name, Object value) {
-        this.extra.put(name, value);
-    }
-
-    public Object getExtra(String name) {
-        return this.extra.get(name);
-    }
-
-    public void setFirstName(String name) {
-        this.firstName = name;
-    }
-
-    public String getFirstName() {
-        return this.firstName;
-    }
-
-    public void setLastName(String name) {
-        this.lastName = name;
-    }
-
-    public String getLastName() {
-        return this.lastName;
-    }
-
-    public String getName() {
-        return this.firstName + " " + this.lastName;
-    }
-
-    public boolean isDeleted() {
-        return this.deleted == 1;
-    }
-
-    public void setDeleted(int deleted) {
-        this.deleted = deleted;
-    }
-
-    /**
-     * Gets the AIM identification
-     * 
-     * @return String with the AIM ID
-     */
-    public String getAim() {
-        return this.aim;
-    }
-
-    /**
-     * Gets the avatar of the user
-     * 
-     * @return String with the avatar
-     */
-    public String getAvatar() {
-        return this.avatar;
-    }
-
-    /**
-     * Checks if avatar is enabled
-     * 
-     * @return boolean value
-     */
-    public boolean isAvatarEnabled() {
-        return this.avatarEnabled;
-    }
-
-    /**
-     * Checks if BB code is enabled
-     * 
-     * @return boolean value
-     */
-    public boolean isBbCodeEnabled() {
-        return this.bbCodeEnabled;
-    }
-
-    /**
-     * Gets the format to represent dates and time
-     * 
-     * @return String with the format
-     */
-    public String getDateFormat() {
-        return this.dateFormat;
-    }
-
-    /**
-     * Gets the user email
-     * 
-     * @return String with the email
-     */
-    public String getEmail() {
-        return this.email;
-    }
-
-    /**
-     * Gets the user location ( where he lives )
-     * 
-     * @return String with the location
-     */
-    public String getFrom() {
-        return this.from;
-    }
-
-    /**
-     * Gets the user gender
-     * 
-     * @return String value. Possible values are <code>M</code> or
-     *         <code>F</code>
-     */
-    public String getGender() {
-        return this.gender;
-    }
-
-    /**
-     * Checks if HTML code is enabled by default in user messages
-     * 
-     * @return boolean value
-     */
-    public boolean isHtmlEnabled() {
-        return this.htmlEnabled;
-    }
-
-    /**
-     * Gets the ICQ UIM
-     * 
-     * @return String with the UIN
-     */
-    public String getIcq() {
-        return this.icq;
-    }
-
-    /**
-     * Gets the user id
-     * 
-     * @return int value with the id
-     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     public int getId() {
         return this.id;
     }
 
-    /**
-     * Gets the user interests
-     * 
-     * @return String literal
-     */
+    public void addExtra(final String name, final Object value) {
+        this.extra.put(name, value);
+    }
+
+    @Transient
+    public Object getExtra(final String name) {
+        return this.extra.get(name);
+    }
+
+    public void setFirstName(final String name) {
+        this.firstName = name;
+    }
+
+    @Transient
+    public String getFirstName() {
+        return this.firstName;
+    }
+
+    public void setLastName(final String name) {
+        this.lastName = name;
+    }
+
+    @Transient
+    public String getLastName() {
+        return this.lastName;
+    }
+
+    @Transient
+    public String getName() {
+        return this.firstName + " " + this.lastName;
+    }
+
+    @Transient
+    public boolean isDeleted() {
+        return this.deleted == 1;
+    }
+
+    public void setDeleted(final int deleted) {
+        this.deleted = deleted;
+    }
+
+    @Transient
+    public String getAim() {
+        return this.aim;
+    }
+
+    @Transient
+    public String getAvatar() {
+        return this.avatar;
+    }
+
+    @Transient
+    public boolean isAvatarEnabled() {
+        return this.avatarEnabled;
+    }
+
+    @Transient
+    public boolean isBbCodeEnabled() {
+        return this.bbCodeEnabled;
+    }
+
+    @Transient
+    public String getDateFormat() {
+        return this.dateFormat;
+    }
+
+    @Transient
+    public String getEmail() {
+        return this.email;
+    }
+
+    @Transient
+    public String getFrom() {
+        return this.from;
+    }
+
+    @Transient
+    public String getGender() {
+        return this.gender;
+    }
+
+    @Transient
+    public boolean isHtmlEnabled() {
+        return this.htmlEnabled;
+    }
+
+    @Transient
+    public String getIcq() {
+        return this.icq;
+    }
+
+    @Transient
     public String getInterests() {
         return this.interests;
     }
 
-    /**
-     * Gets the user language
-     * 
-     * @return String value with the language chosen
-     */
+    @Transient
     public String getLang() {
         return this.lang;
     }
 
-    /**
-     * Gets the last visit time the user was in the forum
-     * 
-     * @return long value representing the time
-     */
+    @Transient
     public Date getLastVisit() {
         return this.lastVisit;
     }
 
-    /**
-     * Gets the user leve
-     * 
-     * @return int value with the level
-     */
+    @Transient
     public int getLevel() {
         return this.level;
     }
 
-    /**
-     * Checks if notification of new private messages is enabled
-     * 
-     * @return boolean value
-     */
+    @Transient
     public boolean isNotifyPrivateMessagesEnabled() {
         return this.notifyPrivateMessagesEnabled;
     }
 
-    /**
-     * Gets the OCC
-     * 
-     * @return String
-     */
+    @Transient
     public String getOccupation() {
         return this.occupation;
     }
 
-    /**
-     * Gets the user password
-     * 
-     * @return String with the password ( in plain/text )
-     */
+    @Transient
     public String getPassword() {
         return this.password;
     }
 
-    /**
-     * Checks if user permits other people to sent private messages to him
-     * 
-     * @return boolean value
-     */
+    @Transient
     public boolean isPrivateMessagesEnabled() {
         return this.privateMessagesEnabled;
     }
 
-    /**
-     * Gets the ranking ID of the user
-     * 
-     * @return int
-     */
+    @Transient
     public int getRankId() {
         return this.rankId;
     }
 
-    /**
-     * Gets the registration date of the user
-     * 
-     * @return String value with the registration date
-     */
+    @Transient
     public String getRegistrationDate() {
-        SimpleDateFormat df = new SimpleDateFormat(SystemGlobals.getValue(ConfigKeys.DATE_TIME_FORMAT));
+        final SimpleDateFormat df = new SimpleDateFormat(SystemGlobals.getValue(ConfigKeys.DATE_TIME_FORMAT));
 
         return df.format(this.registrationDate);
     }
 
-    /**
-     * Gets the user signature
-     * 
-     * @return String literal with the signature
-     */
+    @Transient
     public String getSignature() {
         return this.signature;
     }
 
-    /**
-     * Checks if smilies are enabled
-     * 
-     * @return boolean value
-     */
+    @Transient
     public boolean isSmiliesEnabled() {
         return this.smiliesEnabled;
     }
 
-    /**
-     * Gets the id of the theme chosen by the user
-     * 
-     * @return int value with the theme ID
-     */
+    @Transient
     public int getThemeId() {
         return this.themeId;
     }
 
-    /**
-     * Gets the timezone
-     * 
-     * @return String value with the timezone
-     */
+    @Transient
     public String getTimeZone() {
         return this.timeZone;
     }
@@ -398,15 +312,12 @@ public class User implements Serializable {
      * 
      * @return int value with the total of messages
      */
+    @Transient
     public int getTotalPosts() {
         return this.totalPosts;
     }
 
-    /**
-     * Gets the username
-     * 
-     * @return String with the username
-     */
+    @Transient
     public String getUsername() {
         return this.username;
     }
@@ -416,24 +327,17 @@ public class User implements Serializable {
      * 
      * @return boolean value
      */
+    @Transient
     public boolean isViewOnlineEnabled() {
         return this.viewOnlineEnabled;
     }
 
-    /**
-     * Gets the user website address
-     * 
-     * @return String with the URL
-     */
+    @Transient
     public String getWebSite() {
         return this.webSite;
     }
 
-    /**
-     * Gets the Yahoo messenger ID
-     * 
-     * @return String with the ID
-     */
+    @Transient
     public String getYim() {
         return this.yim;
     }
@@ -443,6 +347,7 @@ public class User implements Serializable {
      * 
      * @return integer 1 if true
      */
+    @Transient
     public boolean isActive() {
         return this.active == 1;
     }
@@ -450,9 +355,9 @@ public class User implements Serializable {
     /**
      * Gets the Yahoo messenger ID
      * 
-     * @return String with the activation key that is created during user
-     *         registration
+     * @return String with the activation key that is created during user registration
      */
+    @Transient
     public String getActivationKey() {
         return this.activationKey;
     }
@@ -463,7 +368,7 @@ public class User implements Serializable {
      * @param aim
      *            The aim ID to set
      */
-    public void setAim(String aim) {
+    public void setAim(final String aim) {
         this.aim = aim;
     }
 
@@ -473,7 +378,7 @@ public class User implements Serializable {
      * @param avatar
      *            The avatar to set
      */
-    public void setAvatar(String avatar) {
+    public void setAvatar(final String avatar) {
         this.avatar = avatar;
 
         if (avatar != null && avatar.toLowerCase().startsWith("http://")) {
@@ -486,6 +391,7 @@ public class User implements Serializable {
      * 
      * @return <code>true</code> if the avatar is some external image
      */
+    @Transient
     public boolean isExternalAvatar() {
         return this.isExternalAvatar;
     }
@@ -496,7 +402,7 @@ public class User implements Serializable {
      * @param avatarEnabled
      *            <code>true</code> or <code>false</code>
      */
-    public void setAvatarEnabled(boolean avatarEnabled) {
+    public void setAvatarEnabled(final boolean avatarEnabled) {
         this.avatarEnabled = avatarEnabled;
     }
 
@@ -506,7 +412,7 @@ public class User implements Serializable {
      * @param bbCodeEnabled
      *            <code>true</code> or <code>false</code>
      */
-    public void setBbCodeEnabled(boolean bbCodeEnabled) {
+    public void setBbCodeEnabled(final boolean bbCodeEnabled) {
         this.bbCodeEnabled = bbCodeEnabled;
     }
 
@@ -516,7 +422,7 @@ public class User implements Serializable {
      * @param dateFormat
      *            The date format to set
      */
-    public void setDateFormat(String dateFormat) {
+    public void setDateFormat(final String dateFormat) {
         this.dateFormat = dateFormat;
     }
 
@@ -526,7 +432,7 @@ public class User implements Serializable {
      * @param email
      *            The email to set
      */
-    public void setEmail(String email) {
+    public void setEmail(final String email) {
         this.email = email;
     }
 
@@ -536,7 +442,7 @@ public class User implements Serializable {
      * @param from
      *            The location
      */
-    public void setFrom(String from) {
+    public void setFrom(final String from) {
         this.from = from;
     }
 
@@ -544,10 +450,9 @@ public class User implements Serializable {
      * Sets the gender.
      * 
      * @param gender
-     *            The gender to set. Possible values must be <code>M</code> or
-     *            <code>F</code>
+     *            The gender to set. Possible values must be <code>M</code> or <code>F</code>
      */
-    public void setGender(String gender) {
+    public void setGender(final String gender) {
         this.gender = gender;
     }
 
@@ -557,7 +462,7 @@ public class User implements Serializable {
      * @param htmlEnabled
      *            <code>true</code> or <code>false</code>
      */
-    public void setHtmlEnabled(boolean htmlEnabled) {
+    public void setHtmlEnabled(final boolean htmlEnabled) {
         this.htmlEnabled = htmlEnabled;
     }
 
@@ -567,7 +472,7 @@ public class User implements Serializable {
      * @param icq
      *            The icq to set
      */
-    public void setIcq(String icq) {
+    public void setIcq(final String icq) {
         this.icq = icq;
     }
 
@@ -577,7 +482,7 @@ public class User implements Serializable {
      * @param id
      *            The user id to set
      */
-    public void setId(int id) {
+    public void setId(final int id) {
         this.id = id;
     }
 
@@ -587,7 +492,7 @@ public class User implements Serializable {
      * @param interests
      *            The interests to set
      */
-    public void setInterests(String interests) {
+    public void setInterests(final String interests) {
         this.interests = interests;
     }
 
@@ -597,7 +502,7 @@ public class User implements Serializable {
      * @param lang
      *            The lang to set
      */
-    public void setLang(String lang) {
+    public void setLang(final String lang) {
         this.lang = lang;
     }
 
@@ -607,7 +512,7 @@ public class User implements Serializable {
      * @param lastVisit
      *            Last visit time, represented as a long value
      */
-    public void setLastVisit(Date lastVisit) {
+    public void setLastVisit(final Date lastVisit) {
         this.lastVisit = lastVisit;
     }
 
@@ -617,7 +522,7 @@ public class User implements Serializable {
      * @param level
      *            The level to set
      */
-    public void setLevel(int level) {
+    public void setLevel(final int level) {
         this.level = level;
     }
 
@@ -627,7 +532,7 @@ public class User implements Serializable {
      * @param notifyPrivateMessagesEnabled
      *            <code>true</code> or <code>false</code>
      */
-    public void setNotifyPrivateMessagesEnabled(boolean notifyPrivateMessagesEnabled) {
+    public void setNotifyPrivateMessagesEnabled(final boolean notifyPrivateMessagesEnabled) {
         this.notifyPrivateMessagesEnabled = notifyPrivateMessagesEnabled;
     }
 
@@ -637,7 +542,7 @@ public class User implements Serializable {
      * @param occ
      *            The occ to set
      */
-    public void setOccupation(String occupation) {
+    public void setOccupation(final String occupation) {
         this.occupation = occupation;
     }
 
@@ -647,7 +552,7 @@ public class User implements Serializable {
      * @param password
      *            The password to set
      */
-    public void setPassword(String password) {
+    public void setPassword(final String password) {
         this.password = password;
     }
 
@@ -657,7 +562,7 @@ public class User implements Serializable {
      * @param privateMessagesEnabled
      *            <code>true</code> or <code>false</code>
      */
-    public void setPrivateMessagesEnabled(boolean privateMessagesEnabled) {
+    public void setPrivateMessagesEnabled(final boolean privateMessagesEnabled) {
         this.privateMessagesEnabled = privateMessagesEnabled;
     }
 
@@ -667,7 +572,7 @@ public class User implements Serializable {
      * @param rankId
      *            The id of the ranking
      */
-    public void setRankId(int rankId) {
+    public void setRankId(final int rankId) {
         this.rankId = rankId;
     }
 
@@ -677,7 +582,7 @@ public class User implements Serializable {
      * @param registrationDate
      *            The registration date to set
      */
-    public void setRegistrationDate(Date registrationDate) {
+    public void setRegistrationDate(final Date registrationDate) {
         this.registrationDate = registrationDate;
     }
 
@@ -687,7 +592,7 @@ public class User implements Serializable {
      * @param signature
      *            The signature to set
      */
-    public void setSignature(String signature) {
+    public void setSignature(final String signature) {
         this.signature = signature;
     }
 
@@ -697,7 +602,7 @@ public class User implements Serializable {
      * @param smilesEnabled
      *            <code>true</code> or <code>false</code>
      */
-    public void setSmiliesEnabled(boolean smilesEnabled) {
+    public void setSmiliesEnabled(final boolean smilesEnabled) {
         this.smiliesEnabled = smilesEnabled;
     }
 
@@ -707,7 +612,7 @@ public class User implements Serializable {
      * @param themeId
      *            The theme Id to set
      */
-    public void setThemeId(int themeId) {
+    public void setThemeId(final int themeId) {
         this.themeId = themeId;
     }
 
@@ -717,7 +622,7 @@ public class User implements Serializable {
      * @param timeZone
      *            The Timezone to set
      */
-    public void setTimeZone(String timeZone) {
+    public void setTimeZone(final String timeZone) {
         this.timeZone = timeZone;
     }
 
@@ -727,7 +632,7 @@ public class User implements Serializable {
      * @param totalPosts
      *            int value with the total of messages posted by the user
      */
-    public void setTotalPosts(int totalPosts) {
+    public void setTotalPosts(final int totalPosts) {
         this.totalPosts = totalPosts;
     }
 
@@ -737,7 +642,7 @@ public class User implements Serializable {
      * @param username
      *            The username to set
      */
-    public void setUsername(String username) {
+    public void setUsername(final String username) {
         this.username = username;
     }
 
@@ -747,7 +652,7 @@ public class User implements Serializable {
      * @param viewOnlineEnabled
      *            The viewOnlineEnabled to set
      */
-    public void setViewOnlineEnabled(boolean viewOnlineEnabled) {
+    public void setViewOnlineEnabled(final boolean viewOnlineEnabled) {
         this.viewOnlineEnabled = viewOnlineEnabled;
     }
 
@@ -757,7 +662,7 @@ public class User implements Serializable {
      * @param webSite
      *            The webSite to set
      */
-    public void setWebSite(String webSite) {
+    public void setWebSite(final String webSite) {
         this.webSite = webSite;
     }
 
@@ -767,13 +672,14 @@ public class User implements Serializable {
      * @param yim
      *            The yim to set
      */
-    public void setYim(String yim) {
+    public void setYim(final String yim) {
         this.yim = yim;
     }
 
     /**
      * @return
      */
+    @Transient
     public String getMsnm() {
         return this.msnm;
     }
@@ -781,13 +687,14 @@ public class User implements Serializable {
     /**
      * @param string
      */
-    public void setMsnm(String string) {
+    public void setMsnm(final String string) {
         this.msnm = string;
     }
 
     /**
      * @return
      */
+    @Transient
     public boolean isNotifyOnMessagesEnabled() {
         return this.notifyOnMessagesEnabled;
     }
@@ -795,13 +702,14 @@ public class User implements Serializable {
     /**
      * @param b
      */
-    public void setNotifyOnMessagesEnabled(boolean b) {
+    public void setNotifyOnMessagesEnabled(final boolean b) {
         this.notifyOnMessagesEnabled = b;
     }
 
     /**
      * @return
      */
+    @Transient
     public boolean isViewEmailEnabled() {
         return this.viewEmailEnabled;
     }
@@ -809,13 +717,14 @@ public class User implements Serializable {
     /**
      * @param b
      */
-    public void setViewEmailEnabled(boolean b) {
+    public void setViewEmailEnabled(final boolean b) {
         this.viewEmailEnabled = b;
     }
 
     /**
      * @return
      */
+    @Transient
     public boolean getAttachSignatureEnabled() {
         return this.attachSignatureEnabled;
     }
@@ -823,13 +732,14 @@ public class User implements Serializable {
     /**
      * @param b
      */
-    public void setAttachSignatureEnabled(boolean b) {
+    public void setAttachSignatureEnabled(final boolean b) {
         this.attachSignatureEnabled = b;
     }
 
     /**
      * @return
      */
+    @Transient
     public List<Group> getGroupsList() {
         return this.groupsList;
     }
@@ -837,6 +747,7 @@ public class User implements Serializable {
     /**
      * @return Returns the privateMessagesCount.
      */
+    @Transient
     public int getPrivateMessagesCount() {
         return this.privateMessagesCount;
     }
@@ -845,7 +756,7 @@ public class User implements Serializable {
      * @param privateMessagesCount
      *            The privateMessagesCount to set.
      */
-    public void setPrivateMessagesCount(int privateMessagesCount) {
+    public void setPrivateMessagesCount(final int privateMessagesCount) {
         this.privateMessagesCount = privateMessagesCount;
     }
 
@@ -859,18 +770,19 @@ public class User implements Serializable {
     /**
      * Set when user authenticates his email after user registration
      */
-    public void setActive(int active) {
+    public void setActive(final int active) {
         this.active = active;
     }
 
-    public void setActivationKey(String activationKey) {
+    public void setActivationKey(final String activationKey) {
         this.activationKey = activationKey;
     }
 
-    public void setKarma(KarmaStatus karma) {
+    public void setKarma(final KarmaStatus karma) {
         this.karma = karma;
     }
 
+    @Transient
     public KarmaStatus getKarma() {
         return this.karma;
     }
@@ -880,6 +792,7 @@ public class User implements Serializable {
      * 
      * @return true if user is in Session
      */
+    @Transient
     public boolean isOnline() {
         return (SessionFacade.isUserInSession(this.id) != null);
     }
@@ -889,6 +802,7 @@ public class User implements Serializable {
      * 
      * @return the user biography
      */
+    @Transient
     public String getBiography() {
         return biography;
     }
@@ -899,13 +813,14 @@ public class User implements Serializable {
      * @param biography
      *            the user's biography
      */
-    public void setBiography(String biography) {
+    public void setBiography(final String biography) {
         this.biography = biography;
     }
 
     /**
      * @return the notifyAlways
      */
+    @Transient
     public boolean notifyAlways() {
         return this.notifyAlways;
     }
@@ -913,6 +828,7 @@ public class User implements Serializable {
     /**
      * @return the notifyText
      */
+    @Transient
     public boolean notifyText() {
         return this.notifyText;
     }
@@ -921,7 +837,7 @@ public class User implements Serializable {
      * @param notifyAlways
      *            the notifyAlways to set
      */
-    public void setNotifyAlways(boolean notifyAlways) {
+    public void setNotifyAlways(final boolean notifyAlways) {
         this.notifyAlways = notifyAlways;
     }
 
@@ -929,7 +845,7 @@ public class User implements Serializable {
      * @param notifyText
      *            the notifyText to set
      */
-    public void setNotifyText(boolean notifyText) {
+    public void setNotifyText(final boolean notifyText) {
         this.notifyText = notifyText;
     }
 
@@ -938,6 +854,7 @@ public class User implements Serializable {
      * 
      * @return <code>true</code> if the user is an administrator
      */
+    @Transient
     public boolean isAdmin() {
         return SecurityRepository.canAccess(this.id, SecurityConstants.PERM_ADMINISTRATION);
     }
@@ -947,6 +864,7 @@ public class User implements Serializable {
      * 
      * @return <code>true</code> if the user has moderations rights
      */
+    @Transient
     public boolean isSuperModerator() {
         return SecurityRepository.canAccess(this.id, SecurityConstants.PERM_SUPER_MODERATION);
     }

@@ -52,7 +52,6 @@ import java.util.List;
 import net.jforum.JForumExecutionContext;
 import net.jforum.dao.DataAccessDriver;
 import net.jforum.dao.UserDAO;
-import net.jforum.entities.Recommendation;
 import net.jforum.exceptions.DatabaseException;
 import net.jforum.util.DbUtils;
 import net.jforum.util.preferences.SystemGlobals;
@@ -60,6 +59,7 @@ import net.jforum.util.preferences.SystemGlobals;
 import com.google.common.collect.Lists;
 import com.igearbook.entities.PaginationData;
 import com.igearbook.entities.PaginationParams;
+import com.igearbook.entities.Recommendation;
 
 public class GenericRecommendationDAO extends AutoKeys implements net.jforum.dao.RecommendationDAO {
 

@@ -60,7 +60,7 @@ import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
 import net.jforum.util.preferences.TemplateKeys;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.index.IndexReader;
 
 import freemarker.template.SimpleHash;
@@ -75,12 +75,13 @@ public class LuceneStatsAction extends AdminCommand
 	/**
 	 * @see net.jforum.Command#list()
 	 */
-	public void list()
+	@Override
+    public void list()
 	{
 		IndexReader reader = null;
 		
 		try {
-			File indexDir = new File(SystemGlobals.getValue(ConfigKeys.LUCENE_INDEX_WRITE_PATH));
+			final File indexDir = new File(SystemGlobals.getValue(ConfigKeys.LUCENE_INDEX_WRITE_PATH));
 			
 			this.setTemplateName(TemplateKeys.SEARCH_STATS_LIST);
 			boolean isInformationAvailable = true;
@@ -88,7 +89,7 @@ public class LuceneStatsAction extends AdminCommand
 			try {
 				reader = IndexReader.open(indexDir);
 			}
-			catch (IOException e) {
+			catch (final IOException e) {
 				isInformationAvailable = false;
 			}
 			
@@ -105,13 +106,13 @@ public class LuceneStatsAction extends AdminCommand
 				this.context.put("numberOfDocs", new Integer(reader.numDocs()));
 			}
 		}
-		catch (IOException e) {
+		catch (final IOException e) {
 			throw new ForumException(e);
 		}
 		finally {
 			if (reader != null) {
 				try { reader.close(); }
-				catch (Exception e) {}
+				catch (final Exception e) {}
 			}
 		}
 	}
@@ -125,10 +126,10 @@ public class LuceneStatsAction extends AdminCommand
 	
 	public void reconstructIndexFromScratch()
 	{
-		LuceneReindexArgs args = this.buildReindexArgs();
-		boolean recreate = "recreate".equals(this.request.getParameter("indexOperationType"));
+		final LuceneReindexArgs args = this.buildReindexArgs();
+		final boolean recreate = "recreate".equals(this.request.getParameter("indexOperationType"));
 		
-		LuceneReindexer reindexer = new LuceneReindexer(this.settings(), args, recreate);
+		final LuceneReindexer reindexer = new LuceneReindexer(this.settings(), args, recreate);
 		reindexer.startBackgroundProcess();
 		
 		this.list();
@@ -145,7 +146,8 @@ public class LuceneStatsAction extends AdminCommand
 		this.setTemplateName(TemplateKeys.SEARCH_STATS_NOT_ENABLED);
 	}
 	
-	public Template process(RequestContext request, ResponseContext response, SimpleHash context)
+	@Override
+    public Template process(final RequestContext request, final ResponseContext response, final SimpleHash context)
 	{
 		if (!this.isSearchEngineLucene()) {
 			this.ignoreAction();
@@ -169,8 +171,8 @@ public class LuceneStatsAction extends AdminCommand
 	
 	private LuceneReindexArgs buildReindexArgs()
 	{
-		Date fromDate = this.buildDateFromRequest("from");
-		Date toDate = this.buildDateFromRequest("to");
+		final Date fromDate = this.buildDateFromRequest("from");
+		final Date toDate = this.buildDateFromRequest("to");
 		
 		int firstPostId = 0;
 		int lastPostId = 0;
@@ -188,14 +190,14 @@ public class LuceneStatsAction extends AdminCommand
 			this.request.getIntParameter("type"));
 	}
 	
-	private Date buildDateFromRequest(String prefix)
+	private Date buildDateFromRequest(final String prefix)
 	{
-		String day = this.request.getParameter(prefix + "Day");
-		String month = this.request.getParameter(prefix + "Month");
-		String year = this.request.getParameter(prefix + "Year");
+		final String day = this.request.getParameter(prefix + "Day");
+		final String month = this.request.getParameter(prefix + "Month");
+		final String year = this.request.getParameter(prefix + "Year");
 		
-		String hour = this.request.getParameter(prefix + "Hour");
-		String minutes = this.request.getParameter(prefix + "Minutes");
+		final String hour = this.request.getParameter(prefix + "Hour");
+		final String minutes = this.request.getParameter(prefix + "Minutes");
 		
 		Date date = null;
 		

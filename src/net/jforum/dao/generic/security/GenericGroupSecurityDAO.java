@@ -65,7 +65,7 @@ import net.jforum.security.RoleValueCollection;
 import net.jforum.util.DbUtils;
 import net.jforum.util.preferences.SystemGlobals;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

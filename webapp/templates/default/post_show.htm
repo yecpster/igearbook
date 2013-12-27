@@ -11,8 +11,8 @@
 
 <#assign canEditSomeMessage = false/>
 
-<script type="text/javascript" src="${contextPath}/templates/${templateName}/js/jquery.js?${startupTime}"></script>
-<script type="text/javascript" src="${contextPath}/templates/${templateName}/js/jquery.jeditable.pack.js?${startupTime}"></script>
+<script type="text/javascript" src="${contextPath}/templates/${templateName}/js/jquery-1.10.2.min.js?${startupTime}"></script>
+<script type="text/javascript" src="${contextPath}/templates/${templateName}/js/jquery-migrate-1.2.1.min.js?${startupTime}"></script>
 <script type="text/javascript" src="${contextPath}/templates/${templateName}/js/post_show.js?${startupTime}"></script>
 <script type="text/javascript" src="${contextPath}/templates/${templateName}/js/post.js?${startupTime}"></script>
 <script type="text/javascript" src="${contextPath}/templates/${templateName}/js/pagination.js?${startupTime}"></script>
@@ -296,6 +296,9 @@
 
 					function validatePostForm(f)
 					{
+					   <#if logged && !session.isMobileUser()>
+                            editor.sync();
+                       </#if>
 						if (f.message.value.replace(/^\s*|\s*$/g, "").length == 0) {
 							alert("${I18n.getMessage("PostForm.textEmpty")}");
 							f.message.focus();
@@ -444,6 +447,67 @@ $("#main").find(".postbody img").each(function(){
      img.click(function(){window.open(src);});
     }
 });
+});
+$(document).ready(function(){
+var win=$(window);
+var doc=$(document);
+var heightIfShow;
+var link=$(".back-to-top");
+var winHeight;
+var main=$("#main");
+var isIE6=$.browser.msie&&($.browser.version|0)<7;
+
+var e=function(){
+if(e.value){
+    return e.value
+    }
+return main.offset().top+main.outerHeight();
+};
+win.load(function(){e.value=e()});
+var c=function(m){
+    if(m+winHeight>=e()){
+        if(link.css("top")!=(e()-link.outerHeight()-110)){
+        var initPos=link.offset().top+link.outerHeight();
+        link.finish().css({position:"absolute",bottom:"",top:initPos}).animate({top:e()-link.outerHeight()-110}, 1500);
+        }
+    }else{
+        if(!isIE6){link.finish().css({position:"fixed",top:"",bottom:10})}
+    }
+    link.show("slow").find("a").finish().animate({top:0});
+};
+var hideLink=function(){link.hide("slow").find("a").css("top",40)};
+win.resize(function(){
+winHeight=win.height();
+var winWidth=win.width();
+var linkLeftPos= main.offset().left+main.width()+10;
+if(linkLeftPos>winWidth){
+    linkLeftPos=winWidth-60;
+}
+link.css("left",linkLeftPos);
+heightIfShow=doc.height()/winHeight>2?winHeight:0
+}).trigger("resize");
+win.scroll((function(){
+    var m;
+    return function(){
+        if(m){clearTimeout(m)}
+        setTimeout(function(){
+                if(heightIfShow===0){return}
+                var distanceFromTop=doc.scrollTop();
+                if(distanceFromTop>heightIfShow){
+                    c(distanceFromTop)
+                }else{
+                    hideLink()
+                }
+            },100)}
+    })());
+
+link.find("a").click(function(m){m.preventDefault();doc.scrollTop(0);});
+if(isIE6){
+    win.scroll(function(){
+        if(doc.scrollTop()+winHeight>=e()){return}
+        link.css("top", doc.scrollTop()+winHeight-link.height()+40)
+        })
+}
 });
 $(document).ready(function() {
 	limitURLSize();

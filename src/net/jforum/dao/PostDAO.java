@@ -45,7 +45,6 @@ package net.jforum.dao;
 import java.util.List;
 
 import net.jforum.entities.Post;
-import net.jforum.entities.Recommendation;
 
 /**
  * Model interface for {@link net.jforum.entities.Post}. This interface defines

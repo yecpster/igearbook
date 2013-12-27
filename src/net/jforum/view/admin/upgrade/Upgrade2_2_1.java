@@ -18,10 +18,11 @@ import net.jforum.dao.TopicDAO;
 import net.jforum.entities.Attachment;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Post;
-import net.jforum.entities.Recommendation;
 import net.jforum.entities.Topic;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
+
+import com.igearbook.entities.Recommendation;
 
 public class Upgrade2_2_1 extends GenericUpgradeService implements UpgradeService {
     private static final Pattern PT = Pattern.compile("uploadImg/view/(\\d+?)\\.page");

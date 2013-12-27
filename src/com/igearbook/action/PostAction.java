@@ -13,7 +13,6 @@ import net.jforum.dao.DataAccessDriver;
 import net.jforum.dao.RecommendationDAO;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Post;
-import net.jforum.entities.Recommendation;
 import net.jforum.entities.Topic;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
@@ -21,19 +20,22 @@ import net.jforum.repository.ForumRepository;
 import net.jforum.repository.PostRepository;
 import net.jforum.repository.TopicRepository;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Namespace;
 import org.apache.struts2.convention.annotation.Result;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.igearbook.common.ImageCommon;
 import com.igearbook.constant.ImageSize;
+import com.igearbook.dao.RecommendDao;
 import com.igearbook.entities.ImageVo;
 import com.igearbook.entities.PaginationData;
+import com.igearbook.entities.Recommendation;
 import com.igearbook.util.HtmlUtil;
 import com.opensymphony.xwork2.ActionContext;
 
@@ -50,6 +52,12 @@ public class PostAction extends BaseAction {
     private File upload;
     private String uploadFileName;
     private String coverImgType;
+    @Autowired
+    private RecommendDao recommendDao;
+
+    public void setRecommendDao(final RecommendDao recommendDao) {
+        this.recommendDao = recommendDao;
+    }
 
     @Action(value = "manageRecommend", results = { @Result(name = SUCCESS, location = "post_recommend_list.ftl") })
     public String manageRecommend() {
@@ -70,10 +78,11 @@ public class PostAction extends BaseAction {
         if (!canEdit) {
             return ERROR;
         }
-        final RecommendationDAO recommendationDao = DataAccessDriver.getInstance().newRecommendationDAO();
         if (selectedRtopics != null) {
             for (final Integer selectedRtopic : selectedRtopics) {
-                recommendationDao.delete(selectedRtopic);
+                final Recommendation recommend = new Recommendation();
+                recommend.setId(selectedRtopic);
+                recommendDao.delete(recommend);
             }
         }
         return SUCCESS;
@@ -91,7 +100,6 @@ public class PostAction extends BaseAction {
         if (!canEditTeam) {
             return ERROR;
         }
-        final RecommendationDAO recommendDao = DataAccessDriver.getInstance().newRecommendationDAO();
 
         final Post post = PostRepository.selectAllByTopicByLimit(topicId, 0, 1).get(0);
         final String text = post.getText();
@@ -105,7 +113,7 @@ public class PostAction extends BaseAction {
                 imgList.add(src);
             }
         }
-        rtopic = recommendDao.selectByTopicId(topicId);
+        rtopic = recommendDao.get(topicId);
         if (rtopic == null) {
             rtopic = new Recommendation();
             String description = HtmlUtil.removeAllHTML(text);
@@ -169,7 +177,6 @@ public class PostAction extends BaseAction {
         final int userId = SessionFacade.getUserSession().getUserId();
         final User user = DataAccessDriver.getInstance().newUserDAO().selectById(userId);
 
-        final RecommendationDAO recommendDao = DataAccessDriver.getInstance().newRecommendationDAO();
         final Date now = new Date();
         rtopic.setLastUpdateBy(user);
         rtopic.setLastUpdateTime(now);
@@ -177,7 +184,7 @@ public class PostAction extends BaseAction {
         if (isNew) {
             rtopic.setCreateBy(user);
             rtopic.setCreateTime(now);
-            recommendDao.addNew(rtopic);
+            recommendDao.add(rtopic);
         } else {
             recommendDao.update(rtopic);
         }

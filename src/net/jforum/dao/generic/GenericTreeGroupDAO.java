@@ -45,17 +45,15 @@ package net.jforum.dao.generic;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import net.jforum.JForumExecutionContext;
-import net.jforum.entities.Group;
 import net.jforum.exceptions.DatabaseException;
 import net.jforum.util.DbUtils;
 import net.jforum.util.GroupNode;
 import net.jforum.util.preferences.SystemGlobals;
+
+import com.google.common.collect.Lists;
 
 /**
  * @author Rafael Steil

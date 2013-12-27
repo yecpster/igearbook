@@ -63,7 +63,7 @@ import net.jforum.exceptions.MailException;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import freemarker.template.SimpleHash;
@@ -83,11 +83,11 @@ public class Spammer
 	private static final int MESSAGE_TEXT = 1;
 	
 	private static int messageFormat;
-	private Session session;
-	private String username;
-	private String password;
+	private final Session session;
+	private final String username;
+	private final String password;
 	
-	private Properties mailProps = new Properties();
+	private final Properties mailProps = new Properties();
 	private MimeMessage message;
 	private List users = new ArrayList();
 	private String messageId;
@@ -98,17 +98,17 @@ public class Spammer
 	
 	protected Spammer() throws MailException
 	{
-		boolean ssl = SystemGlobals.getBoolValue(ConfigKeys.MAIL_SMTP_SSL);
+		final boolean ssl = SystemGlobals.getBoolValue(ConfigKeys.MAIL_SMTP_SSL);
 		
-		String hostProperty = this.hostProperty(ssl);
-		String portProperty = this.portProperty(ssl);
-		String authProperty = this.authProperty(ssl);
-		String localhostProperty = this.localhostProperty(ssl);
+		final String hostProperty = this.hostProperty(ssl);
+		final String portProperty = this.portProperty(ssl);
+		final String authProperty = this.authProperty(ssl);
+		final String localhostProperty = this.localhostProperty(ssl);
 		
 		mailProps.put(hostProperty, SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_HOST));
 		mailProps.put(portProperty, SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_PORT));
 
-		String localhost = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_LOCALHOST);
+		final String localhost = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_LOCALHOST);
 		
 		if (!StringUtils.isEmpty(localhost)) {
 			mailProps.put(localhostProperty, localhost);
@@ -132,27 +132,27 @@ public class Spammer
 	{
         try
         {
-            int sendDelay = SystemGlobals.getIntValue(ConfigKeys.MAIL_SMTP_DELAY);
+            final int sendDelay = SystemGlobals.getIntValue(ConfigKeys.MAIL_SMTP_DELAY);
             
 			if (SystemGlobals.getBoolValue(ConfigKeys.MAIL_SMTP_AUTH)) {
                 if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
-                	boolean ssl = SystemGlobals.getBoolValue(ConfigKeys.MAIL_SMTP_SSL);
+                	final boolean ssl = SystemGlobals.getBoolValue(ConfigKeys.MAIL_SMTP_SSL);
                 	
-                    Transport transport = this.session.getTransport(ssl ? "smtps" : "smtp");
+                    final Transport transport = this.session.getTransport(ssl ? "smtps" : "smtp");
                     
                     try {
-	                    String host = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_HOST);
+	                    final String host = SystemGlobals.getValue(ConfigKeys.MAIL_SMTP_HOST);
 	                    transport.connect(host, username, password);
 	
 	                    if (transport.isConnected()) {
-	                        for (Iterator userIter = this.users.iterator(); userIter.hasNext(); ) {
-	                        	User user = (User)userIter.next();
+	                        for (final Iterator userIter = this.users.iterator(); userIter.hasNext(); ) {
+	                        	final User user = (User)userIter.next();
 	                        	
 	                        	if (this.needCustomization) {
 	                        		this.defineUserMessage(user);
 	                        	}
 	                        	
-	                        	Address address = new InternetAddress(user.getEmail());
+	                        	final Address address = new InternetAddress(user.getEmail());
 	                        	
 	                        	logger.debug("Sending mail to: " + user.getEmail());
 	                        	
@@ -163,30 +163,30 @@ public class Spammer
 		                        	try {
 		                            	Thread.sleep(sendDelay);
 		                            } 
-		                        	catch (InterruptedException ie) {
+		                        	catch (final InterruptedException ie) {
 		                            	logger.error("Error while Thread.sleep." + ie, ie);
 		                            }
 	                        	}
 	                        }
 	                    }
                     }
-                    catch (Exception e) {
+                    catch (final Exception e) {
                     	throw new MailException(e);
                     }
                     finally {
-                    	try { transport.close(); } catch (Exception e) {}
+                    	try { transport.close(); } catch (final Exception e) {}
                     }
                 }
             }
             else {
-                for (Iterator iter = this.users.iterator(); iter.hasNext();) {
-                	User user = (User)iter.next();
+                for (final Iterator iter = this.users.iterator(); iter.hasNext();) {
+                	final User user = (User)iter.next();
                 	
                 	if (this.needCustomization) {
                 		this.defineUserMessage(user);
                 	}
                 	
-                	Address address = new InternetAddress(user.getEmail());
+                	final Address address = new InternetAddress(user.getEmail());
                 	logger.debug("Sending mail to: " + user.getEmail());
                 	this.message.setRecipient(Message.RecipientType.TO,address);
                     Transport.send(this.message, new Address[] { address });
@@ -194,30 +194,30 @@ public class Spammer
                     if (sendDelay > 0) {
 	                    try {
 	                    	Thread.sleep(sendDelay);
-	                    } catch (InterruptedException ie) {
+	                    } catch (final InterruptedException ie) {
 	                    	logger.error("Error while Thread.sleep." + ie, ie);
 	                    }
                     }
                 }
             }
         }
-        catch (MessagingException e) {
+        catch (final MessagingException e) {
             logger.error("Error while dispatching the message." + e, e);
         }
 
         return true;
 	}
 
-	private void defineUserMessage(User user)
+	private void defineUserMessage(final User user)
 	{
 		try {
 			this.templateParams.put("user", user);
 			
-			String text = this.processTemplate();
+			final String text = this.processTemplate();
 			
 			this.defineMessageText(text);
 		}
-		catch (Exception e) {
+		catch (final Exception e) {
 			throw new MailException(e);
 		}
 	}
@@ -229,7 +229,7 @@ public class Spammer
 	 * @param messageFile the path to the mail message template
 	 * @throws MailException
 	 */
-	protected void prepareMessage(String subject, String messageFile) throws MailException
+	protected void prepareMessage(final String subject, final String messageFile) throws MailException
 	{
 		if (this.messageId != null) {
 			this.message = new IdentifiableMimeMessage(session);
@@ -256,11 +256,11 @@ public class Spammer
 			// If we don't need to customize any part of the message, 
 			// then build the generic text right now
 			if (!this.needCustomization) {
-				String text = this.processTemplate();
+				final String text = this.processTemplate();
 				this.defineMessageText(text);
 			}
 		}
-		catch (Exception e) {
+		catch (final Exception e) {
 			throw new MailException(e);
 		}
 	}
@@ -270,9 +270,9 @@ public class Spammer
 	 * @param text the text to set
 	 * @throws MessagingException
 	 */
-	private void defineMessageText(String text) throws MessagingException
+	private void defineMessageText(final String text) throws MessagingException
 	{
-		String charset = SystemGlobals.getValue(ConfigKeys.MAIL_CHARSET);
+		final String charset = SystemGlobals.getValue(ConfigKeys.MAIL_CHARSET);
 		
 		if (messageFormat == MESSAGE_HTML) {
 			this.message.setContent(text.replaceAll("\n", "<br />"), "text/html; charset=" + charset);
@@ -289,9 +289,9 @@ public class Spammer
 	 * @return The email message text
 	 * @throws Exception
 	 */
-	protected void createTemplate(String messageFile) throws Exception
+	protected void createTemplate(final String messageFile) throws Exception
 	{
-		String templateEncoding = SystemGlobals.getValue(ConfigKeys.MAIL_TEMPLATE_ENCODING);
+		final String templateEncoding = SystemGlobals.getValue(ConfigKeys.MAIL_TEMPLATE_ENCODING);
 
 		if (StringUtils.isEmpty(templateEncoding)) {
 			this.template = JForumExecutionContext.templateConfig().getTemplate(messageFile);
@@ -311,7 +311,7 @@ public class Spammer
 	 */
 	protected String processTemplate() throws Exception
 	{
-		StringWriter writer = new StringWriter();
+		final StringWriter writer = new StringWriter();
 		this.template.process(this.templateParams, writer);
 		return writer.toString();
 	}
@@ -320,7 +320,7 @@ public class Spammer
 	 * Set the parameters for the template being processed
 	 * @param params the parameters to the template
 	 */
-	protected void setTemplateParams(SimpleHash params)
+	protected void setTemplateParams(final SimpleHash params)
 	{
 		this.templateParams = params;
 	}
@@ -333,8 +333,8 @@ public class Spammer
 	{
 		boolean need = false;
 		
-		for (Iterator iter = this.users.iterator(); iter.hasNext(); ) {
-			User user = (User)iter.next();
+		for (final Iterator iter = this.users.iterator(); iter.hasNext(); ) {
+			final User user = (User)iter.next();
 
 			if (user.notifyText()) {
 				need = true;
@@ -345,43 +345,43 @@ public class Spammer
 		return need;
 	}
 	
-	protected void setMessageId(String messageId)
+	protected void setMessageId(final String messageId)
 	{
 		this.messageId = messageId;
 	}
 	
-	protected void setInReplyTo(String inReplyTo)
+	protected void setInReplyTo(final String inReplyTo)
 	{
 		this.inReplyTo = inReplyTo;
 	}
 	
-	protected void setUsers(List users)
+	protected void setUsers(final List users)
 	{
 		this.users = users;
 	}
 
-	private String localhostProperty(boolean ssl)
+	private String localhostProperty(final boolean ssl)
 	{
 		return ssl 
 			? ConfigKeys.MAIL_SMTP_SSL_LOCALHOST
 			: ConfigKeys.MAIL_SMTP_LOCALHOST;
 	}
 
-	private String authProperty(boolean ssl)
+	private String authProperty(final boolean ssl)
 	{
 		return ssl 
 			? ConfigKeys.MAIL_SMTP_SSL_AUTH
 			: ConfigKeys.MAIL_SMTP_AUTH;
 	}
 
-	private String portProperty(boolean ssl)
+	private String portProperty(final boolean ssl)
 	{
 		return ssl 
 			? ConfigKeys.MAIL_SMTP_SSL_PORT
 			: ConfigKeys.MAIL_SMTP_PORT;
 	}
 
-	private String hostProperty(boolean ssl)
+	private String hostProperty(final boolean ssl)
 	{
 		return ssl 
 			? ConfigKeys.MAIL_SMTP_SSL_HOST

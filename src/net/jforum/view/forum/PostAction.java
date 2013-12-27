@@ -75,7 +75,6 @@ import net.jforum.entities.Poll;
 import net.jforum.entities.PollChanges;
 import net.jforum.entities.Post;
 import net.jforum.entities.QuotaLimit;
-import net.jforum.entities.Recommendation;
 import net.jforum.entities.Topic;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
@@ -100,8 +99,9 @@ import net.jforum.view.forum.common.PostCommon;
 import net.jforum.view.forum.common.TopicsCommon;
 import net.jforum.view.forum.common.ViewCommon;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import com.igearbook.entities.Recommendation;
 import com.igearbook.util.HtmlUtil;
 
 import freemarker.template.SimpleHash;
@@ -116,22 +116,23 @@ public class PostAction extends Command {
     public PostAction() {
     }
 
-    public PostAction(RequestContext request, SimpleHash templateContext) {
+    public PostAction(final RequestContext request, final SimpleHash templateContext) {
         super.context = templateContext;
         super.request = request;
     }
 
+    @Override
     public void list() {
-        PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
-        PollDAO pollDao = DataAccessDriver.getInstance().newPollDAO();
+        final PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
+        final PollDAO pollDao = DataAccessDriver.getInstance().newPollDAO();
 
-        TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
+        final TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
 
-        UserSession us = SessionFacade.getUserSession();
-        int anonymousUser = SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID);
-        boolean logged = SessionFacade.isLogged();
+        final UserSession us = SessionFacade.getUserSession();
+        final int anonymousUser = SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID);
+        final boolean logged = SessionFacade.isLogged();
 
-        int topicId = this.request.getIntParameter("topic_id");
+        final int topicId = this.request.getIntParameter("topic_id");
 
         Topic topic = TopicRepository.getTopic(new Topic(topicId));
 
@@ -146,7 +147,7 @@ public class PostAction extends Command {
         }
 
         // Shall we proceed?
-        Forum forum = ForumRepository.getForum(topic.getForumId());
+        final Forum forum = ForumRepository.getForum(topic.getForumId());
 
         if (!logged) {
             if (forum == null || !ForumRepository.isCategoryAccessible(forum.getCategoryId())) {
@@ -157,17 +158,17 @@ public class PostAction extends Command {
             return;
         }
 
-        int count = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
-        int start = ViewCommon.getStartPage();
+        final int count = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
+        final int start = ViewCommon.getStartPage();
 
-        PermissionControl pc = SecurityRepository.get(us.getUserId());
+        final PermissionControl pc = SecurityRepository.get(us.getUserId());
 
         boolean moderatorCanEdit = false;
         if (pc.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT, String.valueOf(forum.getId()))) {
             moderatorCanEdit = true;
         }
 
-        List<Post> helperList = PostCommon.topicPosts(postDao, moderatorCanEdit, us.getUserId(), topic.getId(), start, count);
+        final List<Post> helperList = PostCommon.topicPosts(postDao, moderatorCanEdit, us.getUserId(), topic.getId(), start, count);
 
         // Ugly assumption:
         // Is moderation pending for the topic?
@@ -200,15 +201,15 @@ public class PostAction extends Command {
             SessionFacade.getTopicsReadTime().put(new Integer(topic.getId()), new Long(System.currentTimeMillis()));
         }
 
-        boolean karmaEnabled = SecurityRepository.canAccess(SecurityConstants.PERM_KARMA_ENABLED);
+        final boolean karmaEnabled = SecurityRepository.canAccess(SecurityConstants.PERM_KARMA_ENABLED);
         Map userVotes = new HashMap();
 
         if (logged && karmaEnabled) {
             userVotes = DataAccessDriver.getInstance().newKarmaDAO().getUserVotes(topic.getId(), us.getUserId());
         }
 
-        RecommendationDAO recommendDao = DataAccessDriver.getInstance().newRecommendationDAO();
-        Recommendation recommend = recommendDao.selectByTopicId(topicId);
+        final RecommendationDAO recommendDao = DataAccessDriver.getInstance().newRecommendationDAO();
+        final Recommendation recommend = recommendDao.selectByTopicId(topicId);
 
         this.setTemplateName(TemplateKeys.POSTS_LIST);
         this.context.put("attachmentsEnabled", pc.canAccess(SecurityConstants.PERM_ATTACHMENTS_ENABLED, Integer.toString(topic.getForumId())));
@@ -233,9 +234,9 @@ public class PostAction extends Command {
         this.context.put("moderationLoggingEnabled", SystemGlobals.getBoolValue(ConfigKeys.MODERATION_LOGGING_ENABLED));
         this.context.put("needCaptcha", SystemGlobals.getBoolValue(ConfigKeys.CAPTCHA_POSTS));
 
-        Map<Integer, User> topicPosters = topicDao.topicPosters(topic.getId());
+        final Map<Integer, User> topicPosters = topicDao.topicPosters(topic.getId());
 
-        for (User user : topicPosters.values()) {
+        for (final User user : topicPosters.values()) {
             ViewCommon.prepareUserSignature(user);
         }
 
@@ -247,7 +248,7 @@ public class PostAction extends Command {
         this.context.put("replyOnly", !pc.canAccess(SecurityConstants.PERM_NEW_POST, Integer.toString(topic.getForumId())));
         this.context.put("isModerator", us.isModerator(topic.getForumId()));
 
-        String pageTitle = String.format("%s - %s - %s", topic.getTitle(), forum.getName(), SystemGlobals.getValue(ConfigKeys.FORUM_PAGE_TITLE));
+        final String pageTitle = String.format("%s - %s - %s", topic.getTitle(), forum.getName(), SystemGlobals.getValue(ConfigKeys.FORUM_PAGE_TITLE));
         String description = HtmlUtil.removeAllHTML(helperList.get(0).getText());
         if (StringUtils.isNotBlank(description)) {
             description = description.trim();
@@ -272,12 +273,12 @@ public class PostAction extends Command {
      * Given a postId, sends the user to the right page
      */
     public void preList() {
-        int postId = this.request.getIntParameter("post_id");
+        final int postId = this.request.getIntParameter("post_id");
 
-        PostDAO dao = DataAccessDriver.getInstance().newPostDAO();
+        final PostDAO dao = DataAccessDriver.getInstance().newPostDAO();
 
-        int count = dao.countPreviousPosts(postId);
-        int postsPerPage = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
+        final int count = dao.countPreviousPosts(postId);
+        final int postsPerPage = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
 
         int topicId = 0;
 
@@ -286,7 +287,7 @@ public class PostAction extends Command {
         }
 
         if (topicId == 0) {
-            Post post = dao.selectById(postId);
+            final Post post = dao.selectById(postId);
             topicId = post.getTopicId();
         }
 
@@ -304,8 +305,8 @@ public class PostAction extends Command {
      * Votes on a poll.
      */
     public void vote() {
-        int pollId = this.request.getIntParameter("poll_id");
-        int topicId = this.request.getIntParameter("topic_id");
+        final int pollId = this.request.getIntParameter("poll_id");
+        final int topicId = this.request.getIntParameter("topic_id");
 
         if (SessionFacade.isLogged() && this.request.getParameter("poll_option") != null) {
             Topic topic = TopicRepository.getTopic(new Topic(topicId));
@@ -320,12 +321,12 @@ public class PostAction extends Command {
             }
 
             // They voted, save the value
-            int optionId = this.request.getIntParameter("poll_option");
+            final int optionId = this.request.getIntParameter("poll_option");
 
-            PollDAO dao = DataAccessDriver.getInstance().newPollDAO();
+            final PollDAO dao = DataAccessDriver.getInstance().newPollDAO();
 
             // vote on the poll
-            UserSession user = SessionFacade.getUserSession();
+            final UserSession user = SessionFacade.getUserSession();
             dao.voteOnPoll(pollId, optionId, user.getUserId(), request.getRemoteAddr());
         }
 
@@ -334,11 +335,11 @@ public class PostAction extends Command {
     }
 
     public void listByUser() {
-        PostDAO pm = DataAccessDriver.getInstance().newPostDAO();
-        UserDAO um = DataAccessDriver.getInstance().newUserDAO();
-        TopicDAO tm = DataAccessDriver.getInstance().newTopicDAO();
+        final PostDAO pm = DataAccessDriver.getInstance().newPostDAO();
+        final UserDAO um = DataAccessDriver.getInstance().newUserDAO();
+        final TopicDAO tm = DataAccessDriver.getInstance().newTopicDAO();
 
-        User u = um.selectById(this.request.getIntParameter("user_id"));
+        final User u = um.selectById(this.request.getIntParameter("user_id"));
 
         if (u.getId() == 0) {
             this.context.put("message", I18n.getMessage("User.notFound"));
@@ -346,19 +347,19 @@ public class PostAction extends Command {
             return;
         }
 
-        int count = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
-        int start = ViewCommon.getStartPage();
-        int postsPerPage = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
+        final int count = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
+        final int start = ViewCommon.getStartPage();
+        final int postsPerPage = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
 
-        List posts = pm.selectByUserByLimit(u.getId(), start, postsPerPage);
+        final List posts = pm.selectByUserByLimit(u.getId(), start, postsPerPage);
         int totalMessages = pm.countUserPosts(u.getId());
 
         // get list of forums
-        Map topics = new HashMap();
-        Map forums = new HashMap();
+        final Map topics = new HashMap();
+        final Map forums = new HashMap();
 
-        for (Iterator iter = posts.iterator(); iter.hasNext();) {
-            Post p = (Post) iter.next();
+        for (final Iterator iter = posts.iterator(); iter.hasNext();) {
+            final Post p = (Post) iter.next();
 
             if (!topics.containsKey(new Integer(p.getTopicId()))) {
                 Topic t = TopicRepository.getTopic(new Topic(p.getTopicId()));
@@ -375,7 +376,7 @@ public class PostAction extends Command {
             }
 
             if (!forums.containsKey(new Integer(p.getForumId()))) {
-                Forum f = ForumRepository.getForum(p.getForumId());
+                final Forum f = ForumRepository.getForum(p.getForumId());
 
                 if (f == null) {
                     // Ok, probably the user does not have permission to see
@@ -408,11 +409,11 @@ public class PostAction extends Command {
     }
 
     public void review() {
-        PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
-        TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
+        final PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
+        final TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
 
-        int userId = SessionFacade.getUserSession().getUserId();
-        int topicId = this.request.getIntParameter("topic_id");
+        final int userId = SessionFacade.getUserSession().getUserId();
+        final int topicId = this.request.getIntParameter("topic_id");
 
         Topic topic = TopicRepository.getTopic(new Topic(topicId));
 
@@ -424,11 +425,11 @@ public class PostAction extends Command {
             return;
         }
 
-        int count = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
-        int start = ViewCommon.getStartPage();
+        final int count = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
+        final int start = ViewCommon.getStartPage();
 
-        Map usersMap = topicDao.topicPosters(topic.getId());
-        List helperList = PostCommon.topicPosts(postDao, false, userId, topic.getId(), start, count);
+        final Map usersMap = topicDao.topicPosters(topic.getId());
+        final List helperList = PostCommon.topicPosts(postDao, false, userId, topic.getId(), start, count);
         Collections.reverse(helperList);
 
         this.setTemplateName(SystemGlobals.getValue(ConfigKeys.TEMPLATE_DIR) + "/empty.htm");
@@ -453,7 +454,7 @@ public class PostAction extends Command {
         this.context.put("message", I18n.getMessage("PostShow.replyOnly"));
     }
 
-    private boolean isReplyOnly(int forumId) {
+    private boolean isReplyOnly(final int forumId) {
         return !SecurityRepository.canAccess(SecurityConstants.PERM_NEW_POST, Integer.toString(forumId));
     }
 
@@ -466,7 +467,7 @@ public class PostAction extends Command {
 
         // If we have a topic_id, then it should be a reply
         if (this.request.getParameter("topic_id") != null) {
-            int topicId = this.request.getIntParameter("topic_id");
+            final int topicId = this.request.getIntParameter("topic_id");
 
             Topic t = TopicRepository.getTopic(new Topic(topicId));
 
@@ -503,7 +504,7 @@ public class PostAction extends Command {
             this.context.put("pageTitle", I18n.getMessage("PostForm.title"));
         }
 
-        Forum forum = ForumRepository.getForum(forumId);
+        final Forum forum = ForumRepository.getForum(forumId);
 
         if (forum == null) {
             throw new ForumException("Could not find a forum with id #" + forumId);
@@ -517,7 +518,7 @@ public class PostAction extends Command {
             return;
         }
 
-        int userId = SessionFacade.getUserSession().getUserId();
+        final int userId = SessionFacade.getUserSession().getUserId();
 
         this.setTemplateName(TemplateKeys.POSTS_INSERT);
 
@@ -531,12 +532,12 @@ public class PostAction extends Command {
         this.context.put("attachmentsEnabled", attachmentsEnabled);
 
         if (attachmentsEnabled) {
-            QuotaLimit ql = new AttachmentCommon(this.request, forumId).getQuotaLimit(userId);
+            final QuotaLimit ql = new AttachmentCommon(this.request, forumId).getQuotaLimit(userId);
             this.context.put("maxAttachmentsSize", new Long(ql != null ? ql.getSizeInBytes() : 1));
             this.context.put("maxAttachments", SystemGlobals.getValue(ConfigKeys.ATTACHMENTS_MAX_POST));
         }
 
-        boolean needCaptcha = SystemGlobals.getBoolValue(ConfigKeys.CAPTCHA_POSTS);
+        final boolean needCaptcha = SystemGlobals.getBoolValue(ConfigKeys.CAPTCHA_POSTS);
 
         this.context.put("moderationLoggingEnabled", SystemGlobals.getBoolValue(ConfigKeys.MODERATION_LOGGING_ENABLED));
         this.context.put("smilies", SmiliesRepository.getSmilies());
@@ -550,7 +551,7 @@ public class PostAction extends Command {
                 SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_STICKY_ANNOUNCEMENT_TOPICS, String.valueOf(forumId)));
         this.context.put("canCreatePolls", SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_POLL, String.valueOf(forumId)));
 
-        User user = DataAccessDriver.getInstance().newUserDAO().selectById(userId);
+        final User user = DataAccessDriver.getInstance().newUserDAO().selectById(userId);
 
         ViewCommon.prepareUserSignature(user);
 
@@ -565,11 +566,11 @@ public class PostAction extends Command {
         this.edit(false, null);
     }
 
-    private void edit(boolean preview, Post p) {
-        int userId = SessionFacade.getUserSession().getUserId();
+    private void edit(final boolean preview, Post p) {
+        final int userId = SessionFacade.getUserSession().getUserId();
 
         if (!preview) {
-            PostDAO pm = DataAccessDriver.getInstance().newPostDAO();
+            final PostDAO pm = DataAccessDriver.getInstance().newPostDAO();
             p = pm.selectById(this.request.getIntParameter("post_id"));
 
             // The post exist?
@@ -579,8 +580,8 @@ public class PostAction extends Command {
             }
         }
 
-        boolean isModerator = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT, String.valueOf(p.getForumId()));
-        boolean canEdit = SessionFacade.isLogged() && (isModerator || p.getUserId() == userId);
+        final boolean isModerator = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT, String.valueOf(p.getForumId()));
+        final boolean canEdit = SessionFacade.isLogged() && (isModerator || p.getUserId() == userId);
 
         if (!canEdit) {
             this.setTemplateName(TemplateKeys.POSTS_EDIT_CANNOTEDIT);
@@ -613,7 +614,7 @@ public class PostAction extends Command {
 
             if (topic.isVote() && topic.getFirstPostId() == p.getId()) {
                 // It has a poll associated with the topic
-                PollDAO poolDao = DataAccessDriver.getInstance().newPollDAO();
+                final PollDAO poolDao = DataAccessDriver.getInstance().newPollDAO();
                 poll = poolDao.selectById(topic.getVoteId());
             }
 
@@ -624,7 +625,7 @@ public class PostAction extends Command {
 
             this.context.put("moderationLoggingEnabled", SystemGlobals.getBoolValue(ConfigKeys.MODERATION_LOGGING_ENABLED));
 
-            QuotaLimit ql = new AttachmentCommon(this.request, p.getForumId()).getQuotaLimit(userId);
+            final QuotaLimit ql = new AttachmentCommon(this.request, p.getForumId()).getQuotaLimit(userId);
             this.context.put("maxAttachmentsSize", new Long(ql != null ? ql.getSizeInBytes() : 1));
             this.context.put("isEdit", true);
             this.context.put("maxAttachments", SystemGlobals.getValue(ConfigKeys.ATTACHMENTS_MAX_POST));
@@ -644,8 +645,8 @@ public class PostAction extends Command {
             this.context.put("canCreatePolls", SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_POLL, String.valueOf(topic.getForumId())));
         }
 
-        UserDAO udao = DataAccessDriver.getInstance().newUserDAO();
-        User u = udao.selectById(userId);
+        final UserDAO udao = DataAccessDriver.getInstance().newUserDAO();
+        final User u = udao.selectById(userId);
         ViewCommon.prepareUserSignature(u);
 
         if (preview) {
@@ -653,7 +654,7 @@ public class PostAction extends Command {
 
             if (u.getId() != p.getUserId()) {
                 // Probably a moderator is editing the message
-                User previewUser = udao.selectById(p.getUserId());
+                final User previewUser = udao.selectById(p.getUserId());
                 ViewCommon.prepareUserSignature(previewUser);
                 this.context.put("previewUser", previewUser);
             }
@@ -663,8 +664,8 @@ public class PostAction extends Command {
     }
 
     public void quote() {
-        PostDAO pm = DataAccessDriver.getInstance().newPostDAO();
-        Post p = pm.selectById(this.request.getIntParameter("post_id"));
+        final PostDAO pm = DataAccessDriver.getInstance().newPostDAO();
+        final Post p = pm.selectById(this.request.getIntParameter("post_id"));
 
         if (p.getId() == 0) {
             this.postNotFound();
@@ -701,15 +702,15 @@ public class PostAction extends Command {
         this.context.put("action", "insertSave");
         this.context.put("post", p);
 
-        UserDAO um = DataAccessDriver.getInstance().newUserDAO();
-        User u = um.selectById(p.getUserId());
+        final UserDAO um = DataAccessDriver.getInstance().newUserDAO();
+        final User u = um.selectById(p.getUserId());
 
-        int userId = SessionFacade.getUserSession().getUserId();
+        final int userId = SessionFacade.getUserSession().getUserId();
 
         this.context.put("attachmentsEnabled",
                 SecurityRepository.canAccess(SecurityConstants.PERM_ATTACHMENTS_ENABLED, Integer.toString(topic.getForumId())));
 
-        QuotaLimit ql = new AttachmentCommon(this.request, topic.getForumId()).getQuotaLimit(userId);
+        final QuotaLimit ql = new AttachmentCommon(this.request, topic.getForumId()).getQuotaLimit(userId);
         this.context.put("maxAttachmentsSize", new Long(ql != null ? ql.getSizeInBytes() : 1));
 
         this.context.put("moderationLoggingEnabled", SystemGlobals.getBoolValue(ConfigKeys.MODERATION_LOGGING_ENABLED));
@@ -725,7 +726,7 @@ public class PostAction extends Command {
         this.context.put("pageTitle", I18n.getMessage("PostForm.reply") + " " + topic.getTitle());
         this.context.put("smilies", SmiliesRepository.getSmilies());
 
-        boolean needCaptcha = SystemGlobals.getBoolValue(ConfigKeys.CAPTCHA_POSTS);
+        final boolean needCaptcha = SystemGlobals.getBoolValue(ConfigKeys.CAPTCHA_POSTS);
 
         if (needCaptcha) {
             SessionFacade.getUserSession().createNewCaptcha();
@@ -735,9 +736,9 @@ public class PostAction extends Command {
     }
 
     public void editSave() {
-        PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
-        PollDAO pollDao = DataAccessDriver.getInstance().newPollDAO();
-        TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
+        final PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
+        final PollDAO pollDao = DataAccessDriver.getInstance().newPollDAO();
+        final TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
 
         Post post = postDao.selectById(this.request.getIntParameter("post_id"));
 
@@ -746,9 +747,9 @@ public class PostAction extends Command {
             return;
         }
 
-        boolean isModerator = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT, String.valueOf(post.getForumId()));
+        final boolean isModerator = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_EDIT, String.valueOf(post.getForumId()));
 
-        String originalMessage = post.getText();
+        final String originalMessage = post.getText();
 
         post = PostCommon.fillPostFromRequest(post, true);
 
@@ -756,16 +757,16 @@ public class PostAction extends Command {
         if ("1".equals(this.request.getParameter("preview"))) {
             this.context.put("preview", true);
 
-            Post postPreview = new Post(post);
+            final Post postPreview = new Post(post);
             this.context.put("postPreview", PostCommon.preparePostForDisplay(postPreview));
 
             this.edit(true, post);
         } else {
-            AttachmentCommon attachments = new AttachmentCommon(this.request, post.getForumId());
+            final AttachmentCommon attachments = new AttachmentCommon(this.request, post.getForumId());
 
             try {
                 attachments.preProcess();
-            } catch (AttachmentException e) {
+            } catch (final AttachmentException e) {
                 JForumExecutionContext.enableRollback();
                 post.setText(this.request.getParameter("message"));
                 this.context.put("errorMessage", e.getMessage());
@@ -801,8 +802,8 @@ public class PostAction extends Command {
             if (t.getFirstPostId() == post.getId()) {
                 t.setTitle(post.getSubject());
 
-                int newType = this.request.getIntParameter("topic_type");
-                boolean changeType = SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_STICKY_ANNOUNCEMENT_TOPICS,
+                final int newType = this.request.getIntParameter("topic_type");
+                final boolean changeType = SecurityRepository.canAccess(SecurityConstants.PERM_CREATE_STICKY_ANNOUNCEMENT_TOPICS,
                         String.valueOf(post.getForumId()))
                         && newType != t.getType();
 
@@ -811,7 +812,7 @@ public class PostAction extends Command {
                 }
 
                 // Poll
-                Poll poll = PollCommon.fillPollFromRequest();
+                final Poll poll = PollCommon.fillPollFromRequest();
 
                 if (poll != null && !t.isVote()) {
                     // They added a poll
@@ -830,8 +831,8 @@ public class PostAction extends Command {
                     }
 
                     // They edited the poll in the topic
-                    Poll existing = pollDao.selectById(t.getVoteId());
-                    PollChanges changes = new PollChanges(existing, poll);
+                    final Poll existing = pollDao.selectById(t.getVoteId());
+                    final PollChanges changes = new PollChanges(existing, poll);
 
                     if (changes.hasChanges()) {
                         poll.setId(existing.getId());
@@ -856,9 +857,9 @@ public class PostAction extends Command {
 
             if (SystemGlobals.getBoolValue(ConfigKeys.MODERATION_LOGGING_ENABLED) && isModerator
                     && post.getUserId() != SessionFacade.getUserSession().getUserId()) {
-                ModerationHelper helper = new ModerationHelper();
+                final ModerationHelper helper = new ModerationHelper();
                 this.request.addParameter("log_original_message", originalMessage);
-                ModerationLog log = helper.buildModerationLogFromRequest();
+                final ModerationLog log = helper.buildModerationLogFromRequest();
                 log.getPosterUser().setId(post.getUserId());
                 helper.saveModerationLog(log);
             }
@@ -868,7 +869,7 @@ public class PostAction extends Command {
             }
 
             String path = this.request.getContextPath() + "/posts/list/";
-            int start = ViewCommon.getStartPage();
+            final int start = ViewCommon.getStartPage();
 
             if (start > 0) {
                 path += start + "/";
@@ -883,7 +884,7 @@ public class PostAction extends Command {
         }
     }
 
-    private boolean ensurePollMinimumOptions(Post p, Poll poll) {
+    private boolean ensurePollMinimumOptions(final Post p, final Poll poll) {
         if (poll.getOptions().size() < 2) {
             // It is not a valid poll, cancel the post
             JForumExecutionContext.enableRollback();
@@ -902,7 +903,7 @@ public class PostAction extends Command {
     public void waitingModeration() {
         this.setTemplateName(TemplateKeys.POSTS_WAITING);
 
-        int topicId = this.request.getIntParameter("topic_id");
+        final int topicId = this.request.getIntParameter("topic_id");
         String path = this.request.getContextPath();
 
         if (topicId == 0) {
@@ -921,7 +922,7 @@ public class PostAction extends Command {
     }
 
     public void insertSave() {
-        int forumId = this.request.getIntParameter("forum_id");
+        final int forumId = this.request.getIntParameter("forum_id");
         boolean firstPost = false;
 
         if (!this.anonymousPost(forumId)) {
@@ -937,13 +938,13 @@ public class PostAction extends Command {
             return;
         }
 
-        TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
-        PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
-        PollDAO poolDao = DataAccessDriver.getInstance().newPollDAO();
-        ForumDAO forumDao = DataAccessDriver.getInstance().newForumDAO();
+        final TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
+        final PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
+        final PollDAO poolDao = DataAccessDriver.getInstance().newPollDAO();
+        final ForumDAO forumDao = DataAccessDriver.getInstance().newForumDAO();
 
         if (!newTopic) {
-            int topicId = this.request.getIntParameter("topic_id");
+            final int topicId = this.request.getIntParameter("topic_id");
 
             t = TopicRepository.getTopic(new Topic(topicId));
 
@@ -985,8 +986,8 @@ public class PostAction extends Command {
             }
         }
 
-        UserSession us = SessionFacade.getUserSession();
-        User u = DataAccessDriver.getInstance().newUserDAO().selectById(us.getUserId());
+        final UserSession us = SessionFacade.getUserSession();
+        final User u = DataAccessDriver.getInstance().newUserDAO().selectById(us.getUserId());
 
         if ("1".equals(this.request.getParameter("quick")) && SessionFacade.isLogged()) {
             this.request.addParameter("notify", u.isNotifyOnMessagesEnabled() ? "1" : null);
@@ -997,7 +998,7 @@ public class PostAction extends Command {
         }
 
         // Set the Post
-        Post p = PostCommon.fillPostFromRequest();
+        final Post p = PostCommon.fillPostFromRequest();
 
         if (p.getText() == null || p.getText().trim().equals("")) {
             this.insert();
@@ -1005,10 +1006,10 @@ public class PostAction extends Command {
         }
 
         // Check the elapsed time since the last post from the user
-        int delay = SystemGlobals.getIntValue(ConfigKeys.POSTS_NEW_DELAY);
+        final int delay = SystemGlobals.getIntValue(ConfigKeys.POSTS_NEW_DELAY);
 
         if (delay > 0) {
-            Long lastPostTime = (Long) SessionFacade.getAttribute(ConfigKeys.LAST_POST_TIME);
+            final Long lastPostTime = (Long) SessionFacade.getAttribute(ConfigKeys.LAST_POST_TIME);
 
             if (lastPostTime != null) {
                 if (System.currentTimeMillis() < (lastPostTime.longValue() + delay)) {
@@ -1027,7 +1028,7 @@ public class PostAction extends Command {
             p.setSubject(t.getTitle());
         }
 
-        boolean needCaptcha = SystemGlobals.getBoolValue(ConfigKeys.CAPTCHA_POSTS)
+        final boolean needCaptcha = SystemGlobals.getBoolValue(ConfigKeys.CAPTCHA_POSTS)
                 && request.getSessionContext().getAttribute(ConfigKeys.REQUEST_IGNORE_CAPTCHA) == null;
 
         if (needCaptcha) {
@@ -1042,14 +1043,14 @@ public class PostAction extends Command {
             }
         }
 
-        boolean preview = "1".equals(this.request.getParameter("preview"));
+        final boolean preview = "1".equals(this.request.getParameter("preview"));
 
         if (!preview) {
-            AttachmentCommon attachments = new AttachmentCommon(this.request, forumId);
+            final AttachmentCommon attachments = new AttachmentCommon(this.request, forumId);
 
             try {
                 attachments.preProcess();
-            } catch (AttachmentException e) {
+            } catch (final AttachmentException e) {
                 JForumExecutionContext.enableRollback();
                 p.setText(this.request.getParameter("message"));
                 p.setId(0);
@@ -1059,8 +1060,8 @@ public class PostAction extends Command {
                 return;
             }
 
-            Forum forum = ForumRepository.getForum(forumId);
-            PermissionControl pc = SecurityRepository.get(us.getUserId());
+            final Forum forum = ForumRepository.getForum(forumId);
+            final PermissionControl pc = SecurityRepository.get(us.getUserId());
 
             // Moderators and admins don't need to have their messages moderated
             boolean moderate = (forum.isModerated() && !us.isModerator(forumId) && !us.isAdmin());
@@ -1072,7 +1073,7 @@ public class PostAction extends Command {
                 t.setPostedBy(u);
                 t.setFirstPostTime(ViewCommon.formatDate(t.getTime()));
 
-                int topicId = topicDao.addNew(t);
+                final int topicId = topicDao.addNew(t);
                 t.setId(topicId);
                 firstPost = true;
             }
@@ -1089,7 +1090,7 @@ public class PostAction extends Command {
             p.setTopicId(t.getId());
 
             // add a poll
-            Poll poll = PollCommon.fillPollFromRequest();
+            final Poll poll = PollCommon.fillPollFromRequest();
 
             if (poll != null && newTopic) {
                 poll.setTopicId(t.getId());
@@ -1112,7 +1113,7 @@ public class PostAction extends Command {
 
             // Save the remaining stuff
             p.setModerate(moderate);
-            int postId = postDao.addNew(p);
+            final int postId = postDao.addNew(p);
 
             if (newTopic) {
                 t.setFirstPostId(postId);
@@ -1130,10 +1131,10 @@ public class PostAction extends Command {
             attachments.insertAttachments(p);
 
             if (!moderate) {
-                StringBuffer path = new StringBuffer(512);
+                final StringBuffer path = new StringBuffer(512);
                 path.append(this.request.getContextPath()).append("/posts/list/");
 
-                int start = ViewCommon.getStartPage();
+                final int start = ViewCommon.getStartPage();
 
                 path.append(this.startPage(t, start)).append("/").append(t.getId()).append(SystemGlobals.getValue(ConfigKeys.SERVLET_EXTENSION))
                         .append('#').append(postId);
@@ -1156,14 +1157,14 @@ public class PostAction extends Command {
                 TopicsCommon.updateBoardStatus(t, postId, firstPost, topicDao, forumDao);
                 ForumRepository.updateForumStats(t, u, p);
 
-                int anonymousUser = SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID);
+                final int anonymousUser = SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID);
 
                 if (u.getId() != anonymousUser) {
                     SessionFacade.getTopicsReadTime().put(t.getId(), p.getTime().getTime());
                 }
 
                 if (SystemGlobals.getBoolValue(ConfigKeys.POSTS_CACHE_ENABLED)) {
-                    SimpleDateFormat df = new SimpleDateFormat(SystemGlobals.getValue(ConfigKeys.DATE_TIME_FORMAT));
+                    final SimpleDateFormat df = new SimpleDateFormat(SystemGlobals.getValue(ConfigKeys.DATE_TIME_FORMAT));
                     p.setFormatedTime(df.format(p.getTime()));
 
                     PostRepository.append(p.getTopicId(), PostCommon.preparePostForDisplay(p));
@@ -1181,25 +1182,25 @@ public class PostAction extends Command {
             this.context.put("post", p);
             this.context.put("start", this.request.getParameter("start"));
 
-            Post postPreview = new Post(p);
+            final Post postPreview = new Post(p);
             this.context.put("postPreview", PostCommon.preparePostForDisplay(postPreview));
 
             this.insert();
         }
     }
 
-    private int startPage(Topic t, int currentStart) {
-        int postsPerPage = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
+    private int startPage(final Topic t, final int currentStart) {
+        final int postsPerPage = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
 
-        int newStart = (t.getTotalReplies() + 1) / postsPerPage * postsPerPage;
+        final int newStart = (t.getTotalReplies() + 1) / postsPerPage * postsPerPage;
 
         return (newStart > currentStart) ? newStart : currentStart;
     }
 
     public void delete() {
         // Post
-        PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
-        Post p = postDao.selectById(this.request.getIntParameter("post_id"));
+        final PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
+        final Post p = postDao.selectById(this.request.getIntParameter("post_id"));
 
         if (!SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_POST_REMOVE, String.valueOf(p.getForumId()))) {
             this.setTemplateName(TemplateKeys.POSTS_CANNOT_DELETE);
@@ -1213,7 +1214,7 @@ public class PostAction extends Command {
             return;
         }
 
-        TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
+        final TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
         Topic t = topicDao.selectRaw(p.getTopicId());
 
         if (!TopicsCommon.isTopicAccessible(t.getForumId())) {
@@ -1224,14 +1225,14 @@ public class PostAction extends Command {
         DataAccessDriver.getInstance().newUserDAO().decrementPosts(p.getUserId());
 
         // Karma
-        KarmaDAO karmaDao = DataAccessDriver.getInstance().newKarmaDAO();
+        final KarmaDAO karmaDao = DataAccessDriver.getInstance().newKarmaDAO();
         karmaDao.updateUserKarma(p.getUserId());
 
         // Attachments
         new AttachmentCommon(this.request, p.getForumId()).deleteAttachments(p.getId(), p.getForumId());
 
         // It was the last remaining post in the topic?
-        int totalPosts = topicDao.getTotalPosts(p.getTopicId());
+        final int totalPosts = topicDao.getTotalPosts(p.getTopicId());
 
         if (totalPosts > 0) {
             // Topic
@@ -1242,13 +1243,13 @@ public class PostAction extends Command {
                 topicDao.setLastPostId(p.getTopicId(), maxPostId);
             }
 
-            int minPostId = topicDao.getMinPostId(p.getTopicId());
+            final int minPostId = topicDao.getMinPostId(p.getTopicId());
             if (minPostId > -1) {
                 topicDao.setFirstPostId(p.getTopicId(), minPostId);
             }
 
             // Forum
-            ForumDAO fm = DataAccessDriver.getInstance().newForumDAO();
+            final ForumDAO fm = DataAccessDriver.getInstance().newForumDAO();
 
             maxPostId = fm.getMaxPostId(p.getForumId());
             if (maxPostId > -1) {
@@ -1260,7 +1261,7 @@ public class PostAction extends Command {
             int page = ViewCommon.getStartPage();
 
             if (page > 0) {
-                int postsPerPage = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
+                final int postsPerPage = SystemGlobals.getIntValue(ConfigKeys.POSTS_PER_PAGE);
 
                 if (totalPosts % postsPerPage == 0) {
                     page -= postsPerPage;
@@ -1279,7 +1280,7 @@ public class PostAction extends Command {
         } else {
             // Ok, all posts were removed. Time to say goodbye
             TopicsCommon.deleteTopic(p.getTopicId(), p.getForumId(), false);
-            Forum forum = ForumRepository.getForum(p.getForumId());
+            final Forum forum = ForumRepository.getForum(p.getForumId());
             if (forum.getType() == Forum.TYPE_TEAM) {
                 JForumExecutionContext.setRedirect(this.request.getContextPath() + "/team/forum.action?teamId=" + forum.getId());
             } else {
@@ -1290,8 +1291,8 @@ public class PostAction extends Command {
         }
 
         this.request.addOrReplaceParameter("log_original_message", p.getText());
-        ModerationHelper moderationHelper = new ModerationHelper();
-        ModerationLog moderationLog = moderationHelper.buildModerationLogFromRequest();
+        final ModerationHelper moderationHelper = new ModerationHelper();
+        final ModerationLog moderationLog = moderationHelper.buildModerationLogFromRequest();
         moderationLog.getPosterUser().setId(p.getUserId());
         moderationHelper.saveModerationLog(moderationLog);
 
@@ -1301,15 +1302,15 @@ public class PostAction extends Command {
         ForumRepository.reloadForum(p.getForumId());
     }
 
-    private void watch(TopicDAO tm, int topicId, int userId) {
+    private void watch(final TopicDAO tm, final int topicId, final int userId) {
         if (!tm.isUserSubscribed(topicId, userId)) {
             tm.subscribeUser(topicId, userId);
         }
     }
 
     public void watch() {
-        int topicId = this.request.getIntParameter("topic_id");
-        int userId = SessionFacade.getUserSession().getUserId();
+        final int topicId = this.request.getIntParameter("topic_id");
+        final int userId = SessionFacade.getUserSession().getUserId();
 
         this.watch(DataAccessDriver.getInstance().newTopicDAO(), topicId, userId);
         this.list();
@@ -1319,9 +1320,9 @@ public class PostAction extends Command {
         if (!SessionFacade.isLogged()) {
             this.setTemplateName(ViewCommon.contextToLogin());
         } else {
-            int topicId = this.request.getIntParameter("topic_id");
-            int userId = SessionFacade.getUserSession().getUserId();
-            int start = ViewCommon.getStartPage();
+            final int topicId = this.request.getIntParameter("topic_id");
+            final int userId = SessionFacade.getUserSession().getUserId();
+            final int start = ViewCommon.getStartPage();
 
             DataAccessDriver.getInstance().newTopicDAO().removeSubscription(topicId, userId);
 
@@ -1340,10 +1341,10 @@ public class PostAction extends Command {
     }
 
     public void downloadAttach() {
-        int id = this.request.getIntParameter("attach_id");
+        final int id = this.request.getIntParameter("attach_id");
 
         if (!SessionFacade.isLogged() && !SystemGlobals.getBoolValue(ConfigKeys.ATTACHMENTS_ANONYMOUS)) {
-            String referer = this.request.getHeader("Referer");
+            final String referer = this.request.getHeader("Referer");
 
             if (referer != null) {
                 this.setTemplateName(ViewCommon.contextToLogin(referer));
@@ -1354,16 +1355,16 @@ public class PostAction extends Command {
             return;
         }
 
-        AttachmentDAO am = DataAccessDriver.getInstance().newAttachmentDAO();
-        Attachment a = am.selectAttachmentById(id);
+        final AttachmentDAO am = DataAccessDriver.getInstance().newAttachmentDAO();
+        final Attachment a = am.selectAttachmentById(id);
 
-        PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
-        Post post = postDao.selectById(a.getPostId());
+        final PostDAO postDao = DataAccessDriver.getInstance().newPostDAO();
+        final Post post = postDao.selectById(a.getPostId());
 
-        String forumId = Integer.toString(post.getForumId());
+        final String forumId = Integer.toString(post.getForumId());
 
-        boolean attachmentsEnabled = SecurityRepository.canAccess(SecurityConstants.PERM_ATTACHMENTS_ENABLED, forumId);
-        boolean attachmentsDownload = SecurityRepository.canAccess(SecurityConstants.PERM_ATTACHMENTS_DOWNLOAD, forumId);
+        final boolean attachmentsEnabled = SecurityRepository.canAccess(SecurityConstants.PERM_ATTACHMENTS_ENABLED, forumId);
+        final boolean attachmentsDownload = SecurityRepository.canAccess(SecurityConstants.PERM_ATTACHMENTS_DOWNLOAD, forumId);
 
         if (!attachmentsEnabled && !attachmentsDownload) {
             this.setTemplateName(TemplateKeys.POSTS_CANNOT_DOWNLOAD);
@@ -1371,7 +1372,7 @@ public class PostAction extends Command {
             return;
         }
 
-        String filename = SystemGlobals.getValue(ConfigKeys.ATTACHMENTS_STORE_DIR) + "/" + a.getInfo().getPhysicalFilename();
+        final String filename = SystemGlobals.getValue(ConfigKeys.ATTACHMENTS_STORE_DIR) + "/" + a.getInfo().getPhysicalFilename();
 
         if (!new File(filename).exists()) {
             this.setTemplateName(TemplateKeys.POSTS_ATTACH_NOTFOUND);
@@ -1409,26 +1410,26 @@ public class PostAction extends Command {
             this.response.setContentLength((int) a.getInfo().getFilesize());
 
             int c;
-            byte[] b = new byte[4096];
+            final byte[] b = new byte[4096];
             while ((c = fis.read(b)) != -1) {
                 os.write(b, 0, c);
             }
 
             JForumExecutionContext.enableCustomContent(true);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new ForumException(e);
         } finally {
             if (fis != null) {
                 try {
                     fis.close();
-                } catch (Exception e) {
+                } catch (final Exception e) {
                 }
             }
 
             if (os != null) {
                 try {
                     os.close();
-                } catch (Exception e) {
+                } catch (final Exception e) {
                 }
             }
         }
@@ -1450,7 +1451,7 @@ public class PostAction extends Command {
         this.context.put("smilies", SmiliesRepository.getSmilies());
     }
 
-    private boolean isForumReadonly(int forumId, boolean isReply) {
+    private boolean isForumReadonly(final int forumId, final boolean isReply) {
         if (!SecurityRepository.canAccess(SecurityConstants.PERM_REPLY, Integer.toString(forumId))) {
             if (isReply) {
                 this.list();
@@ -1465,7 +1466,7 @@ public class PostAction extends Command {
         return false;
     }
 
-    private boolean anonymousPost(int forumId) {
+    private boolean anonymousPost(final int forumId) {
         // Check if anonymous posts are allowed
         if (!SessionFacade.isLogged() && !SecurityRepository.canAccess(SecurityConstants.PERM_ANONYMOUS_POST, Integer.toString(forumId))) {
             this.setTemplateName(ViewCommon.contextToLogin());

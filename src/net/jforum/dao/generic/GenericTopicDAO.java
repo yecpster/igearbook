@@ -55,9 +55,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 import net.jforum.JForumExecutionContext;
 import net.jforum.SessionFacade;
 import net.jforum.dao.DataAccessDriver;
@@ -75,6 +72,9 @@ import net.jforum.search.SearchResult;
 import net.jforum.util.DbUtils;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * @author Rafael Steil

@@ -65,7 +65,7 @@ import net.jforum.util.legacy.commons.fileupload.FileItem;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -82,18 +82,18 @@ public class UserCommon
 	 * @param userId int The user id we are saving
      * @return List
 	 */
-	public static List saveUser(int userId)
+	public static List saveUser(final int userId)
 	{
-		List errors = new ArrayList();
+		final List errors = new ArrayList();
 		
-		UserDAO um = DataAccessDriver.getInstance().newUserDAO();
-		User u = um.selectById(userId);
+		final UserDAO um = DataAccessDriver.getInstance().newUserDAO();
+		final User u = um.selectById(userId);
 		
-		RequestContext request = JForumExecutionContext.getRequest();
-		boolean isAdmin = SessionFacade.getUserSession().isAdmin();
+		final RequestContext request = JForumExecutionContext.getRequest();
+		final boolean isAdmin = SessionFacade.getUserSession().isAdmin();
 
 		if (isAdmin) {
-			String username = request.getParameter("username");
+			final String username = request.getParameter("username");
 		
 			if (username != null) {
 				u.setUsername(username.trim());
@@ -104,7 +104,7 @@ public class UserCommon
 			}
 		}
 		
-		SafeHtml safeHtml = new SafeHtml();
+		final SafeHtml safeHtml = new SafeHtml();
 		
 		u.setId(userId);
 		u.setIcq(safeHtml.makeSafe(request.getParameter("icq")));
@@ -137,7 +137,7 @@ public class UserCommon
 		u.setWebSite(website);
 		
 		String currentPassword = request.getParameter("current_password");
-		boolean isCurrentPasswordEmpty = currentPassword == null || "".equals(currentPassword.trim());
+		final boolean isCurrentPasswordEmpty = currentPassword == null || "".equals(currentPassword.trim());
 		
 		if (isAdmin || !isCurrentPasswordEmpty) {
 			if (!isCurrentPasswordEmpty) {
@@ -147,7 +147,7 @@ public class UserCommon
 			if (isAdmin || u.getPassword().equals(currentPassword)) {
 				u.setEmail(safeHtml.makeSafe(request.getParameter("email")));
 				
-				String newPassword = request.getParameter("new_password");
+				final String newPassword = request.getParameter("new_password");
 
 				if (newPassword != null && newPassword.length() > 0) {
 					u.setPassword(MD5.crypt(newPassword));
@@ -159,9 +159,9 @@ public class UserCommon
 		}
 		
 		if (request.getParameter("avatardel") != null) {
-			File avatarFile = new File(u.getAvatar());
+			final File avatarFile = new File(u.getAvatar());
 			
-			File fileToDelete = new File(SystemGlobals.getApplicationPath() 
+			final File fileToDelete = new File(SystemGlobals.getApplicationPath() 
 				+ "/images/avatar/"
 				+ avatarFile.getName());
 			
@@ -176,18 +176,18 @@ public class UserCommon
 			try {
 				UserCommon.handleAvatar(u);
 			}
-			catch (Exception e) {
+			catch (final Exception e) {
 				UserCommon.logger.warn("Problems while uploading the avatar: " + e);
 				errors.add(I18n.getMessage("User.avatarUploadError"));
 			}
 		} else if (SystemGlobals.getBoolValue(ConfigKeys.AVATAR_ALLOW_EXTERNAL_URL)) {
-			String avatarUrl = request.getParameter("avatarUrl");
+			final String avatarUrl = request.getParameter("avatarUrl");
 			
 			if (!StringUtils.isEmpty(avatarUrl)) {
 				if (avatarUrl.toLowerCase().startsWith("http://")) {
 					
 					try {
-						Image image = ImageIO.read(new URL(avatarUrl));
+						final Image image = ImageIO.read(new URL(avatarUrl));
 						
 						if (image != null) {
 							if (image.getWidth(null) > SystemGlobals.getIntValue(ConfigKeys.AVATAR_MAX_WIDTH)
@@ -199,7 +199,7 @@ public class UserCommon
 							}
 						}
 					}
-					catch (Exception e) {
+					catch (final Exception e) {
 						errors.add(I18n.getMessage("User.avatarUploadError"));
 					}
 				}
@@ -223,11 +223,11 @@ public class UserCommon
 	/**
 	 * @param u User
 	 */
-	private static void handleAvatar(User u)
+	private static void handleAvatar(final User u)
 	{
-		String fileName = MD5.crypt(Integer.toString(u.getId()));
-		FileItem item = (FileItem)JForumExecutionContext.getRequest().getObjectParameter("avatar");
-		UploadUtils uploadUtils = new UploadUtils(item);
+		final String fileName = MD5.crypt(Integer.toString(u.getId()));
+		final FileItem item = (FileItem)JForumExecutionContext.getRequest().getObjectParameter("avatar");
+		final UploadUtils uploadUtils = new UploadUtils(item);
 		
 		// Gets file extension
 		String extension = uploadUtils.getExtension().toLowerCase();
@@ -241,7 +241,7 @@ public class UserCommon
 		}
 		
 		if (type != ImageUtils.IMAGE_UNKNOWN) {
-			String avatarTmpFileName = SystemGlobals.getApplicationPath() 
+			final String avatarTmpFileName = SystemGlobals.getApplicationPath() 
 				+ "/images/avatar/" 
 				+ fileName 
 				+ "_tmp." 
@@ -252,7 +252,7 @@ public class UserCommon
 				extension = "png";
 			}
 	
-			String avatarFinalFileName = SystemGlobals.getApplicationPath() 
+			final String avatarFinalFileName = SystemGlobals.getApplicationPath() 
 				+ "/images/avatar/" 
 				+ fileName 
 				+ "." 
@@ -261,10 +261,10 @@ public class UserCommon
 			uploadUtils.saveUploadedFile(avatarTmpFileName);
 			
 			// OK, time to check and process the avatar size
-			int maxWidth = SystemGlobals.getIntValue(ConfigKeys.AVATAR_MAX_WIDTH);
-			int maxHeight = SystemGlobals.getIntValue(ConfigKeys.AVATAR_MAX_HEIGHT);
+			final int maxWidth = SystemGlobals.getIntValue(ConfigKeys.AVATAR_MAX_WIDTH);
+			final int maxHeight = SystemGlobals.getIntValue(ConfigKeys.AVATAR_MAX_HEIGHT);
 	
-			BufferedImage image = ImageUtils.resizeImage(avatarTmpFileName, type, maxWidth, maxHeight);
+			final BufferedImage image = ImageUtils.resizeImage(avatarTmpFileName, type, maxWidth, maxHeight);
 			ImageUtils.saveImage(image, avatarFinalFileName, type);
 	
 			u.setAvatar(fileName + "." + extension);
