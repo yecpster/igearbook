@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 
 import net.jforum.SessionFacade;
 import net.jforum.dao.DataAccessDriver;
-import net.jforum.dao.RecommendationDAO;
 import net.jforum.entities.Forum;
 import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
@@ -66,8 +65,7 @@ public class RecommendAction extends BaseAction {
         if (!canEdit) {
             return ERROR;
         }
-        final RecommendationDAO recommendationDao = DataAccessDriver.getInstance().newRecommendationDAO();
-        data = recommendationDao.selectAllByLimit(this.getPaginationParams());
+        data = recommendDao.doPagination(getPaginationParams());
         return SUCCESS;
     }
 

@@ -317,7 +317,7 @@ public class User implements Serializable {
         return this.totalPosts;
     }
 
-    @Transient
+    @Column(name = "username")
     public String getUsername() {
         return this.username;
     }

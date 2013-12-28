@@ -1,7 +1,11 @@
 package com.igearbook.action;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.struts2.ServletActionContext;
 
+import com.google.common.collect.Maps;
 import com.igearbook.entities.PaginationParams;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionSupport;
@@ -35,7 +39,16 @@ public abstract class BaseAction extends ActionSupport {
     protected PaginationParams getPaginationParams() {
         final PaginationParams params = new PaginationParams();
         params.setStart(this.getStart());
+        final Map<String, Object> webParams = ActionContext.getContext().getParameters();
+        // PropertyUtils.isReadable(bean, name)
+        final Map<String, Object> queryParams = Maps.newHashMap();
+        for (final Entry<String, Object> entry : webParams.entrySet()) {
+            if ("start".equals(entry.getKey())) {
+                continue;
+            }
+            queryParams.put(entry.getKey(), entry.getValue());
+        }
+        params.setQueryParams(queryParams);
         return params;
     }
-
 }
