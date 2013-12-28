@@ -70,14 +70,18 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 
     @Override
     public PaginationData<T> doPagination(final PaginationParams params) {
-        Criteria criteria = getSession().createCriteria(type);
+        return this.doPagination(type, params);
+    }
+
+    protected <P> PaginationData<P> doPagination(final Class<P> theClass, final PaginationParams params) {
+        final Criteria criteria = getSession().createCriteria(theClass);
         for (final Entry<String, Object> entry : params.getQueryParams().entrySet()) {
-            criteria = criteria.add(Restrictions.eq(entry.getKey(), entry.getValue()));
+            criteria.add(Restrictions.eq(entry.getKey(), entry.getValue()));
         }
 
-        final PaginationData<T> paginationData = new PaginationData<T>();
+        final PaginationData<P> paginationData = new PaginationData<P>();
         final BigDecimal recordsPerPage = BigDecimal.valueOf(params.getRecordsPerPage());
-        final BigDecimal totalRecords = getTotalRecords(params);
+        final BigDecimal totalRecords = getTotalRecords(theClass, params);
         final int totalPages = totalRecords.divide(recordsPerPage, RoundingMode.CEILING).intValue();
         final int currentPage = BigDecimal.valueOf(params.getStart() + 1).divide(recordsPerPage, RoundingMode.CEILING).intValue();
         paginationData.setTotalRecords(totalRecords.intValue());
@@ -88,13 +92,16 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
         criteria.setFirstResult(params.getStart());
         criteria.setMaxResults(params.getRecordsPerPage());
         @SuppressWarnings("unchecked")
-        final List<T> list = criteria.list();
+        final List<P> list = criteria.list();
         paginationData.setList(list);
         return paginationData;
     }
 
-    private BigDecimal getTotalRecords(final PaginationParams params) {
-        final Criteria criteria = getSession().createCriteria(type);
+    private <P> BigDecimal getTotalRecords(final Class<P> theClass, final PaginationParams params) {
+        final Criteria criteria = getSession().createCriteria(theClass);
+        for (final Entry<String, Object> entry : params.getQueryParams().entrySet()) {
+            criteria.add(Restrictions.eq(entry.getKey(), entry.getValue()));
+        }
         final Long count = (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
         return BigDecimal.valueOf(count);
     }
