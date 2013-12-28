@@ -39,8 +39,8 @@ import com.igearbook.entities.Recommendation;
 import com.igearbook.util.HtmlUtil;
 import com.opensymphony.xwork2.ActionContext;
 
-@Namespace("/post")
-public class PostAction extends BaseAction {
+@Namespace("/recommend")
+public class RecommendAction extends BaseAction {
     private static final long serialVersionUID = 8123243588174068662L;
     private static final Pattern IMG_PT = Pattern.compile("<img.*?src\\s*=\\s*['\"](.+?)['\"]", Pattern.CASE_INSENSITIVE);
     private static final Pattern IMG_SRC_PT = Pattern.compile(".+?_\\d+_\\d+_\\d\\.[a-zA-Z]+", Pattern.CASE_INSENSITIVE);
@@ -59,8 +59,8 @@ public class PostAction extends BaseAction {
         this.recommendDao = recommendDao;
     }
 
-    @Action(value = "manageRecommend", results = { @Result(name = SUCCESS, location = "post_recommend_list.ftl") })
-    public String manageRecommend() {
+    @Action(value = "manage", results = { @Result(name = SUCCESS, location = "recommend_list.ftl") })
+    public String manage() {
         final UserSession userSession = SessionFacade.getUserSession();
         final boolean canEdit = userSession.isWebAdmin() || userSession.isAdmin();
         if (!canEdit) {
@@ -71,8 +71,8 @@ public class PostAction extends BaseAction {
         return SUCCESS;
     }
 
-    @Action(value = "deleteRecommend", results = { @Result(name = SUCCESS, location = "manageRecommend.action", type = "redirect") })
-    public String deleteRecommend() {
+    @Action(value = "delete", results = { @Result(name = SUCCESS, location = "manage.action", type = "redirect") })
+    public String delete() {
         final UserSession userSession = SessionFacade.getUserSession();
         final boolean canEdit = userSession.isWebAdmin() || userSession.isAdmin();
         if (!canEdit) {
@@ -85,11 +85,22 @@ public class PostAction extends BaseAction {
                 recommendDao.delete(recommend);
             }
         }
+        TopicRepository.loadRecommendTopics(Recommendation.TYPE_INDEX_TEAM);
+        TopicRepository.loadRecommendTopics(Recommendation.TYPE_INDEX_IMG);
         return SUCCESS;
     }
 
-    @Action(value = "recommend", results = { @Result(name = SUCCESS, location = "post_recommend_form.ftl") })
-    public String recommend() {
+    @Action(value = "add", results = { @Result(name = SUCCESS, location = "recommend_form.ftl") })
+    public String add() {
+        return recommend();
+    }
+
+    @Action(value = "edit", results = { @Result(name = SUCCESS, location = "recommend_form.ftl") })
+    public String edit() {
+        return recommend();
+    }
+
+    private String recommend() {
         Topic topic = TopicRepository.getTopic(new Topic(topicId));
         if (topic == null) {
             topic = DataAccessDriver.getInstance().newTopicDAO().selectById(topicId);
@@ -113,7 +124,7 @@ public class PostAction extends BaseAction {
                 imgList.add(src);
             }
         }
-        rtopic = recommendDao.get(topicId);
+        rtopic = recommendDao.getByTopicId(topicId);
         if (rtopic == null) {
             rtopic = new Recommendation();
             String description = HtmlUtil.removeAllHTML(text);
@@ -146,11 +157,11 @@ public class PostAction extends BaseAction {
         return SUCCESS;
     }
 
-    @Action(value = "recommendSave", interceptorRefs = {
+    @Action(value = "save", interceptorRefs = {
             @InterceptorRef("tokenSession"),
             @InterceptorRef(value = "fileUpload", params = { "allowedExtensions ", ".gif,.jpg,.png", "allowedTypes",
                     "image/png,image/gif,image/jpeg,image/pjpeg" }), @InterceptorRef("defaultStackIgearbook") }, results = { @Result(name = SUCCESS, location = "/", type = "redirect") })
-    public String recommendSave() {
+    public String save() {
         Topic topic = TopicRepository.getTopic(new Topic(rtopic.getTopicId()));
         if (topic == null) {
             topic = DataAccessDriver.getInstance().newTopicDAO().selectById(rtopic.getTopicId());

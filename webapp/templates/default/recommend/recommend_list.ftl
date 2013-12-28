@@ -8,11 +8,11 @@
 <table width="100%">
     <tr>
         <td align="right">
-        <#assign paginationData><@pagination.doPagination "/post", "manageRecommend", data /></#assign>${paginationData}
+        <#assign paginationData><@pagination.doPagination "/recommend", "manage", data /></#assign>${paginationData}
         </td>
     </tr>
 </table>
-<@s.form namespace="/post" action="deleteRecommend" method="post">
+<@s.form namespace="/recommend" action="delete" method="post">
 <table class="forumline" cellspacing="1" cellpadding="3" width="100%" border="0">
 	<tr align="center">
 	  <th class="thcornerl" nowrap="nowrap">#</th>
@@ -41,7 +41,7 @@
 				<td class="row2"><span class="gen">${r.lastUpdateTime?datetime?string}<br/>by&nbsp;</span>
 				                 <a href="${JForumContext.encodeURL("/user/profile/${r.lastUpdateBy.id}")}">${r.lastUpdateBy.username}</a>
 				</td>
-				<td class="row2"><span class="gen"><a href="<@s.url namespace="/post" action="recommend"><@s.param name="topicId" value="${r.topicId}" /></@s.url>">编辑</a></td>
+				<td class="row2"><span class="gen"><a href="<@s.url namespace="/recommend" action="edit"><@s.param name="topicId" value="${r.topicId}" /></@s.url>">编辑</a></td>
 				<td class="row2"><span class="gen"><@s.checkbox name="selectedRtopics" value="" fieldValue="${r.id}" /></span></td>
 			</tr>
 	</#list>

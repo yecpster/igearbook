@@ -121,7 +121,7 @@
                     </td>
                     <td width="8%" align="left" valign="bottom" nowrap="nowrap">
                        <#if moderator && !topicRecommended>
-                            <a href="${contextPath}/post/recommend.action?topicId=${topic.id}" rel="nofollow" class="icon_recommend nav" target="_blank"><img src="${contextPath}/images/transp.gif" alt="" /></a>
+                            <a href="${contextPath}/recommend/add.action?topicId=${topic.id}" rel="nofollow" class="icon_recommend nav" target="_blank"><img src="${contextPath}/images/transp.gif" alt="" /></a>
                         </#if>
                         <#if topic.status == STATUS_LOCKED>
                             <span class="icon_reply_locked"><img src="${contextPath}/images/transp.gif" alt="" /></span>

@@ -34,7 +34,9 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 
     @Override
     public void delete(final T obj) {
-        getSession().delete(obj);
+        final Session session = getSession();
+        session.delete(obj);
+        session.flush();
     }
 
     @Override
@@ -54,6 +56,6 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
     @Override
     @SuppressWarnings("unchecked")
     public List<T> list() {
-        return getSession().createQuery("from " + type.getSimpleName()).list();
+        return getSession().createCriteria(type).list();
     }
 }

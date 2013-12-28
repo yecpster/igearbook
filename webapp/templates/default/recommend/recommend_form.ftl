@@ -7,9 +7,11 @@
 <script type="text/javascript" src="${contextPath}/templates/${templateName}/js/jquery.js?${startupTime}"></script>
 <#assign isEdit = isEdit?if_exists/>
 
-<@s.form namespace="/post" action="recommendSave" method="post" enctype="multipart/form-data" onsubmit="return checkSubmit()" id="postFrom">
+<@s.form namespace="/recommend" action="save" method="post" enctype="multipart/form-data" onsubmit="return checkSubmit()" id="postFrom">
 <@s.if test="rtopic.getId()!=0">
     <@s.hidden name="rtopic.id" />
+    <@s.hidden name="rtopic.createBy.id" />
+    <@s.hidden name="rtopic.createTime" />
 </@s.if>
 <@s.hidden name="rtopic.topicId" />
 <table cellspacing="0" cellpadding="10" width="100%" align="center" border="0">
