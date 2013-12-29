@@ -84,11 +84,12 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#pendingActivations()
      */
+    @Override
     public List pendingActivations() {
         PreparedStatement p = null;
         ResultSet rs = null;
 
-        List l = new ArrayList();
+        final List l = new ArrayList();
 
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("UserModel.pendingActivations"));
@@ -96,7 +97,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             rs = p.executeQuery();
 
             while (rs.next()) {
-                User user = new User();
+                final User user = new User();
 
                 user.setId(rs.getInt("user_id"));
                 user.setUsername(rs.getString("username"));
@@ -104,7 +105,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
 
                 l.add(user);
             }
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -116,8 +117,9 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#selectById(int)
      */
-    public User selectById(int userId) {
-        String q = SystemGlobals.getSql("UserModel.selectById");
+    @Override
+    public User selectById(final int userId) {
+        final String q = SystemGlobals.getSql("UserModel.selectById");
         PreparedStatement p = null;
         ResultSet rs = null;
 
@@ -126,7 +128,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             p.setInt(1, userId);
 
             rs = p.executeQuery();
-            User u = new User();
+            final User u = new User();
 
             if (rs.next()) {
                 this.fillUserFromResultSet(u, rs);
@@ -141,7 +143,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
 
                 rs = p.executeQuery();
                 while (rs.next()) {
-                    Group g = new Group();
+                    final Group g = new Group();
                     g.setName(rs.getString("group_name"));
                     g.setId(rs.getInt("group_id"));
 
@@ -150,14 +152,15 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             }
 
             return u;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
         }
     }
 
-    public User selectByName(String username) {
+    @Override
+    public User selectByName(final String username) {
         PreparedStatement p = null;
         ResultSet rs = null;
         try {
@@ -173,14 +176,14 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             }
 
             return u;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
         }
     }
 
-    protected void fillUserFromResultSet(User u, ResultSet rs) throws SQLException {
+    protected void fillUserFromResultSet(final User u, final ResultSet rs) throws SQLException {
         u.setAim(rs.getString("user_aim"));
         u.setAvatar(rs.getString("user_avatar"));
         u.setGender(rs.getString("gender"));
@@ -213,21 +216,22 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
         u.setAttachSignatureEnabled(rs.getInt("user_attachsig") == 1);
         u.setMsnm(rs.getString("user_msnm"));
         u.setLang(rs.getString("user_lang"));
-        u.setActive(rs.getInt("user_active"));
+        u.setActive(rs.getInt("user_active")==1);
         u.setKarma(new KarmaStatus(u.getId(), rs.getDouble("user_karma")));
         u.setNotifyPrivateMessagesEnabled(rs.getInt("user_notify_pm") == 1);
-        u.setDeleted(rs.getInt("deleted"));
+        u.setDeleted(rs.getInt("deleted")==1);
         u.setNotifyAlways(rs.getInt("user_notify_always") == 1);
         u.setNotifyText(rs.getInt("user_notify_text") == 1);
 
-        String actkey = rs.getString("user_actkey");
+        final String actkey = rs.getString("user_actkey");
         u.setActivationKey(actkey == null || "".equals(actkey) ? null : actkey);
     }
 
     /**
      * @see net.jforum.dao.UserDAO#delete(int)
      */
-    public void delete(int userId) {
+    @Override
+    public void delete(final int userId) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("UserModel.deletedStatus"));
@@ -235,7 +239,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             p.setInt(2, userId);
 
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -245,7 +249,8 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#update(net.jforum.entities.User)
      */
-    public void update(User user) {
+    @Override
+    public void update(final User user) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("UserModel.update"));
@@ -289,7 +294,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             p.setInt(32, user.getId());
 
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -299,7 +304,8 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#addNew(net.jforum.entities.User)
      */
-    public int addNew(User user) {
+    @Override
+    public int addNew(final User user) {
         PreparedStatement p = null;
         try {
             p = this.getStatementForAutoKeys("UserModel.addNew");
@@ -307,20 +313,20 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             this.initNewUser(user, p);
 
             this.setAutoGeneratedKeysQuery(SystemGlobals.getSql("UserModel.lastGeneratedUserId"));
-            int id = this.executeAutoKeysQuery(p);
+            final int id = this.executeAutoKeysQuery(p);
 
             this.addToGroup(id, new int[] { SystemGlobals.getIntValue(ConfigKeys.DEFAULT_USER_GROUP) });
 
             user.setId(id);
             return id;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
         }
     }
 
-    protected void initNewUser(User user, PreparedStatement p) throws SQLException {
+    protected void initNewUser(final User user, final PreparedStatement p) throws SQLException {
         p.setString(1, user.getUsername());
         p.setString(2, user.getPassword());
         p.setString(3, user.getEmail());
@@ -331,7 +337,8 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#addNewWithId(net.jforum.entities.User)
      */
-    public void addNewWithId(User user) {
+    @Override
+    public void addNewWithId(final User user) {
         PreparedStatement p = null;
         try {
             p = this.getStatementForAutoKeys("UserModel.addNewWithId");
@@ -342,7 +349,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             p.executeUpdate();
 
             this.addToGroup(user.getId(), new int[] { SystemGlobals.getIntValue(ConfigKeys.DEFAULT_USER_GROUP) });
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -352,14 +359,15 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#decrementPosts(int)
      */
-    public void decrementPosts(int userId) {
+    @Override
+    public void decrementPosts(final int userId) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("UserModel.decrementPosts"));
             p.setInt(1, userId);
 
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -369,14 +377,15 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#incrementPosts(int)
      */
-    public void incrementPosts(int userId) {
+    @Override
+    public void incrementPosts(final int userId) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("UserModel.incrementPosts"));
             p.setInt(1, userId);
 
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -386,7 +395,8 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#incrementRanking(int)
      */
-    public void setRanking(int userId, int rankingId) {
+    @Override
+    public void setRanking(final int userId, final int rankingId) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("UserModel.rankingId"));
@@ -394,7 +404,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             p.setInt(2, userId);
 
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -404,7 +414,8 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#setActive(int, boolean)
      */
-    public void setActive(int userId, boolean active) {
+    @Override
+    public void setActive(final int userId, final boolean active) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("UserModel.activeStatus"));
@@ -412,7 +423,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             p.setInt(2, userId);
 
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -422,7 +433,8 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#undelete(int)
      */
-    public void undelete(int userId) {
+    @Override
+    public void undelete(final int userId) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("UserModel.deletedStatus"));
@@ -430,7 +442,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             p.setInt(2, userId);
 
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -440,6 +452,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#selectAll()
      */
+    @Override
     public List selectAll() {
         return selectAll(0, 0);
     }
@@ -447,7 +460,8 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#selectAll(int, int)
      */
-    public List selectAll(int startFrom, int count) {
+    @Override
+    public List selectAll(final int startFrom, final int count) {
         PreparedStatement p = null;
         ResultSet rs = null;
 
@@ -463,7 +477,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             rs = p.executeQuery();
 
             return this.processSelectAll(rs);
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -473,6 +487,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#selectAllWithKarma()
      */
+    @Override
     public List selectAllWithKarma() {
         return this.selectAllWithKarma(0, 0);
     }
@@ -480,15 +495,16 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#selectAllWithKarma(int, int)
      */
-    public List selectAllWithKarma(int startFrom, int count) {
+    @Override
+    public List selectAllWithKarma(final int startFrom, final int count) {
         return this.loadKarma(this.selectAll(startFrom, count));
     }
 
-    protected List processSelectAll(ResultSet rs) throws SQLException {
-        List list = new ArrayList();
+    protected List processSelectAll(final ResultSet rs) throws SQLException {
+        final List list = new ArrayList();
 
         while (rs.next()) {
-            User u = new User();
+            final User u = new User();
 
             u.setEmail(rs.getString("user_email"));
             u.setId(rs.getInt("user_id"));
@@ -496,8 +512,8 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             u.setTotalPosts(rs.getInt("user_posts"));
             u.setRegistrationDate(new Date(rs.getTimestamp("user_regdate").getTime()));
             u.setUsername(rs.getString("username"));
-            u.setDeleted(rs.getInt("deleted"));
-            KarmaStatus karma = new KarmaStatus();
+            u.setDeleted(rs.getInt("deleted")==1);
+            final KarmaStatus karma = new KarmaStatus();
             karma.setKarmaPoints(rs.getInt("user_karma"));
             u.setKarma(karma);
             u.setFrom(rs.getString("user_from"));
@@ -513,7 +529,8 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#selectAllByGroup(int, int, int)
      */
-    public List selectAllByGroup(int groupId, int start, int count) {
+    @Override
+    public List selectAllByGroup(final int groupId, final int start, final int count) {
         PreparedStatement p = null;
         ResultSet rs = null;
         try {
@@ -525,7 +542,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             rs = p.executeQuery();
 
             return this.processSelectAll(rs);
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -535,11 +552,12 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#getLastUserInfo()
      */
+    @Override
     public User getLastUserInfo() {
         PreparedStatement p = null;
         ResultSet rs = null;
         try {
-            User u = new User();
+            final User u = new User();
 
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("UserModel.lastUserRegistered"));
             rs = p.executeQuery();
@@ -549,7 +567,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             u.setId(rs.getInt("user_id"));
 
             return u;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -559,12 +577,13 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#getTotalUsers()
      */
+    @Override
     public int getTotalUsers() {
         PreparedStatement preparedStatement = null;
         try {
             preparedStatement = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("UserModel.totalUsers"));
             return this.getTotalUsersCommon(preparedStatement);
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(preparedStatement);
@@ -574,25 +593,26 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#getTotalUsersByGroup(int)
      */
-    public int getTotalUsersByGroup(int groupId) {
+    @Override
+    public int getTotalUsersByGroup(final int groupId) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("UserModel.totalUsersByGroup"));
             p.setInt(1, groupId);
 
             return this.getTotalUsersCommon(p);
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
         }
     }
 
-    protected int getTotalUsersCommon(PreparedStatement p) throws SQLException {
-        ResultSet rs = p.executeQuery();
+    protected int getTotalUsersCommon(final PreparedStatement p) throws SQLException {
+        final ResultSet rs = p.executeQuery();
         rs.next();
 
-        int total = rs.getInt(1);
+        final int total = rs.getInt(1);
 
         rs.close();
 
@@ -602,7 +622,8 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#isDeleted(int user_id)
      */
-    public boolean isDeleted(int userId) {
+    @Override
+    public boolean isDeleted(final int userId) {
         PreparedStatement p = null;
         ResultSet rs = null;
         try {
@@ -617,7 +638,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             }
 
             return deleted == 1;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -627,7 +648,8 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#isUsernameRegistered(java.lang.String)
      */
-    public boolean isUsernameRegistered(String username) {
+    @Override
+    public boolean isUsernameRegistered(final String username) {
         boolean status = false;
 
         PreparedStatement p = null;
@@ -642,7 +664,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             }
 
             return status;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -653,14 +675,16 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
      * @see net.jforum.dao.UserDAO#validateLogin(java.lang.String,
      *      java.lang.String)
      */
-    public User validateLogin(String username, String password) {
+    @Override
+    public User validateLogin(final String username, final String password) {
         return loginAuthenticator.validateLogin(username, password, null);
     }
 
     /**
      * @see net.jforum.dao.UserDAO#addToGroup(int, int[])
      */
-    public void addToGroup(int userId, int[] groupId) {
+    @Override
+    public void addToGroup(final int userId, final int[] groupId) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("UserModel.addToGroup"));
@@ -670,7 +694,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
                 p.setInt(2, groupId[i]);
                 p.executeUpdate();
             }
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -681,7 +705,8 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#removeFromGroup(int, int[])
      */
-    public void removeFromGroup(int userId, int[] groupId) {
+    @Override
+    public void removeFromGroup(final int userId, final int[] groupId) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("UserModel.removeFromGroup"));
@@ -691,7 +716,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
                 p.setInt(2, groupId[i]);
                 p.executeUpdate();
             }
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -702,14 +727,15 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
      * @see net.jforum.dao.UserDAO#saveNewPassword(java.lang.String,
      *      java.lang.String)
      */
-    public void saveNewPassword(String password, String email) {
+    @Override
+    public void saveNewPassword(final String password, final String email) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("UserModel.saveNewPassword"));
             p.setString(1, password);
             p.setString(2, email);
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -720,7 +746,8 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
      * @see net.jforum.dao.UserDAO#validateLostPasswordHash(java.lang.String,
      *      java.lang.String)
      */
-    public boolean validateLostPasswordHash(String email, String hash) {
+    @Override
+    public boolean validateLostPasswordHash(final String email, final String hash) {
         PreparedStatement p = null;
         ResultSet rs = null;
         try {
@@ -738,7 +765,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             }
 
             return status;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -749,14 +776,15 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
      * @see net.jforum.dao.UserDAO#writeLostPasswordHash(java.lang.String,
      *      java.lang.String)
      */
-    public void writeLostPasswordHash(String email, String hash) {
+    @Override
+    public void writeLostPasswordHash(final String email, final String hash) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("UserModel.writeLostPasswordHash"));
             p.setString(1, hash);
             p.setString(2, email);
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -766,7 +794,8 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#getUsernameByEmail(java.lang.String)
      */
-    public String getUsernameByEmail(String email) {
+    @Override
+    public String getUsernameByEmail(final String email) {
         PreparedStatement p = null;
         ResultSet rs = null;
         try {
@@ -781,7 +810,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             }
 
             return username;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -791,8 +820,9 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#findByName(java.lang.String, boolean)
      */
-    public List findByName(String input, boolean exactMatch) {
-        List namesList = new ArrayList();
+    @Override
+    public List findByName(final String input, final boolean exactMatch) {
+        final List namesList = new ArrayList();
 
         PreparedStatement p = null;
         ResultSet rs = null;
@@ -802,17 +832,17 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
 
             rs = p.executeQuery();
             while (rs.next()) {
-                User u = new User();
+                final User u = new User();
 
                 u.setId(rs.getInt("user_id"));
                 u.setUsername(rs.getString("username"));
                 u.setEmail(rs.getString("user_email"));
-                u.setDeleted(rs.getInt("deleted"));
+                u.setDeleted(rs.getInt("deleted")==1);
 
                 namesList.add(u);
             }
             return namesList;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -823,7 +853,8 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
      * @see net.jforum.dao.UserDAO#validateActivationKeyHash(int,
      *      java.lang.String)
      */
-    public boolean validateActivationKeyHash(int userId, String hash) {
+    @Override
+    public boolean validateActivationKeyHash(final int userId, final String hash) {
         PreparedStatement p = null;
         ResultSet rs = null;
         try {
@@ -839,7 +870,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             }
 
             return status;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -849,13 +880,14 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#writeUserActive(int)
      */
-    public void writeUserActive(int userId) {
+    @Override
+    public void writeUserActive(final int userId) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("UserModel.writeUserActive"));
             p.setInt(1, userId);
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -865,14 +897,15 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#updateUsername(int, String)
      */
-    public void updateUsername(int userId, String username) {
+    @Override
+    public void updateUsername(final int userId, final String username) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("UserModel.updateUsername"));
             p.setString(1, username);
             p.setInt(2, userId);
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -882,7 +915,8 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#hasUsernameChanged(int, java.lang.String)
      */
-    public boolean hasUsernameChanged(int userId, String usernameToCheck) {
+    @Override
+    public boolean hasUsernameChanged(final int userId, final String usernameToCheck) {
         PreparedStatement p = null;
         ResultSet rs = null;
         try {
@@ -904,7 +938,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             }
 
             return status;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -919,11 +953,11 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
      * @return List
      * @throws SQLException
      */
-    protected List loadKarma(List users) {
-        List result = new ArrayList(users.size());
+    protected List loadKarma(final List users) {
+        final List result = new ArrayList(users.size());
 
-        for (Iterator iter = users.iterator(); iter.hasNext();) {
-            User user = (User) iter.next();
+        for (final Iterator iter = users.iterator(); iter.hasNext();) {
+            final User user = (User) iter.next();
 
             // Load Karma
             DataAccessDriver.getInstance().newKarmaDAO().getUserTotalKarma(user);
@@ -936,14 +970,15 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#saveUserAuthHash(int, java.lang.String)
      */
-    public void saveUserAuthHash(int userId, String hash) {
+    @Override
+    public void saveUserAuthHash(final int userId, final String hash) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("UserModel.saveUserAuthHash"));
             p.setString(1, hash);
             p.setInt(2, userId);
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -953,7 +988,8 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#getUserAuthHash(int)
      */
-    public String getUserAuthHash(int userId) {
+    @Override
+    public String getUserAuthHash(final int userId) {
         PreparedStatement p = null;
         ResultSet rs = null;
         try {
@@ -968,7 +1004,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             }
 
             return hash;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -978,7 +1014,8 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
     /**
      * @see net.jforum.dao.UserDAO#findByEmail(java.lang.String)
      */
-    public User findByEmail(String email) {
+    @Override
+    public User findByEmail(final String email) {
         PreparedStatement p = null;
         ResultSet rs = null;
 
@@ -993,7 +1030,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
                 u = new User();
                 fillUserFromResultSet(u, rs);
             }
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);

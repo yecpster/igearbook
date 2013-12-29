@@ -47,12 +47,23 @@ package net.jforum.entities;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 /**
  * Represents a group in the system.
  * 
  * @author Rafael Steil
  */
+@Entity
+@Table(name = "jforum_groups")
 public class Group implements Serializable {
+    private static final long serialVersionUID = 3669202193784949447L;
     private int id;
     private int type = 0;// group_type: 0 - user group, 1 - entitlement group
     private int parentId;
@@ -77,14 +88,14 @@ public class Group implements Serializable {
      * @param description
      *            The Group Description
      **/
-    public Group(int id, int parentId, String name, String description) {
+    public Group(final int id, final int parentId, final String name, final String description) {
         setName(name);
         setId(id);
         setParentId(parentId);
         setDescription(description);
     }
 
-    public Group(int id, int type, int parentId, String name, String description) {
+    public Group(final int id, final int type, final int parentId, final String name, final String description) {
         setName(name);
         setId(id);
         setType(type);
@@ -95,13 +106,14 @@ public class Group implements Serializable {
     /**
      * @return String
      */
+    @Transient
     public String getDescription() {
         return this.description;
     }
 
-    /**
-     * @return int
-     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "group_id")
     public int getId() {
         return this.id;
     }
@@ -109,21 +121,21 @@ public class Group implements Serializable {
     /**
      * @return int
      */
+    @Transient
     public int getParentId() {
         return this.parentId;
     }
 
+    @Transient
     public int getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(final int type) {
         this.type = type;
     }
 
-    /**
-     * @return String
-     */
+    @Transient
     public String getName() {
         return this.name;
     }
@@ -134,7 +146,7 @@ public class Group implements Serializable {
      * @param description
      *            The description to set
      */
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 
@@ -144,7 +156,7 @@ public class Group implements Serializable {
      * @param id
      *            The id to set
      */
-    public void setId(int id) {
+    public void setId(final int id) {
         this.id = id;
     }
 
@@ -154,7 +166,7 @@ public class Group implements Serializable {
      * @param id
      *            The parent id to set
      */
-    public void setParentId(int parentId) {
+    public void setParentId(final int parentId) {
         this.parentId = parentId;
     }
 
@@ -164,14 +176,16 @@ public class Group implements Serializable {
      * @param name
      *            The name to set
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
     /*
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    public boolean equals(Object o) {
+    @Override
+    @Transient
+    public boolean equals(final Object o) {
         if (!(o instanceof Group)) {
             return false;
         }
@@ -182,6 +196,8 @@ public class Group implements Serializable {
     /*
      * @see java.lang.Object#hashCode()
      */
+    @Override
+    @Transient
     public int hashCode() {
         return this.id;
     }
@@ -189,6 +205,8 @@ public class Group implements Serializable {
     /*
      * @see java.lang.Object#toString()
      */
+    @Override
+    @Transient
     public String toString() {
         return this.name + " - " + this.id;
     }

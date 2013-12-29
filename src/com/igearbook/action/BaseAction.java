@@ -39,16 +39,16 @@ public abstract class BaseAction extends ActionSupport {
     protected PaginationParams getPaginationParams() {
         final PaginationParams params = new PaginationParams();
         params.setStart(this.getStart());
-        final Map<String, Object> webParams = ActionContext.getContext().getParameters();
+        final Map<String, Object> rqParams = ActionContext.getContext().getParameters();
         // PropertyUtils.isReadable(bean, name)
-        final Map<String, Object> queryParams = Maps.newHashMap();
-        for (final Entry<String, Object> entry : webParams.entrySet()) {
+        final Map<String, Object> webParams = Maps.newHashMap();
+        for (final Entry<String, Object> entry : rqParams.entrySet()) {
             if ("start".equals(entry.getKey())) {
                 continue;
             }
-            queryParams.put(entry.getKey(), entry.getValue());
+            webParams.put(entry.getKey(), entry.getValue());
         }
-        params.setQueryParams(queryParams);
+        params.setWebParams(webParams);
         return params;
     }
 }

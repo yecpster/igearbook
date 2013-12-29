@@ -68,7 +68,7 @@ public class SSOUtils
 	 * @see #register(String, String)
 	 * @see #getUser()
 	 */
-	public boolean userExists(String username)
+	public boolean userExists(final String username)
 	{
 		this.username = username;
 		this.dao = DataAccessDriver.getInstance().newUserDAO();
@@ -89,7 +89,7 @@ public class SSOUtils
 	 * @param email the user's email
 	 * @see #getUser()
 	 */
-	public void register(String password, String email)
+	public void register(final String password, final String email)
 	{
 		if (this.exists) {
 			return;
@@ -100,7 +100,7 @@ public class SSOUtils
 		user.setUsername(this.username);
 		user.setPassword(password);
 		user.setEmail(email);
-		user.setActive(1);
+		user.setActive(true);
 		
 		this.dao.addNew(user);
 	}

@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -51,8 +52,13 @@ import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Namespace;
 import org.apache.struts2.convention.annotation.Result;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.igearbook.dao.UserDao;
+import com.igearbook.entities.PaginationData;
+import com.igearbook.entities.PaginationParams;
 import com.igearbook.util.DateUtil;
 import com.igearbook.util.ImageHelper;
 import com.opensymphony.xwork2.ActionContext;
@@ -78,6 +84,13 @@ public class TeamAction extends BaseAction {
     private String uploadContentType;
 
     private String uploadFileName;
+
+    @Autowired
+    private UserDao userDao;
+
+    public void setUserDao(final UserDao userDao) {
+        this.userDao = userDao;
+    }
 
     @Action(value = "list", results = { @Result(name = SUCCESS, location = "team_list.ftl") })
     public String list() {
@@ -300,6 +313,31 @@ public class TeamAction extends BaseAction {
         return SUCCESS;
     }
 
+    @Action(value = "members", results = { @Result(name = SUCCESS, location = "team_members.ftl") })
+    public String members() {
+        final ActionContext context = ServletActionContext.getContext();
+        final GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
+
+        // The user can access this team?
+        final Forum team = ForumRepository.getForum(teamId);
+
+        if (team == null || team.getType() != 1 || !ForumRepository.isCategoryAccessible(team.getCategoryId())) {
+            new ModerationHelper().denied(I18n.getMessage("ForumListing.denied"));
+            return ERROR;
+        }
+
+        context.put("team", team);
+
+        final Group teamUserGorup = groupDao.getEntitlementGroup(SecurityConstants.PERM_TEAMFORUM_USER, teamId);
+        final PaginationParams paginationParams = getPaginationParams();
+        final Map<String, Object> queryParams = Maps.newHashMap();
+        queryParams.put("groupId", teamUserGorup.getId());
+        paginationParams.setQueryParams(queryParams);
+        final PaginationData<User> pgData = userDao.listByGroup(paginationParams);
+        context.put("pgData", pgData);
+        return SUCCESS;
+    }
+
     @Action(value = "show", results = { @Result(name = SUCCESS, location = "team_show.ftl") })
     public String show() {
         final ActionContext context = ServletActionContext.getContext();
@@ -415,8 +453,8 @@ public class TeamAction extends BaseAction {
         }
     }
 
-    @Action(value = "saveAnnounce", interceptorRefs = { @InterceptorRef("tokenSession"), @InterceptorRef("defaultStackIgearbook") }, results = { @Result(name = SUCCESS, location = "show.action", type = "redirect", params = {
-            "teamId", "${teamId}" }) })
+    @Action(value = "saveAnnounce", interceptorRefs = { @InterceptorRef("tokenSession"), @InterceptorRef("defaultStackIgearbook") },
+            results = { @Result(name = SUCCESS, location = "show.action", type = "redirect", params = { "teamId", "${teamId}" }) })
     public String saveAnnounce() {
         teamId = team.getId();
         final boolean canEditTeam = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
@@ -608,7 +646,8 @@ public class TeamAction extends BaseAction {
     @Action(value = "save", interceptorRefs = {
             @InterceptorRef("tokenSession"),
             @InterceptorRef(value = "fileUpload", params = { "allowedExtensions ", ".gif,.jpg,.png", "allowedTypes",
-                    "image/png,image/gif,image/jpeg,image/pjpeg" }), @InterceptorRef("defaultStackIgearbook") }, results = { @Result(name = SUCCESS, location = "/team/list.action", type = "redirect") })
+                    "image/png,image/gif,image/jpeg,image/pjpeg" }), @InterceptorRef("defaultStackIgearbook") }, results = { @Result(name = SUCCESS,
+            location = "/team/list.action", type = "redirect") })
     public String save() {
         if (team.getId() == 0) {
             return createSave();

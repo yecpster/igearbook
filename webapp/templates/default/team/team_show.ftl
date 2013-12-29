@@ -159,7 +159,7 @@
     </div>
     
     
-    <div class="more"><a href="#">&gt;&gt;更多成员</a></div>
+    <div class="more"><a href="<@s.url namespace="/team" action="members"><@s.param name="teamId" value="${team.id}" /></@s.url>">&gt;&gt;更多成员</a></div>
     <div id="latest_members">
       <h3>群组成员</h3>
       

@@ -5,6 +5,7 @@ import java.util.Map;
 public class PaginationParams {
     private int start;
     private int recordsPerPage = 12;
+    private Map<String, Object> webParams;
     private Map<String, Object> queryParams;
 
     public int getStart() {
@@ -29,6 +30,14 @@ public class PaginationParams {
 
     public void setQueryParams(final Map<String, Object> queryParams) {
         this.queryParams = queryParams;
+    }
+
+    public Map<String, Object> getWebParams() {
+        return webParams;
+    }
+
+    public void setWebParams(final Map<String, Object> webParams) {
+        this.webParams = webParams;
     }
 
 }

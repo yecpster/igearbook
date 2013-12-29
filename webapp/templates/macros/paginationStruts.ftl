@@ -15,6 +15,9 @@
 			             <#if (start > 0)>
 			             <@s.param name="start" value="${start}" />
 			             </#if>
+			             <#list data.webParams?keys as key>
+                            <@s.param name="${key}" value="${data.webParams[key]}" />
+                         </#list>
 			         </@s.url>">
 			             &#9668;
 			</a>
@@ -78,6 +81,9 @@
                          <#if (start > 0)>
                          <@s.param name="start" value="${start}" />
                          </#if>
+                         <#list data.webParams?keys as key>
+                            <@s.param name="${key}" value="${data.webParams[key]}" />
+                         </#list>
                      </@s.url>">&#9658;</a>
 		</#if>
 
@@ -96,6 +102,9 @@
                                      <#if (start > 0)>
                                      <@s.param name="start" value="${start}" />
                                      </#if>
+                                     <#list data.webParams?keys as key>
+                                        <@s.param name="${key}" value="${data.webParams[key]}" />
+                                      </#list>
                                </@s.url>">${page}</a></#assign>
 	<#else>
 		<#assign link><span class="current">${page}</span></#assign>

@@ -50,11 +50,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -63,6 +68,8 @@ import net.jforum.repository.SecurityRepository;
 import net.jforum.security.SecurityConstants;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
+
+import org.hibernate.annotations.Type;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -119,9 +126,10 @@ public class User implements Serializable {
     private List<Group> groupsList;
     private int privateMessagesCount;
     private KarmaStatus karma;
-    private int active;
+    private double karmaColumn;
+    private boolean active;
     private String activationKey;
-    private int deleted;
+    private boolean deleted;
     private String firstName;
     private String lastName;
     private final Map<String, Object> extra = Maps.newHashMap();
@@ -176,12 +184,13 @@ public class User implements Serializable {
         return this.firstName + " " + this.lastName;
     }
 
-    @Transient
+    @Column(name = "deleted", columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     public boolean isDeleted() {
-        return this.deleted == 1;
+        return this.deleted;
     }
 
-    public void setDeleted(final int deleted) {
+    public void setDeleted(final boolean deleted) {
         this.deleted = deleted;
     }
 
@@ -190,7 +199,7 @@ public class User implements Serializable {
         return this.aim;
     }
 
-    @Transient
+    @Column(name = "user_avatar")
     public String getAvatar() {
         return this.avatar;
     }
@@ -210,12 +219,12 @@ public class User implements Serializable {
         return this.dateFormat;
     }
 
-    @Transient
+    @Column(name = "user_email")
     public String getEmail() {
         return this.email;
     }
 
-    @Transient
+    @Column(name = "user_from")
     public String getFrom() {
         return this.from;
     }
@@ -265,7 +274,7 @@ public class User implements Serializable {
         return this.occupation;
     }
 
-    @Transient
+    @Column(name = "user_password")
     public String getPassword() {
         return this.password;
     }
@@ -280,10 +289,14 @@ public class User implements Serializable {
         return this.rankId;
     }
 
-    @Transient
-    public String getRegistrationDate() {
-        final SimpleDateFormat df = new SimpleDateFormat(SystemGlobals.getValue(ConfigKeys.DATE_TIME_FORMAT));
+    @Column(name = "user_regdate")
+    public Date getRegistrationDate() {
+        return registrationDate;
+    }
 
+    @Transient
+    public String getRegDateString() {
+        final SimpleDateFormat df = new SimpleDateFormat(SystemGlobals.getValue(ConfigKeys.DATE_TIME_FORMAT));
         return df.format(this.registrationDate);
     }
 
@@ -312,7 +325,7 @@ public class User implements Serializable {
      * 
      * @return int value with the total of messages
      */
-    @Transient
+    @Column(name = "user_posts")
     public int getTotalPosts() {
         return this.totalPosts;
     }
@@ -332,7 +345,7 @@ public class User implements Serializable {
         return this.viewOnlineEnabled;
     }
 
-    @Transient
+    @Column(name = "user_website")
     public String getWebSite() {
         return this.webSite;
     }
@@ -347,9 +360,10 @@ public class User implements Serializable {
      * 
      * @return integer 1 if true
      */
-    @Transient
+    @Column(name = "user_active", columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     public boolean isActive() {
-        return this.active == 1;
+        return active;
     }
 
     /**
@@ -709,7 +723,8 @@ public class User implements Serializable {
     /**
      * @return
      */
-    @Transient
+    @Column(name = "user_viewemail", columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     public boolean isViewEmailEnabled() {
         return this.viewEmailEnabled;
     }
@@ -736,12 +751,15 @@ public class User implements Serializable {
         this.attachSignatureEnabled = b;
     }
 
-    /**
-     * @return
-     */
-    @Transient
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinTable(name = "jforum_user_groups", joinColumns = { @JoinColumn(name = "user_id", nullable = false, updatable = false) },
+            inverseJoinColumns = { @JoinColumn(name = "group_id", nullable = false, updatable = false) })
     public List<Group> getGroupsList() {
         return this.groupsList;
+    }
+
+    public void setGroupsList(final List<Group> groupsList) {
+        this.groupsList = groupsList;
     }
 
     /**
@@ -770,7 +788,7 @@ public class User implements Serializable {
     /**
      * Set when user authenticates his email after user registration
      */
-    public void setActive(final int active) {
+    public void setActive(final boolean active) {
         this.active = active;
     }
 
@@ -785,6 +803,18 @@ public class User implements Serializable {
     @Transient
     public KarmaStatus getKarma() {
         return this.karma;
+    }
+
+    @Column(name = "user_karma")
+    public double getKarmaColumn() {
+        return karmaColumn;
+    }
+
+    public void setKarmaColumn(final double karmaColumn) {
+        final KarmaStatus karmaStatus = new KarmaStatus();
+        karmaStatus.setKarmaPoints(karmaColumn);
+        setKarma(karma);
+        this.karmaColumn = karmaColumn;
     }
 
     /**

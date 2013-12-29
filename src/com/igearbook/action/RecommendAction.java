@@ -31,8 +31,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.igearbook.common.ImageCommon;
 import com.igearbook.constant.ImageSize;
-import com.igearbook.dao.CommonDao;
-import com.igearbook.dao.CommonDaoImpl;
 import com.igearbook.dao.RecommendDao;
 import com.igearbook.entities.ImageVo;
 import com.igearbook.entities.PaginationData;
@@ -67,8 +65,6 @@ public class RecommendAction extends BaseAction {
         if (!canEdit) {
             return ERROR;
         }
-        final CommonDao commonDao=new CommonDaoImpl();
-        commonDao.add(rtopic);
         data = recommendDao.doPagination(getPaginationParams());
         return SUCCESS;
     }
