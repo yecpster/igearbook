@@ -10,7 +10,9 @@
   <div class="crumbs">
     <a href="${contextPath}/team/list.action">群组首页</a>
     <span class="arrow">→</span>
+    <a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${teamId}" /></@s.url>">
     ${team.name?html}
+    </a>
     <span class="arrow">→</span>
                 成员列表
   </div>
