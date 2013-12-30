@@ -132,11 +132,9 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 
     private <P> void enrichParams(final PaginationData<P> paginationData, final PaginationParams params) {
         final Map<String, String> webParams = Maps.newHashMap();
-        final Map<String, Object> queryParams = Maps.newHashMap();
         for (final Entry<String, Object> entry : params.getWebParams().entrySet()) {
             final String key = entry.getKey();
             final Object value = entry.getValue();
-            queryParams.put(key, value);
             if (value instanceof Object[]) {
                 final Object[] valueArray = (Object[]) value;
                 if (valueArray.length == 1) {
@@ -148,13 +146,10 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
                 webParams.put(key, value.toString());
             }
         }
-        if (params.getQueryParams() == null) {
-            params.setQueryParams(queryParams);
-        }
         paginationData.setWebParams(webParams);
     }
 
-    private BigDecimal getTotalRecords(final String hql, final PaginationParams params) {
+    protected BigDecimal getTotalRecords(final String hql, final PaginationParams params) {
         String countHql = hql;
         final Matcher selectMatcher = SELECT_REGEX.matcher(hql);
         if (selectMatcher.find()) {
@@ -163,17 +158,22 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
             countHql = "select count(*) " + hql;
         }
         final Query query = getSession().createQuery(countHql);
-        for (final Entry<String, Object> entry : params.getQueryParams().entrySet()) {
-            query.setParameter(entry.getKey(), entry.getValue());
+        if (params.getQueryParams() != null) {
+            for (final Entry<String, Object> entry : params.getQueryParams().entrySet()) {
+                query.setParameter(entry.getKey(), entry.getValue());
+            }
         }
+
         final Long count = (Long) query.uniqueResult();
         return BigDecimal.valueOf(count);
     }
 
-    private <P> BigDecimal getTotalRecords(final Class<P> theClass, final PaginationParams params) {
+    protected <P> BigDecimal getTotalRecords(final Class<P> theClass, final PaginationParams params) {
         final Criteria criteria = getSession().createCriteria(theClass);
-        for (final Entry<String, Object> entry : params.getQueryParams().entrySet()) {
-            criteria.add(Restrictions.eq(entry.getKey(), entry.getValue()));
+        if (params.getQueryParams() != null) {
+            for (final Entry<String, Object> entry : params.getQueryParams().entrySet()) {
+                criteria.add(Restrictions.eq(entry.getKey(), entry.getValue()));
+            }
         }
         final Long count = (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
         return BigDecimal.valueOf(count);
