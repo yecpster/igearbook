@@ -54,105 +54,101 @@ import net.jforum.repository.Tpl;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
 import net.jforum.util.preferences.TemplateKeys;
+
+import org.springframework.context.ApplicationContext;
+
 import freemarker.template.SimpleHash;
 import freemarker.template.Template;
 
 /**
- * <code>Command</code> Pattern implementation.
- * All View Helper classes, which are intead to configure and processs
- * presentation actions must extend this class. 
+ * <code>Command</code> Pattern implementation. All View Helper classes, which are intead to configure and processs presentation actions must extend
+ * this class.
  * 
  * @author Rafael Steil
  * @version $Id: Command.java,v 1.27 2007/07/28 14:17:11 rafaelsteil Exp $
  */
-public abstract class Command 
-{
-	private static Class[] NO_ARGS_CLASS = new Class[0];
-	private static Object[] NO_ARGS_OBJECT = new Object[0];
-	
-	private boolean ignoreAction;
-	
-	protected String templateName;
-	protected RequestContext request;
-	protected ResponseContext response;
-	protected SimpleHash context;
-	
-	protected void setTemplateName(String templateName)
-	{
-		this.templateName = Tpl.name(templateName);
-	}
-	
-	protected void ignoreAction()
-	{
-		this.ignoreAction = true;
-	}
-	
-	/**
-	 * Base method for listings. 
-	 * May be used as general listing or as helper
-	 * to another specialized type of listing. Subclasses
-	 * must implement it to the cases where some invalid
-	 * action is called ( which means that the exception will
-	 * be caught and the general listing will be used )
-	 */
-	public abstract void list() ;
-	
-	/**
-	 * Process and manipulate a requisition.
-	 * @return <code>Template</code> reference
-     * @param request WebContextRequest
-     * @param response WebContextResponse
-	 */
-	public Template process(RequestContext request, ResponseContext response, SimpleHash context)
-	{
-		this.request = request;
-		this.response = response;
-		this.context = context;
-		
-		String action = this.request.getAction();
+public abstract class Command {
+    private static Class[] NO_ARGS_CLASS = new Class[0];
+    private static Object[] NO_ARGS_OBJECT = new Object[0];
 
-		if (!this.ignoreAction) {
-			try {
-				this.getClass().getMethod(action, NO_ARGS_CLASS).invoke(this, NO_ARGS_OBJECT);
-			}
-			catch (NoSuchMethodException e) {
-			    try {
+    private boolean ignoreAction;
+
+    protected String templateName;
+    protected RequestContext request;
+    protected ResponseContext response;
+    protected SimpleHash context;
+    protected ApplicationContext appContext;
+    
+    public void setAppContext(final ApplicationContext appContext) {
+        this.appContext = appContext;
+    }
+
+    protected void setTemplateName(final String templateName) {
+        this.templateName = Tpl.name(templateName);
+    }
+
+    protected void ignoreAction() {
+        this.ignoreAction = true;
+    }
+
+    /**
+     * Base method for listings. May be used as general listing or as helper to another specialized type of listing. Subclasses must implement it to
+     * the cases where some invalid action is called ( which means that the exception will be caught and the general listing will be used )
+     */
+    public abstract void list();
+
+    /**
+     * Process and manipulate a requisition.
+     * 
+     * @return <code>Template</code> reference
+     * @param request
+     *            WebContextRequest
+     * @param response
+     *            WebContextResponse
+     */
+    public Template process(final RequestContext request, final ResponseContext response, final SimpleHash context) {
+        this.request = request;
+        this.response = response;
+        this.context = context;
+
+        final String action = this.request.getAction();
+
+        if (!this.ignoreAction) {
+            try {
+                this.getClass().getMethod(action, NO_ARGS_CLASS).invoke(this, NO_ARGS_OBJECT);
+            } catch (final NoSuchMethodException e) {
+                try {
                     JForumExecutionContext.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
-                } catch (IOException e1) {
+                } catch (final IOException e1) {
                     throw new ForumException(e1);
                 }
                 // context.put("action", "list");
                 // request.addOrReplaceParameter("action", "list");
-				this.list();		
-			}
-			catch (Exception e)
-            {
+                this.list();
+            } catch (final Exception e) {
                 throw new ForumException(e);
-			}
-		}
-		
-		if (JForumExecutionContext.getRedirectTo() != null) {
-			this.setTemplateName(TemplateKeys.EMPTY);
-		}
-		else if (request.getAttribute("template") != null) {
-			this.setTemplateName((String)request.getAttribute("template"));
-		}
-		
-		if (JForumExecutionContext.isCustomContent()) {
-			return null;
-		}
-		
-		if (this.templateName == null) {
-			throw new TemplateNotFoundException("Template for action " + action + " is not defined");
-		}
+            }
+        }
+
+        if (JForumExecutionContext.getRedirectTo() != null) {
+            this.setTemplateName(TemplateKeys.EMPTY);
+        } else if (request.getAttribute("template") != null) {
+            this.setTemplateName((String) request.getAttribute("template"));
+        }
+
+        if (JForumExecutionContext.isCustomContent()) {
+            return null;
+        }
+
+        if (this.templateName == null) {
+            throw new TemplateNotFoundException("Template for action " + action + " is not defined");
+        }
 
         try {
             return JForumExecutionContext.templateConfig().getTemplate(
-                new StringBuffer(SystemGlobals.getValue(ConfigKeys.TEMPLATE_DIR)).
-                append('/').append(this.templateName).toString());
-        }
-        catch (IOException e) {
-            throw new ForumException( e);
+                    new StringBuffer(SystemGlobals.getValue(ConfigKeys.TEMPLATE_DIR)).append('/').append(this.templateName).toString());
+        } catch (final IOException e) {
+            throw new ForumException(e);
         }
     }
 }

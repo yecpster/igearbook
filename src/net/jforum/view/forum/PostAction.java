@@ -99,7 +99,6 @@ import net.jforum.view.forum.common.TopicsCommon;
 import net.jforum.view.forum.common.ViewCommon;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.igearbook.dao.RecommendDao;
 import com.igearbook.entities.Recommendation;
@@ -113,14 +112,12 @@ import freemarker.template.SimpleHash;
  */
 public class PostAction extends Command {
     Pattern IMGPT = Pattern.compile("<img\\s*src\\s*=\\s*\"(.*?)\"", Pattern.CASE_INSENSITIVE);
-    @Autowired
-    private RecommendDao recommendDao;
-
-    public void setRecommendDao(final RecommendDao recommendDao) {
-        this.recommendDao = recommendDao;
-    }
 
     public PostAction() {
+    }
+
+    private RecommendDao getRecommendDao() {
+        return appContext.getBean(RecommendDao.class);
     }
 
     public PostAction(final RequestContext request, final SimpleHash templateContext) {
@@ -215,7 +212,7 @@ public class PostAction extends Command {
             userVotes = DataAccessDriver.getInstance().newKarmaDAO().getUserVotes(topic.getId(), us.getUserId());
         }
 
-        final Recommendation recommend = recommendDao.getByTopicId(topicId);
+        final Recommendation recommend = getRecommendDao().getByTopicId(topicId);
 
         this.setTemplateName(TemplateKeys.POSTS_LIST);
         this.context.put("attachmentsEnabled", pc.canAccess(SecurityConstants.PERM_ATTACHMENTS_ENABLED, Integer.toString(topic.getForumId())));

@@ -70,6 +70,10 @@ import net.jforum.repository.SmiliesRepository;
 import net.jforum.util.I18n;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
 import freemarker.template.SimpleHash;
 import freemarker.template.Template;
 
@@ -82,27 +86,30 @@ import freemarker.template.Template;
 public class JForum extends JForumBaseServlet {
     private static final long serialVersionUID = 7160936607198716279L;
     private static boolean isDatabaseUp;
+    private ApplicationContext appContext ;
 
     /**
      * @see javax.servlet.Servlet#init(javax.servlet.ServletConfig)
      */
-    public void init(ServletConfig config) throws ServletException {
+    @Override
+    public void init(final ServletConfig config) throws ServletException {
         super.init(config);
         super.startApplication();
+        appContext = WebApplicationContextUtils.getWebApplicationContext(config.getServletContext());
 
         // Start database
         isDatabaseUp = ForumStartup.startDatabase();
 
         try {
-            Connection conn = DBConnection.getImplementation().getConnection();
+            final Connection conn = DBConnection.getImplementation().getConnection();
             conn.setAutoCommit(!SystemGlobals.getBoolValue(ConfigKeys.DATABASE_USE_TRANSACTIONS));
 
             // Try to fix some MySQL problems
-            MySQLVersionWorkarounder dw = new MySQLVersionWorkarounder();
+            final MySQLVersionWorkarounder dw = new MySQLVersionWorkarounder();
             dw.handleWorkarounds(conn);
 
             // Continues loading the forum
-            JForumExecutionContext ex = JForumExecutionContext.get();
+            final JForumExecutionContext ex = JForumExecutionContext.get();
             ex.setConnection(conn);
             JForumExecutionContext.set(ex);
 
@@ -111,7 +118,7 @@ public class JForum extends JForumBaseServlet {
             RankingRepository.loadRanks();
             SmiliesRepository.loadSmilies();
             BanlistRepository.loadBanlist();
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
             e.printStackTrace();
             throw new ForumStartupException("Error while starting jforum", e);
         } finally {
@@ -123,16 +130,17 @@ public class JForum extends JForumBaseServlet {
      * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
      */
-    public void service(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+    @Override
+    public void service(final HttpServletRequest req, final HttpServletResponse res) throws IOException, ServletException {
         Writer out = null;
         JForumContext forumContext = null;
         RequestContext request = null;
         ResponseContext response = null;
-        String encoding = SystemGlobals.getValue(ConfigKeys.ENCODING);
+        final String encoding = SystemGlobals.getValue(ConfigKeys.ENCODING);
 
         try {
             // Initializes the execution context
-            JForumExecutionContext ex = JForumExecutionContext.get();
+            final JForumExecutionContext ex = JForumExecutionContext.get();
 
             request = new WebRequestContext(req);
             response = new WebResponseContext(res);
@@ -145,9 +153,9 @@ public class JForum extends JForumBaseServlet {
             JForumExecutionContext.set(ex);
 
             // Setup stuff
-            SimpleHash context = JForumExecutionContext.getTemplateContext();
+            final SimpleHash context = JForumExecutionContext.getTemplateContext();
 
-            ControllerUtils utils = new ControllerUtils();
+            final ControllerUtils utils = new ControllerUtils();
             utils.refreshSession();
 
             context.put("logged", SessionFacade.isLogged());
@@ -157,7 +165,7 @@ public class JForum extends JForumBaseServlet {
 
             utils.prepareTemplateContext(context, forumContext);
 
-            String module = request.getModule();
+            final String module = request.getModule();
 
             // Gets the module class name
             String moduleClass = module != null ? ModulesRepository.getModuleClass(module) : null;
@@ -166,7 +174,7 @@ public class JForum extends JForumBaseServlet {
                 // Module not found, send 404 not found response
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             } else {
-                boolean shouldBan = this.shouldBan(request.getRemoteAddr());
+                final boolean shouldBan = this.shouldBan(request.getRemoteAddr());
 
                 if (!shouldBan) {
                     context.put("moduleName", module);
@@ -188,18 +196,19 @@ public class JForum extends JForumBaseServlet {
                     out = this.processCommand(out, request, response, encoding, context, moduleClass);
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             this.handleException(out, response, encoding, e, request);
         } finally {
             this.handleFinally(out, forumContext, response);
         }
     }
 
-    private Writer processCommand(Writer out, RequestContext request, ResponseContext response, String encoding, SimpleHash context,
-            String moduleClass) throws Exception {
+    private Writer processCommand(Writer out, final RequestContext request, final ResponseContext response, final String encoding, final SimpleHash context,
+            final String moduleClass) throws Exception {
         // Here we go, baby
-        Command c = this.retrieveCommand(moduleClass);
-        Template template = c.process(request, response, context);
+        final Command c = this.retrieveCommand(moduleClass);
+        c.setAppContext(appContext);
+        final Template template = c.process(request, response, context);
 
         if (JForumExecutionContext.getRedirectTo() == null) {
             String contentType = JForumExecutionContext.getContentType();
@@ -233,16 +242,16 @@ public class JForum extends JForumBaseServlet {
         }
     }
 
-    private void handleFinally(Writer out, JForumContext forumContext, ResponseContext response) throws IOException {
+    private void handleFinally(final Writer out, final JForumContext forumContext, final ResponseContext response) throws IOException {
         try {
             if (out != null) {
                 out.close();
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // catch close error
         }
 
-        String redirectTo = JForumExecutionContext.getRedirectTo();
+        final String redirectTo = JForumExecutionContext.getRedirectTo();
         JForumExecutionContext.finish();
 
         if (redirectTo != null) {
@@ -254,7 +263,7 @@ public class JForum extends JForumBaseServlet {
         }
     }
 
-    private void handleException(Writer out, ResponseContext response, String encoding, Exception e, RequestContext request) throws IOException {
+    private void handleException(final Writer out, final ResponseContext response, final String encoding, final Exception e, final RequestContext request) throws IOException {
         JForumExecutionContext.enableRollback();
 
         if (e.toString().indexOf("ClientAbortException") == -1) {
@@ -267,8 +276,8 @@ public class JForum extends JForumBaseServlet {
         }
     }
 
-    private boolean shouldBan(String ip) {
-        Banlist b = new Banlist();
+    private boolean shouldBan(final String ip) {
+        final Banlist b = new Banlist();
 
         b.setUserId(SessionFacade.getUserSession().getUserId());
         b.setIp(ip);
@@ -276,13 +285,14 @@ public class JForum extends JForumBaseServlet {
         return BanlistRepository.shouldBan(b);
     }
 
-    private Command retrieveCommand(String moduleClass) throws Exception {
+    private Command retrieveCommand(final String moduleClass) throws Exception {
         return (Command) Class.forName(moduleClass).newInstance();
     }
 
     /**
      * @see javax.servlet.GenericServlet#destroy()
      */
+    @Override
     public void destroy() {
         super.destroy();
         System.out.println("Destroying JForum...");
@@ -290,7 +300,7 @@ public class JForum extends JForumBaseServlet {
         try {
             DBConnection.getImplementation().realReleaseAllConnections();
             ConfigLoader.stopCacheEngine();
-        } catch (Exception e) {
+        } catch (final Exception e) {
         }
     }
 }
