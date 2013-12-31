@@ -465,15 +465,15 @@ return main.offset().top+main.outerHeight();
 };
 win.load(function(){e.value=e()});
 var c=function(m){
-    if(m+winHeight>=e()){
-        if(link.css("top")!=(e()-link.outerHeight()-110)){
-        var initPos=link.offset().top+link.outerHeight();
-        link.finish().css({position:"absolute",bottom:"",top:initPos}).animate({top:e()-link.outerHeight()-110}, 1500);
-        }
-    }else{
-        if(!isIE6){link.finish().css({position:"fixed",top:"",bottom:10})}
-    }
-    link.show("slow").find("a").finish().animate({top:0});
+    //if(m+winHeight>=e()){
+      //  if(link.css("top")!=(e()-link.outerHeight()-110)){
+       // var initPos=link.offset().top+link.outerHeight();
+        //link.finish().css({position:"absolute",bottom:"",top:initPos}).animate({top:e()-link.outerHeight()-110}, 1500);
+       // }
+    //}else{
+        if(!isIE6){link.finish().css({position:"fixed",top:"",bottom:260})}
+    //}
+    link.show("slow").find("a").finish().animate({top:260}, 1000);
 };
 var hideLink=function(){link.hide("slow").find("a").css("top",40)};
 win.resize(function(){

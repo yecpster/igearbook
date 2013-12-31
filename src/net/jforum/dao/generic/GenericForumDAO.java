@@ -83,7 +83,8 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     /**
      * @see net.jforum.dao.ForumDAO#selectById(int)
      */
-    public Forum selectById(int forumId) {
+    @Override
+    public Forum selectById(final int forumId) {
         PreparedStatement p = null;
         ResultSet rs = null;
         try {
@@ -98,18 +99,18 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
                 f = this.fillForum(rs);
             }
             return f;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
         }
     }
 
-    protected Forum fillForum(ResultSet rs) throws SQLException {
-        Forum f = new Forum();
+    protected Forum fillForum(final ResultSet rs) throws SQLException {
+        final Forum f = new Forum();
 
         f.setId(rs.getInt("forum_id"));
-        f.setIdCategories(rs.getInt("categories_id"));
+        f.setCategoryId(rs.getInt("categories_id"));
         f.setName(rs.getString("forum_name"));
         f.setType(rs.getInt("forum_type"));
         f.setLogo(rs.getString("forum_logo"));
@@ -123,7 +124,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
         return f;
     }
 
-    protected int countForumPosts(int forumId) {
+    protected int countForumPosts(final int forumId) {
         PreparedStatement p = null;
         ResultSet rs = null;
         try {
@@ -136,7 +137,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             }
 
             return 0;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -146,12 +147,13 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     /**
      * @see net.jforum.dao.ForumDAO#selectAll()
      */
+    @Override
     public List<Forum> selectAll() {
         PreparedStatement p = null;
         ResultSet rs = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("ForumModel.selectAll"));
-            List<Forum> l = Lists.newArrayList();
+            final List<Forum> l = Lists.newArrayList();
 
             rs = p.executeQuery();
 
@@ -160,7 +162,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             }
 
             return l;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -170,19 +172,21 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     /**
      * @see net.jforum.dao.ForumDAO#setOrderUp(Forum, Forum)
      */
-    public Forum setOrderUp(Forum forum, Forum related) {
+    @Override
+    public Forum setOrderUp(final Forum forum, final Forum related) {
         return this.changeForumOrder(forum, related);
     }
 
     /**
      * @see net.jforum.dao.ForumDAO#setOrderDown(Forum, Forum)
      */
-    public Forum setOrderDown(Forum forum, Forum related) {
+    @Override
+    public Forum setOrderDown(final Forum forum, final Forum related) {
         return this.changeForumOrder(forum, related);
     }
 
-    private Forum changeForumOrder(Forum forum, Forum related) {
-        int tmpOrder = related.getOrder();
+    private Forum changeForumOrder(final Forum forum, final Forum related) {
+        final int tmpOrder = related.getOrder();
         related.setOrder(forum.getOrder());
         forum.setOrder(tmpOrder);
 
@@ -201,7 +205,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             p.executeUpdate();
 
             return this.selectById(forum.getId());
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -211,7 +215,8 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     /**
      * @see net.jforum.dao.ForumDAO#delete(int)
      */
-    public void delete(int forumId) {
+    @Override
+    public void delete(final int forumId) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("ForumModel.delete"));
@@ -219,9 +224,9 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
 
             p.executeUpdate();
 
-            GroupSecurityDAO groupSecurity = DataAccessDriver.getInstance().newGroupSecurityDAO();
+            final GroupSecurityDAO groupSecurity = DataAccessDriver.getInstance().newGroupSecurityDAO();
             groupSecurity.deleteForumRoles(forumId);
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -231,7 +236,8 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     /**
      * @see net.jforum.dao.ForumDAO#update(net.jforum.entities.Forum)
      */
-    public void update(Forum forum) {
+    @Override
+    public void update(final Forum forum) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("ForumModel.update"));
@@ -244,7 +250,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             p.setInt(6, forum.getId());
 
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -254,7 +260,8 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     /**
      * @see net.jforum.dao.ForumDAO#addNew(net.jforum.entities.Forum)
      */
-    public int addNew(Forum forum) {
+    @Override
+    public int addNew(final Forum forum) {
         // Gets the higher order
         PreparedStatement pOrder = null;
         ResultSet rs = null;
@@ -282,11 +289,11 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             pOrder.setInt(7, forum.getType());
 
             this.setAutoGeneratedKeysQuery(SystemGlobals.getSql("ForumModel.lastGeneratedForumId"));
-            int forumId = this.executeAutoKeysQuery(pOrder);
+            final int forumId = this.executeAutoKeysQuery(pOrder);
 
             forum.setId(forumId);
             return forumId;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, pOrder);
@@ -296,7 +303,8 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     /**
      * @see net.jforum.dao.ForumDAO#setLastPost(int, int)
      */
-    public void setLastPost(int forumId, int postId) {
+    @Override
+    public void setLastPost(final int forumId, final int postId) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("ForumModel.updateLastPost"));
@@ -305,7 +313,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             p.setInt(2, forumId);
 
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -315,14 +323,15 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     /**
      * @see net.jforum.dao.ForumDAO#setTotalTopics(int)
      */
-    public void incrementTotalTopics(int forumId, int count) {
+    @Override
+    public void incrementTotalTopics(final int forumId, final int count) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("ForumModel.incrementTotalTopics"));
             p.setInt(1, count);
             p.setInt(2, forumId);
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -332,7 +341,8 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     /**
      * @see net.jforum.dao.ForumDAO#setTotalTopics(int)
      */
-    public void decrementTotalTopics(int forumId, int count) {
+    @Override
+    public void decrementTotalTopics(final int forumId, final int count) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("ForumModel.decrementTotalTopics"));
@@ -342,19 +352,19 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
 
             // If there are no more topics, then clean the
             // last post id information
-            int totalTopics = this.getTotalTopics(forumId);
+            final int totalTopics = this.getTotalTopics(forumId);
             if (totalTopics < 1) {
                 this.setLastPost(forumId, 0);
             }
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
         }
     }
 
-    private LastPostInfo getLastPostInfo(int forumId, boolean tryFix) {
-        LastPostInfo lpi = new LastPostInfo();
+    private LastPostInfo getLastPostInfo(final int forumId, boolean tryFix) {
+        final LastPostInfo lpi = new LastPostInfo();
 
         PreparedStatement p = null;
         ResultSet rs = null;
@@ -368,7 +378,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
                 lpi.setUsername(rs.getString("username"));
                 lpi.setUserId(rs.getInt("user_id"));
 
-                SimpleDateFormat df = new SimpleDateFormat(SystemGlobals.getValue(ConfigKeys.DATE_TIME_FORMAT));
+                final SimpleDateFormat df = new SimpleDateFormat(SystemGlobals.getValue(ConfigKeys.DATE_TIME_FORMAT));
                 lpi.setPostDate(df.format(rs.getTimestamp("post_time")));
                 lpi.setPostId(rs.getInt("post_id"));
                 lpi.setTopicId(rs.getInt("topic_id"));
@@ -379,8 +389,8 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
                 lpi.setHasInfo(true);
 
                 // Check if the topic is consistent
-                TopicDAO tm = DataAccessDriver.getInstance().newTopicDAO();
-                Topic t = tm.selectById(lpi.getTopicId());
+                final TopicDAO tm = DataAccessDriver.getInstance().newTopicDAO();
+                final Topic t = tm.selectById(lpi.getTopicId());
 
                 if (t.getId() == 0) {
                     // Hm, that's not good. Try to fix it
@@ -394,7 +404,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
                 p.close();
                 p = null;
 
-                int postId = this.getMaxPostId(forumId);
+                final int postId = this.getMaxPostId(forumId);
 
                 p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("ForumModel.latestTopicIdForfix"));
                 p.setInt(1, forumId);
@@ -426,7 +436,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             }
 
             return (tryFix ? this.getLastPostInfo(forumId, false) : lpi);
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -436,15 +446,17 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     /**
      * @see net.jforum.dao.ForumDAO#getLastPostInfo(int)
      */
-    public LastPostInfo getLastPostInfo(int forumId) {
+    @Override
+    public LastPostInfo getLastPostInfo(final int forumId) {
         return this.getLastPostInfo(forumId, true);
     }
 
     /**
      * @see net.jforum.dao.ForumDAO#getModeratorList(int)
      */
-    public List<ModeratorInfo> getModeratorList(int forumId) {
-        List<ModeratorInfo> l = Lists.newArrayList();
+    @Override
+    public List<ModeratorInfo> getModeratorList(final int forumId) {
+        final List<ModeratorInfo> l = Lists.newArrayList();
 
         PreparedStatement p = null;
         ResultSet rs = null;
@@ -455,7 +467,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             rs = p.executeQuery();
 
             while (rs.next()) {
-                ModeratorInfo mi = new ModeratorInfo();
+                final ModeratorInfo mi = new ModeratorInfo();
 
                 mi.setId(rs.getInt("id"));
                 mi.setName(rs.getString("name"));
@@ -464,7 +476,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             }
 
             return l;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -474,6 +486,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     /**
      * @see net.jforum.dao.ForumDAO#getTotalMessages()
      */
+    @Override
     public int getTotalMessages() {
         PreparedStatement p = null;
         ResultSet rs = null;
@@ -486,7 +499,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             }
 
             return 0;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -496,7 +509,8 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     /**
      * @see net.jforum.dao.ForumDAO#getTotalTopics(int)
      */
-    public int getTotalTopics(int forumId) {
+    @Override
+    public int getTotalTopics(final int forumId) {
         int total = 0;
         PreparedStatement p = null;
         ResultSet rs = null;
@@ -510,7 +524,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             }
 
             return total;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -520,7 +534,8 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     /**
      * @see net.jforum.dao.ForumDAO#getMaxPostId(int)
      */
-    public int getMaxPostId(int forumId) {
+    @Override
+    public int getMaxPostId(final int forumId) {
         int id = -1;
 
         PreparedStatement p = null;
@@ -535,7 +550,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             }
 
             return id;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -545,7 +560,8 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     /**
      * @see net.jforum.dao.ForumDAO#moveTopics(java.lang.String[], int, int)
      */
-    public void moveTopics(String[] topics, int fromForumId, int toForumId) {
+    @Override
+    public void moveTopics(final String[] topics, final int fromForumId, final int toForumId) {
         PreparedStatement p = null;
         PreparedStatement t = null;
         try {
@@ -557,12 +573,12 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
 
             t.setInt(1, toForumId);
 
-            TopicDAO tdao = DataAccessDriver.getInstance().newTopicDAO();
+            final TopicDAO tdao = DataAccessDriver.getInstance().newTopicDAO();
 
-            Forum f = this.selectById(toForumId);
+            final Forum f = this.selectById(toForumId);
 
             for (int i = 0; i < topics.length; i++) {
-                int topicId = Integer.parseInt(topics[i]);
+                final int topicId = Integer.parseInt(topics[i]);
                 p.setInt(3, topicId);
                 t.setInt(2, topicId);
 
@@ -577,7 +593,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
 
             this.setLastPost(fromForumId, this.getMaxPostId(fromForumId));
             this.setLastPost(toForumId, this.getMaxPostId(toForumId));
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -588,8 +604,9 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     /**
      * @see net.jforum.dao.ForumDAO#hasUnreadTopics(int, long)
      */
-    public List checkUnreadTopics(int forumId, long lastVisit) {
-        List l = new ArrayList();
+    @Override
+    public List checkUnreadTopics(final int forumId, final long lastVisit) {
+        final List l = new ArrayList();
 
         PreparedStatement p = null;
         ResultSet rs = null;
@@ -600,7 +617,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
 
             rs = p.executeQuery();
             while (rs.next()) {
-                Topic t = new Topic();
+                final Topic t = new Topic();
                 t.setId(rs.getInt("topic_id"));
                 t.setTime(new Date(rs.getTimestamp(1).getTime()));
 
@@ -608,7 +625,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             }
 
             return l;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -618,14 +635,15 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     /**
      * @see net.jforum.dao.ForumDAO#setModerated(int, boolean)
      */
-    public void setModerated(int categoryId, boolean status) {
+    @Override
+    public void setModerated(final int categoryId, final boolean status) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("ForumModel.setModerated"));
             p.setInt(1, status ? 1 : 0);
             p.setInt(2, categoryId);
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -635,11 +653,12 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     /**
      * @see net.jforum.dao.ForumDAO#getBoardStatus()
      */
+    @Override
     public ForumStats getBoardStatus() {
-        ForumStats fs = new ForumStats();
+        final ForumStats fs = new ForumStats();
         fs.setPosts(this.getTotalMessages());
 
-        Connection c = JForumExecutionContext.getConnection();
+        final Connection c = JForumExecutionContext.getConnection();
 
         // Total Users
         Statement s = null;
@@ -687,7 +706,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
                 s.close();
                 s = null;
 
-                Date today = new Date();
+                final Date today = new Date();
 
                 postPerDay = firstTime != null ? fs.getPosts() / this.daysUntilToday(today, firstTime) : 0;
 
@@ -719,15 +738,15 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             fs.setUsersPerDay(userPerDay);
 
             return fs;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, s);
         }
     }
 
-    private int daysUntilToday(Date today, Date from) {
-        int days = (int) ((today.getTime() - from.getTime()) / (24 * 60 * 60 * 1000));
+    private int daysUntilToday(final Date today, final Date from) {
+        final int days = (int) ((today.getTime() - from.getTime()) / (24 * 60 * 60 * 1000));
         return days == 0 ? 1 : days;
     }
 
@@ -736,9 +755,10 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
      * 
      * @see
      */
-    public List notifyUsers(Forum forum) {
-        int posterId = SessionFacade.getUserSession().getUserId();
-        int anonUser = SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID);
+    @Override
+    public List notifyUsers(final Forum forum) {
+        final int posterId = SessionFacade.getUserSession().getUserId();
+        final int anonUser = SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID);
 
         PreparedStatement p = null;
         ResultSet rs = null;
@@ -751,10 +771,10 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             p.setInt(3, anonUser); // don't notify the anonimous user
 
             rs = p.executeQuery();
-            List users = new ArrayList();
+            final List users = new ArrayList();
 
             while (rs.next()) {
-                User user = new User();
+                final User user = new User();
 
                 user.setId(rs.getInt("user_id"));
                 user.setEmail(rs.getString("user_email"));
@@ -767,7 +787,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             }
 
             return users;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);
@@ -775,7 +795,8 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
 
     }
 
-    public void subscribeUser(int forumId, int userId) {
+    @Override
+    public void subscribeUser(final int forumId, final int userId) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("ForumModel.subscribeUser"));
@@ -784,7 +805,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             p.setInt(2, userId);
 
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -792,7 +813,8 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
 
     }
 
-    public boolean isUserSubscribed(int forumId, int userId) {
+    @Override
+    public boolean isUserSubscribed(final int forumId, final int userId) {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
@@ -804,14 +826,15 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             rs = stmt.executeQuery();
 
             return rs.next();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, stmt);
         }
     }
 
-    public void removeSubscription(int forumId, int userId) {
+    @Override
+    public void removeSubscription(final int forumId, final int userId) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("ForumModel.removeSubscription"));
@@ -819,7 +842,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             p.setInt(2, userId);
 
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -834,14 +857,15 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
      * @param forumId
      *            int
      */
-    public void removeSubscriptionByForum(int forumId) {
+    @Override
+    public void removeSubscriptionByForum(final int forumId) {
         PreparedStatement p = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("ForumModel.removeSubscriptionByForum"));
             p.setInt(1, forumId);
 
             p.executeUpdate();
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(p);
@@ -852,7 +876,8 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     /**
      * @see net.jforum.dao.ForumDAO#discoverForumId(java.lang.String)
      */
-    public int discoverForumId(String listEmail) {
+    @Override
+    public int discoverForumId(final String listEmail) {
         int forumId = 0;
 
         PreparedStatement p = null;
@@ -866,7 +891,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             if (rs.next()) {
                 forumId = rs.getInt(1);
             }
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
 
         } finally {
             DbUtils.close(rs, p);
@@ -876,13 +901,13 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     }
 
     @Override
-    public List<Forum> selectByType(int type) {
+    public List<Forum> selectByType(final int type) {
         PreparedStatement p = null;
         ResultSet rs = null;
         try {
             p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("ForumModel.selectByType"));
             p.setInt(1, type);
-            List<Forum> l = Lists.newArrayList();
+            final List<Forum> l = Lists.newArrayList();
 
             rs = p.executeQuery();
 
@@ -891,7 +916,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
             }
 
             return l;
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new DatabaseException(e);
         } finally {
             DbUtils.close(rs, p);

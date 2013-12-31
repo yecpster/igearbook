@@ -56,24 +56,44 @@
       </table>
     </div>
 -->
-    <#--
     <div class="clearfix">
-        <div class="groups_title"><span>群组知识库</span> <a href="http://www.iteye.com/groups/all_wikis" class="more">更多文章</a></div>
+        <div class="groups_title"><span>最近更新</span> <a href="#" class="more">更多文章</a></div>
         <div class="group_topic clearfix">
-            <h4><a href="http://javaman.group.iteye.com/group/wiki/3433-startos-os-root-login" target="_blank">StartOS 允许 ROOT 登录</a></h4>
+            <h4><a href="#" target="_blank">StartOS 允许 ROOT 登录</a></h4>
             <div style="float:right;">
-                <div class="logo"><a href="http://javaman.group.iteye.com/" target="_blank"><img src="./ITeye群组频道首页_files/3f9a15a5-44b6-33b5-a02d-0410d791b704-normal.jpg" alt="Java研发交流群组" title="Java研发交流: 获取最新Java咨询，交流Web研发技能！" height="48" width="48"></a></div>
+                <div class="logo"><a href="#" target="_blank"><img src="http://www.igearbook.com/upload/teamlogo/20131115111513290.jpg" alt="Java研发交流群组" title="Java研发交流: 获取最新Java咨询，交流Web研发技能！" height="48" width="48"></a></div>
             </div>
-            <div>第一步：开启root用户 运行终端sudo passwd root 这个相信大家都会 就不多说了 第二步：startos 5.0 自带的登录管理器不能root登录 先安装GDM了 再用root登录 运行终端 输入sudo yget --install gdm 根据提示选择YES 第三部：这时候人哦哦过重启用root登录会提示鉴定错误 所以先不要重启 需要先修该 etc/pam.d/gdm.conf  ...</div>
+            <div>第一步：开启root用户 运行终端sudo passwd root 这个相信大家都会 就不多说了 第二步：startos 5.0 自带的登录管理器不能root登录 先安装GDM了 ...</div>
             <div class="page_tags">
             
             </div>
-            <div class="topic_info clearfix">by <a href="http://cuisuqiang.iteye.com/" target="_blank" title="cuisuqiang">cuisuqiang</a> 2013-09-22 浏览 (46) <a href="http://javaman.group.iteye.com/group/wiki/3433-startos-os-root-login#comments" target="_blank">回复 (0)</a> 群组: <a href="http://javaman.group.iteye.com/" target="_blank">Java研发交流</a></div>
+            <div class="topic_info clearfix">by <a href="#" target="_blank" title="cuisuqiang">cuisuqiang</a> 2013-09-22 浏览 (46) <a href="#" target="_blank">回复 (0)</a> 群组: <a href="#" target="_blank">Java研发交流</a></div>
+        </div>
+        <div class="group_topic clearfix">
+            <h4><a href="#" target="_blank">StartOS 允许 ROOT 登录</a></h4>
+            <div style="float:right;">
+                <div class="logo"><a href="#" target="_blank"><img src="http://www.igearbook.com/upload/teamlogo/20131115111513290.jpg" alt="Java研发交流群组" title="Java研发交流: 获取最新Java咨询，交流Web研发技能！" height="48" width="48"></a></div>
+            </div>
+            <div>第一步：开启root用户 运行终端sudo passwd root 这个相信大家都会 就不多说了 第二步：startos 5.0 自带的登录管理器不能root登录 先安装GDM了  ...</div>
+            <div class="page_tags">
+            
+            </div>
+            <div class="topic_info clearfix">by <a href="#" target="_blank" title="cuisuqiang">cuisuqiang</a> 2013-09-22 浏览 (46) <a href="#" target="_blank">回复 (0)</a> 群组: <a href="#" target="_blank">Java研发交流</a></div>
+        </div>
+        <div class="group_topic clearfix">
+            <h4><a href="#" target="_blank">StartOS 允许 ROOT 登录</a></h4>
+            <div style="float:right;">
+                <div class="logo"><a href="#" target="_blank"><img src="http://www.igearbook.com/upload/teamlogo/20131115111513290.jpg" alt="Java研发交流群组" title="Java研发交流: 获取最新Java咨询，交流Web研发技能！" height="48" width="48"></a></div>
+            </div>
+            <div>第一步：开启root用户 运行终端sudo passwd root 这个相信大家都会 就不多说了 第二步：startos 5.0 自带的登录管理器不能root登录 先安装GDM了   ...</div>
+            <div class="page_tags">
+            
+            </div>
+            <div class="topic_info clearfix">by <a href="#" target="_blank" title="cuisuqiang">cuisuqiang</a> 2013-09-22 浏览 (46) <a href="#" target="_blank">回复 (0)</a> 群组: <a href="#" target="_blank">Java研发交流</a></div>
         </div>
     </div>
-    -->
     <div class="clearfix">
-        <div class="groups_title"><span>推荐群组</span> <#--<a href="#" class="more">更多群组</a>--></div>
+        <div class="groups_title"><span>推荐群组</span> <a href="#" class="more">更多群组</a></div>
             <div class="clearfix">
                 <#list categories as category>
                 <#list category.getForums() as team>

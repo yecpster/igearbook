@@ -56,6 +56,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.igearbook.dao.ForumDao;
 import com.igearbook.dao.UserDao;
 import com.igearbook.entities.PaginationData;
 import com.igearbook.entities.PaginationParams;
@@ -86,7 +87,14 @@ public class TeamAction extends BaseAction {
     private String uploadFileName;
 
     @Autowired
+    private ForumDao forumDao;
+
+    @Autowired
     private UserDao userDao;
+
+    public void setForumDao(final ForumDao forumDao) {
+        this.forumDao = forumDao;
+    }
 
     public void setUserDao(final UserDao userDao) {
         this.userDao = userDao;
@@ -346,7 +354,7 @@ public class TeamAction extends BaseAction {
         final UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
 
         // The user can access this team?
-        final Forum team = ForumRepository.getForum(teamId);
+        final Forum team = forumDao.get(teamId);
 
         if (team == null || team.getType() != 1 || !ForumRepository.isCategoryAccessible(team.getCategoryId())) {
             new ModerationHelper().denied(I18n.getMessage("ForumListing.denied"));
@@ -701,7 +709,7 @@ public class TeamAction extends BaseAction {
         if (categories.size() == 1) {
             final Category category = categories.get(0);
             team.setType(1);
-            team.setIdCategories(category.getId());
+            team.setCategoryId(category.getId());
             team.setLogo(logoUrl);
             forumDao.addNew(team);
             ForumRepository.addForum(team);

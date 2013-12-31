@@ -83,8 +83,6 @@ public class RecommendAction extends BaseAction {
                 recommendDao.delete(recommend);
             }
         }
-        TopicRepository.loadRecommendTopics(Recommendation.TYPE_INDEX_TEAM);
-        TopicRepository.loadRecommendTopics(Recommendation.TYPE_INDEX_IMG);
         return SUCCESS;
     }
 
@@ -158,7 +156,8 @@ public class RecommendAction extends BaseAction {
     @Action(value = "save", interceptorRefs = {
             @InterceptorRef("tokenSession"),
             @InterceptorRef(value = "fileUpload", params = { "allowedExtensions ", ".gif,.jpg,.png", "allowedTypes",
-                    "image/png,image/gif,image/jpeg,image/pjpeg" }), @InterceptorRef("defaultStackIgearbook") }, results = { @Result(name = SUCCESS, location = "/", type = "redirect") })
+                    "image/png,image/gif,image/jpeg,image/pjpeg" }), @InterceptorRef("defaultStackIgearbook") }, results = { @Result(name = SUCCESS,
+            location = "/", type = "redirect") })
     public String save() {
         Topic topic = TopicRepository.getTopic(new Topic(rtopic.getTopicId()));
         if (topic == null) {
@@ -198,8 +197,6 @@ public class RecommendAction extends BaseAction {
             recommendDao.update(rtopic);
         }
 
-        TopicRepository.loadRecommendTopics(Recommendation.TYPE_INDEX_TEAM);
-        TopicRepository.loadRecommendTopics(Recommendation.TYPE_INDEX_IMG);
         return SUCCESS;
     }
 

@@ -19,14 +19,22 @@ import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Namespace;
 import org.apache.struts2.convention.annotation.Result;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Lists;
+import com.igearbook.dao.RecommendDao;
 import com.igearbook.entities.Recommendation;
 import com.opensymphony.xwork2.ActionContext;
 
 @Namespace("/portal")
 public class PortalAction extends BaseAction {
     private static final long serialVersionUID = 7587622153127430L;
+    @Autowired
+    private RecommendDao recommendDao;
+
+    public void setRecommendDao(final RecommendDao recommendDao) {
+        this.recommendDao = recommendDao;
+    }
 
     @Action(value = "index", results = { @Result(name = SUCCESS, location = "portal_index.ftl") })
     public String index() {
@@ -42,9 +50,8 @@ public class PortalAction extends BaseAction {
         final int aid = SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID);
 
         final List<UserSession> onlineUsersList = SessionFacade.getLoggedSessions();
-        // If there are only guest users, then just register
-        // a single one. In any other situation, we do not
-        // show the "guest" username
+        // If there are only guest users, then just register a single one.
+        // In any other situation, we do not show the "guest" username
         if (onlineUsersList.size() == 0) {
             final UserSession us = new UserSession();
             us.setUserId(aid);
@@ -73,20 +80,16 @@ public class PortalAction extends BaseAction {
         }
 
         context.put("mostUsersEverOnline", mostUsersEverOnline);
+        final List<Recommendation> portalRecommends = recommendDao.listByTypeByLimit(Recommendation.TYPE_INDEX_IMG, 4);
 
-        final List<Recommendation> portalRecommends = TopicRepository.getRecommendTopics(Recommendation.TYPE_INDEX_IMG);
-        if (portalRecommends != null && portalRecommends.size() > 0) {
-
+        if (portalRecommends.size() > 0) {
             context.put("recommendTopic", portalRecommends.get(0));
         }
-        if (portalRecommends != null && portalRecommends.size() > 3) {
-            final List<Recommendation> igearbookTopics = Lists.newArrayList();
-            igearbookTopics.add(portalRecommends.get(1));
-            igearbookTopics.add(portalRecommends.get(2));
-            igearbookTopics.add(portalRecommends.get(3));
+        if (portalRecommends.size() > 3) {
+            final List<Recommendation> igearbookTopics = portalRecommends.subList(1, 4);
             context.put("igearbookTopics", igearbookTopics);
         }
-        final List<Recommendation> teamRecommends = TopicRepository.getRecommendTopics(Recommendation.TYPE_INDEX_TEAM);
+        final List<Recommendation> teamRecommends = recommendDao.listByTypeByLimit(Recommendation.TYPE_INDEX_TEAM, 9);
         context.put("teamRecommends", teamRecommends);
         context.put("recentTopics", TopicRepository.getRecentTopics());
         context.put("hotTopics", TopicRepository.getHottestTopics());

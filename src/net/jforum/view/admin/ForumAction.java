@@ -76,6 +76,7 @@ import com.google.common.collect.Lists;
  */
 public class ForumAction extends AdminCommand {
     // Listing
+    @Override
     public void list() {
         this.context.put("categories", DataAccessDriver.getInstance().newCategoryDAO().selectAll());
         this.context.put("repository", new ForumRepository());
@@ -84,10 +85,10 @@ public class ForumAction extends AdminCommand {
 
     // One more, one more
     public void insert() {
-        CategoryDAO cm = DataAccessDriver.getInstance().newCategoryDAO();
-        GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
-        List<Group> selectedGroups = Lists.newArrayList();
-        List<Group> candidateGrups = groupDao.getCandidateGroups(selectedGroups);
+        final CategoryDAO cm = DataAccessDriver.getInstance().newCategoryDAO();
+        final GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
+        final List<Group> selectedGroups = Lists.newArrayList();
+        final List<Group> candidateGrups = groupDao.getCandidateGroups(selectedGroups);
 
         this.context.put("accessCandidateGroups", candidateGrups);
         this.context.put("replyCandidateGroups", candidateGrups);
@@ -104,56 +105,56 @@ public class ForumAction extends AdminCommand {
 
     // A new one
     public void insertSave() {
-        Forum f = new Forum();
+        final Forum f = new Forum();
         f.setDescription(this.request.getParameter("description"));
-        f.setIdCategories(this.request.getIntParameter("categories_id"));
+        f.setCategoryId(this.request.getIntParameter("categories_id"));
         f.setName(this.request.getParameter("forum_name"));
         f.setLogo(this.request.getParameter("forum_Logo"));
         f.setModerated("1".equals(this.request.getParameter("moderate")));
 
-        int forumId = DataAccessDriver.getInstance().newForumDAO().addNew(f);
+        final int forumId = DataAccessDriver.getInstance().newForumDAO().addNew(f);
         f.setId(forumId);
 
         ForumRepository.addForum(f);
 
-        GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
-        PermissionControl pc = new PermissionControl();
+        final GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
+        final PermissionControl pc = new PermissionControl();
         pc.setSecurityModel(gmodel);
 
         // Access
-        GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
-        Group accessGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_FORUM, forumId);
+        final GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
+        final Group accessGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_FORUM, forumId);
         this.addRole(pc, SecurityConstants.PERM_FORUM, forumId, accessGroup);
-        String[] groupsAccess = request.getParameterValues("groupsAccess");
+        final String[] groupsAccess = request.getParameterValues("groupsAccess");
         updateChildGroups(accessGroup, groupsAccess, groupDao);
 
         // Anonymous posts
-        Group anonymousPostsGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_ANONYMOUS_POST, forumId);
+        final Group anonymousPostsGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_ANONYMOUS_POST, forumId);
         this.addRole(pc, SecurityConstants.PERM_ANONYMOUS_POST, forumId, anonymousPostsGroup);
 
-        boolean permitAnonymousPosts = "1".equals(this.request.getParameter("permitAnonymousPosts"));
+        final boolean permitAnonymousPosts = "1".equals(this.request.getParameter("permitAnonymousPosts"));
         if (permitAnonymousPosts) {
-            UserDAO um = DataAccessDriver.getInstance().newUserDAO();
-            int anonymousUid = Integer.parseInt(SystemGlobals.getValue(ConfigKeys.ANONYMOUS_USER_ID));
+            final UserDAO um = DataAccessDriver.getInstance().newUserDAO();
+            final int anonymousUid = Integer.parseInt(SystemGlobals.getValue(ConfigKeys.ANONYMOUS_USER_ID));
             um.addToGroup(anonymousUid, new int[] { anonymousPostsGroup.getId() });
         }
 
         // Permit to replay
-        Group replyGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_REPLY, forumId);
+        final Group replyGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_REPLY, forumId);
         this.addRole(pc, SecurityConstants.PERM_REPLY, forumId, replyGroup);
-        String[] groupsReply = request.getParameterValues("groupsReply");
+        final String[] groupsReply = request.getParameterValues("groupsReply");
         updateChildGroups(replyGroup, groupsReply, groupDao);
 
         // Permit to new post
-        Group newPostGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_NEW_POST, forumId);
+        final Group newPostGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_NEW_POST, forumId);
         this.addRole(pc, SecurityConstants.PERM_NEW_POST, forumId, newPostGroup);
-        String[] groupsPost = request.getParameterValues("groupsPost");
+        final String[] groupsPost = request.getParameterValues("groupsPost");
         updateChildGroups(newPostGroup, groupsPost, groupDao);
 
         // HTML
-        Group htmlGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_HTML_DISABLED, forumId);
+        final Group htmlGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_HTML_DISABLED, forumId);
         this.addRole(pc, SecurityConstants.PERM_HTML_DISABLED, forumId, htmlGroup);
-        String[] groupsHtml = request.getParameterValues("groupsHtml");
+        final String[] groupsHtml = request.getParameterValues("groupsHtml");
         updateChildGroups(htmlGroup, groupsHtml, groupDao);
 
         SecurityRepository.clean();
@@ -166,41 +167,41 @@ public class ForumAction extends AdminCommand {
 
     // Edit
     public void edit() {
-        int forumId = this.request.getIntParameter("forum_id");
-        ForumDAO forumDao = DataAccessDriver.getInstance().newForumDAO();
+        final int forumId = this.request.getIntParameter("forum_id");
+        final ForumDAO forumDao = DataAccessDriver.getInstance().newForumDAO();
 
-        CategoryDAO cm = DataAccessDriver.getInstance().newCategoryDAO();
+        final CategoryDAO cm = DataAccessDriver.getInstance().newCategoryDAO();
 
-        GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
-        Group accessGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_FORUM, forumId);
-        List<Group> accessSelectedGroups = groupDao.getChildGroups(accessGroup.getId());
+        final GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
+        final Group accessGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_FORUM, forumId);
+        final List<Group> accessSelectedGroups = groupDao.getChildGroups(accessGroup.getId());
         this.context.put("accessSelectedGroups", accessSelectedGroups);
         this.context.put("accessCandidateGroups", groupDao.getCandidateGroups(accessSelectedGroups));
 
-        int anonymousUid = Integer.parseInt(SystemGlobals.getValue(ConfigKeys.ANONYMOUS_USER_ID));
-        boolean permitAnonymousPosts = SecurityRepository.canAccess(anonymousUid, SecurityConstants.PERM_ANONYMOUS_POST, String.valueOf(forumId));
+        final int anonymousUid = Integer.parseInt(SystemGlobals.getValue(ConfigKeys.ANONYMOUS_USER_ID));
+        final boolean permitAnonymousPosts = SecurityRepository.canAccess(anonymousUid, SecurityConstants.PERM_ANONYMOUS_POST, String.valueOf(forumId));
         this.context.put("permitAnonymousPosts", permitAnonymousPosts);
 
         Group moderationGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_MODERATION_FORUMS, forumId);
         if (moderationGroup == null) {
             moderationGroup = this.createModerationGroup(groupDao, forumId);
         }
-        List<User> moderators = DataAccessDriver.getInstance().newUserDAO().selectAllByGroup(moderationGroup.getId(), 0, 50);
+        final List<User> moderators = DataAccessDriver.getInstance().newUserDAO().selectAllByGroup(moderationGroup.getId(), 0, 50);
         this.context.put("moderationGroup", moderationGroup);
         this.context.put("moderators", moderators);
 
-        Group replyGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_REPLY, forumId);
-        List<Group> replySelectedGroups = groupDao.getChildGroups(replyGroup.getId());
+        final Group replyGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_REPLY, forumId);
+        final List<Group> replySelectedGroups = groupDao.getChildGroups(replyGroup.getId());
         this.context.put("replySelectedGroups", replySelectedGroups);
         this.context.put("replyCandidateGroups", groupDao.getCandidateGroups(replySelectedGroups));
 
-        Group newPostGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_NEW_POST, forumId);
-        List<Group> postSelectedGroups = groupDao.getChildGroups(newPostGroup.getId());
+        final Group newPostGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_NEW_POST, forumId);
+        final List<Group> postSelectedGroups = groupDao.getChildGroups(newPostGroup.getId());
         this.context.put("postSelectedGroups", postSelectedGroups);
         this.context.put("postCandidateGroups", groupDao.getCandidateGroups(postSelectedGroups));
 
-        Group htmlPostGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_HTML_DISABLED, forumId);
-        List<Group> htmlSelectedGroups = groupDao.getChildGroups(htmlPostGroup.getId());
+        final Group htmlPostGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_HTML_DISABLED, forumId);
+        final List<Group> htmlSelectedGroups = groupDao.getChildGroups(htmlPostGroup.getId());
         this.context.put("htmlSelectedGroups", htmlSelectedGroups);
         this.context.put("htmlCandidateGroups", groupDao.getCandidateGroups(htmlSelectedGroups));
 
@@ -216,15 +217,15 @@ public class ForumAction extends AdminCommand {
     }
 
     public void editSave() {
-        ForumDAO forumDao = DataAccessDriver.getInstance().newForumDAO();
-        int forumId = this.request.getIntParameter("forum_id");
-        Forum f = forumDao.selectById(forumId);
+        final ForumDAO forumDao = DataAccessDriver.getInstance().newForumDAO();
+        final int forumId = this.request.getIntParameter("forum_id");
+        final Forum f = forumDao.selectById(forumId);
 
-        boolean moderated = f.isModerated();
-        int categoryId = f.getCategoryId();
+        final boolean moderated = f.isModerated();
+        final int categoryId = f.getCategoryId();
 
         f.setDescription(this.request.getParameter("description"));
-        f.setIdCategories(this.request.getIntParameter("categories_id"));
+        f.setCategoryId(this.request.getIntParameter("categories_id"));
         f.setName(this.request.getParameter("forum_name"));
         f.setLogo(this.request.getParameter("forum_logo"));
         f.setModerated("1".equals(this.request.getParameter("moderate")));
@@ -236,10 +237,10 @@ public class ForumAction extends AdminCommand {
         }
 
         if (categoryId != f.getCategoryId()) {
-            f.setIdCategories(categoryId);
+            f.setCategoryId(categoryId);
             ForumRepository.removeForum(f);
 
-            f.setIdCategories(this.request.getIntParameter("categories_id"));
+            f.setCategoryId(this.request.getIntParameter("categories_id"));
             ForumRepository.addForum(f);
         } else {
             ForumRepository.reloadForum(f.getId());
@@ -248,35 +249,35 @@ public class ForumAction extends AdminCommand {
         // this.handleMailIntegration();
 
         // Forum access
-        GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
-        Group accessGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_FORUM, forumId);
-        String[] groupsAccess = request.getParameterValues("groupsAccess");
+        final GroupDAO groupDao = DataAccessDriver.getInstance().newGroupDAO();
+        final Group accessGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_FORUM, forumId);
+        final String[] groupsAccess = request.getParameterValues("groupsAccess");
         updateChildGroups(accessGroup, groupsAccess, groupDao);
 
         // Anonymous post
-        boolean permitAnonymousPosts = "1".equals(this.request.getParameter("permitAnonymousPosts"));
-        Group anonymousPostsGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_ANONYMOUS_POST, forumId);
-        UserDAO um = DataAccessDriver.getInstance().newUserDAO();
-        int anonymousUid = Integer.parseInt(SystemGlobals.getValue(ConfigKeys.ANONYMOUS_USER_ID));
-        int[] groupIds = { anonymousPostsGroup.getId() };
+        final boolean permitAnonymousPosts = "1".equals(this.request.getParameter("permitAnonymousPosts"));
+        final Group anonymousPostsGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_ANONYMOUS_POST, forumId);
+        final UserDAO um = DataAccessDriver.getInstance().newUserDAO();
+        final int anonymousUid = Integer.parseInt(SystemGlobals.getValue(ConfigKeys.ANONYMOUS_USER_ID));
+        final int[] groupIds = { anonymousPostsGroup.getId() };
         um.removeFromGroup(anonymousUid, groupIds);
         if (permitAnonymousPosts) {
             um.addToGroup(anonymousUid, groupIds);
         }
 
         // Permit to reply
-        Group replyGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_REPLY, forumId);
-        String[] groupsReply = request.getParameterValues("groupsReply");
+        final Group replyGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_REPLY, forumId);
+        final String[] groupsReply = request.getParameterValues("groupsReply");
         updateChildGroups(replyGroup, groupsReply, groupDao);
 
         // Permit to new post
-        Group newPostGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_NEW_POST, forumId);
-        String[] groupsPost = request.getParameterValues("groupsPost");
+        final Group newPostGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_NEW_POST, forumId);
+        final String[] groupsPost = request.getParameterValues("groupsPost");
         updateChildGroups(newPostGroup, groupsPost, groupDao);
 
         // HTML
-        Group htmlGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_HTML_DISABLED, forumId);
-        String[] groupsHtml = request.getParameterValues("groupsHtml");
+        final Group htmlGroup = groupDao.getEntitlementGroup(SecurityConstants.PERM_HTML_DISABLED, forumId);
+        final String[] groupsHtml = request.getParameterValues("groupsHtml");
         updateChildGroups(htmlGroup, groupsHtml, groupDao);
 
         SecurityRepository.clean();
@@ -327,27 +328,27 @@ public class ForumAction extends AdminCommand {
         this.processOrdering(false);
     }
 
-    private void processOrdering(boolean up) {
-        Forum toChange = new Forum(ForumRepository.getForum(Integer.parseInt(this.request.getParameter("forum_id"))));
+    private void processOrdering(final boolean up) {
+        final Forum toChange = new Forum(ForumRepository.getForum(Integer.parseInt(this.request.getParameter("forum_id"))));
 
-        Category category = ForumRepository.getCategory(toChange.getCategoryId());
-        List<Forum> forums = Lists.newArrayList(category.getForums());
-        int index = forums.indexOf(toChange);
+        final Category category = ForumRepository.getCategory(toChange.getCategoryId());
+        final List<Forum> forums = Lists.newArrayList(category.getForums());
+        final int index = forums.indexOf(toChange);
 
         if (index == -1 || (up && index == 0) || (!up && index + 1 == forums.size())) {
             this.list();
             return;
         }
 
-        ForumDAO fm = DataAccessDriver.getInstance().newForumDAO();
+        final ForumDAO fm = DataAccessDriver.getInstance().newForumDAO();
 
         if (up) {
             // Get the forum which comes *before* the forum we're changing
-            Forum otherForum = new Forum(forums.get(index - 1));
+            final Forum otherForum = new Forum(forums.get(index - 1));
             fm.setOrderUp(toChange, otherForum);
         } else {
             // Get the forum which comes *after* the forum we're changing
-            Forum otherForum = new Forum(forums.get(index + 1));
+            final Forum otherForum = new Forum(forums.get(index + 1));
             fm.setOrderDown(toChange, otherForum);
         }
 
@@ -359,19 +360,19 @@ public class ForumAction extends AdminCommand {
 
     // Delete
     public void delete() {
-        String ids[] = this.request.getParameterValues("forum_id");
+        final String ids[] = this.request.getParameterValues("forum_id");
 
-        ForumDAO forumDao = DataAccessDriver.getInstance().newForumDAO();
-        TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
+        final ForumDAO forumDao = DataAccessDriver.getInstance().newForumDAO();
+        final TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
 
         if (ids != null) {
             for (int i = 0; i < ids.length; i++) {
-                int forumId = Integer.parseInt(ids[i]);
+                final int forumId = Integer.parseInt(ids[i]);
 
                 topicDao.deleteByForum(forumId);
                 forumDao.delete(forumId);
 
-                Forum f = new Forum(ForumRepository.getForum(forumId));
+                final Forum f = new Forum(ForumRepository.getForum(forumId));
                 ForumRepository.removeForum(f);
             }
 
@@ -382,11 +383,11 @@ public class ForumAction extends AdminCommand {
         this.list();
     }
 
-    private Group createModerationGroup(GroupDAO groupDao, int forumId) {
-        GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
-        PermissionControl pc = new PermissionControl();
+    private Group createModerationGroup(final GroupDAO groupDao, final int forumId) {
+        final GroupSecurityDAO gmodel = DataAccessDriver.getInstance().newGroupSecurityDAO();
+        final PermissionControl pc = new PermissionControl();
         pc.setSecurityModel(gmodel);
-        Group moderationGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_MODERATION_FORUMS, forumId);
+        final Group moderationGroup = groupDao.addNewEntitlementGroup(SecurityConstants.PERM_MODERATION_FORUMS, forumId);
         this.addRole(pc, SecurityConstants.PERM_CREATE_STICKY_ANNOUNCEMENT_TOPICS, forumId, moderationGroup);
         this.addRole(pc, SecurityConstants.PERM_MODERATION_FORUMS, forumId, moderationGroup);
         this.addRole(pc, SecurityConstants.PERM_MODERATION_APPROVE_MESSAGES, forumId, moderationGroup);
@@ -397,24 +398,24 @@ public class ForumAction extends AdminCommand {
         return moderationGroup;
     }
 
-    private void updateChildGroups(Group parentGroup, String[] groups, GroupDAO groupDao) {
+    private void updateChildGroups(final Group parentGroup, String[] groups, final GroupDAO groupDao) {
         if (groups == null) {
             groups = new String[] {};
         }
-        int[] childGroupIDs = new int[groups.length];
+        final int[] childGroupIDs = new int[groups.length];
         for (int i = 0; i < groups.length; i++) {
             childGroupIDs[i] = Integer.parseInt(groups[i]);
         }
         groupDao.updateChildGroups(parentGroup.getId(), childGroupIDs);
     }
 
-    private void addRole(PermissionControl pc, String roleName, int forumId, Group group) {
-        Role role = new Role();
+    private void addRole(final PermissionControl pc, final String roleName, final int forumId, final Group group) {
+        final Role role = new Role();
         role.setName(roleName);
 
-        RoleValueCollection roleValues = new RoleValueCollection();
+        final RoleValueCollection roleValues = new RoleValueCollection();
 
-        RoleValue rv = new RoleValue();
+        final RoleValue rv = new RoleValue();
         rv.setValue(Integer.toString(forumId));
         roleValues.add(rv);
 

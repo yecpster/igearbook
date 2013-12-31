@@ -43,19 +43,15 @@
 package net.jforum.dao;
 
 /**
- * The class that every driver class must implement. JForum implementation
- * provides a simple and extremely configurable way to use diferent database
+ * The class that every driver class must implement. JForum implementation provides a simple and extremely configurable way to use diferent database
  * engines without any modification to the core source code. <br>
- * For example, if you want to use the Database "XYZ" as backend, all you need
- * to do is to implement <code>DataAccessDriver</code>, all *Model classes and a
- * specific file with the SQL queries. <br>
- * The default implementation was written to support MySQL, so if you want a
- * base code to analise, look at <code>net.jforum.drivers.generic</code>
+ * For example, if you want to use the Database "XYZ" as backend, all you need to do is to implement <code>DataAccessDriver</code>, all *Model classes
+ * and a specific file with the SQL queries. <br>
+ * The default implementation was written to support MySQL, so if you want a base code to analise, look at <code>net.jforum.drivers.generic</code>
  * package.
  * 
  * @author Rafael Steil
- * @version $Id: DataAccessDriver.java,v 1.20 2007/07/28 20:07:18 rafaelsteil
- *          Exp $
+ * @version $Id: DataAccessDriver.java,v 1.20 2007/07/28 20:07:18 rafaelsteil Exp $
  */
 public abstract class DataAccessDriver {
     private static DataAccessDriver driver;
@@ -64,19 +60,17 @@ public abstract class DataAccessDriver {
     }
 
     /**
-     * Starts the engine. This method should be called when the system is
-     * starting.
+     * Starts the engine. This method should be called when the system is starting.
      * 
      * @param implementation
      *            The dao.driver implementation
      */
-    public static void init(DataAccessDriver implementation) {
+    public static void init(final DataAccessDriver implementation) {
         driver = implementation;
     }
 
     /**
-     * Gets a driver implementation instance. You MUST use this method when you
-     * want a instance of a valid <code>DataAccessDriver</code>. Never access
+     * Gets a driver implementation instance. You MUST use this method when you want a instance of a valid <code>DataAccessDriver</code>. Never access
      * the driver implementation directly.
      * 
      * @return <code>DataAccessDriver</code> instance
@@ -105,8 +99,6 @@ public abstract class DataAccessDriver {
      * @return <code>net.jforum.model.PostModel</code> instance.
      */
     public abstract PostDAO newPostDAO();
-
-    public abstract RecommendationDAO newRecommendationDAO();
 
     /**
      * Gets a {@link net.jforum.dao.PollDAO} instance.
@@ -160,16 +152,14 @@ public abstract class DataAccessDriver {
     /**
      * Gets a {@link net.jforum.dao.GroupSecurityDAO} instance
      * 
-     * @return <code>net.jforum.model.security.GroupSecurityModel</code>
-     *         instance
+     * @return <code>net.jforum.model.security.GroupSecurityModel</code> instance
      */
     public abstract GroupSecurityDAO newGroupSecurityDAO();
 
     /**
      * Gets a {@link net.jforum.dao.PrivateMessageDAO} instance
      * 
-     * @return <code>link net.jforum.model.security.PrivateMessageModel</code>
-     *         instance
+     * @return <code>link net.jforum.model.security.PrivateMessageModel</code> instance
      */
     public abstract PrivateMessageDAO newPrivateMessageDAO();
 

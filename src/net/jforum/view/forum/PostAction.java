@@ -65,7 +65,6 @@ import net.jforum.dao.ForumDAO;
 import net.jforum.dao.KarmaDAO;
 import net.jforum.dao.PollDAO;
 import net.jforum.dao.PostDAO;
-import net.jforum.dao.RecommendationDAO;
 import net.jforum.dao.TopicDAO;
 import net.jforum.dao.UserDAO;
 import net.jforum.entities.Attachment;
@@ -100,7 +99,9 @@ import net.jforum.view.forum.common.TopicsCommon;
 import net.jforum.view.forum.common.ViewCommon;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import com.igearbook.dao.RecommendDao;
 import com.igearbook.entities.Recommendation;
 import com.igearbook.util.HtmlUtil;
 
@@ -112,6 +113,12 @@ import freemarker.template.SimpleHash;
  */
 public class PostAction extends Command {
     Pattern IMGPT = Pattern.compile("<img\\s*src\\s*=\\s*\"(.*?)\"", Pattern.CASE_INSENSITIVE);
+    @Autowired
+    private RecommendDao recommendDao;
+
+    public void setRecommendDao(final RecommendDao recommendDao) {
+        this.recommendDao = recommendDao;
+    }
 
     public PostAction() {
     }
@@ -208,8 +215,7 @@ public class PostAction extends Command {
             userVotes = DataAccessDriver.getInstance().newKarmaDAO().getUserVotes(topic.getId(), us.getUserId());
         }
 
-        final RecommendationDAO recommendDao = DataAccessDriver.getInstance().newRecommendationDAO();
-        final Recommendation recommend = recommendDao.selectByTopicId(topicId);
+        final Recommendation recommend = recommendDao.getByTopicId(topicId);
 
         this.setTemplateName(TemplateKeys.POSTS_LIST);
         this.context.put("attachmentsEnabled", pc.canAccess(SecurityConstants.PERM_ATTACHMENTS_ENABLED, Integer.toString(topic.getForumId())));
@@ -248,7 +254,8 @@ public class PostAction extends Command {
         this.context.put("replyOnly", !pc.canAccess(SecurityConstants.PERM_NEW_POST, Integer.toString(topic.getForumId())));
         this.context.put("isModerator", us.isModerator(topic.getForumId()));
 
-        final String pageTitle = String.format("%s - %s - %s", topic.getTitle(), forum.getName(), SystemGlobals.getValue(ConfigKeys.FORUM_PAGE_TITLE));
+        final String pageTitle = String
+                .format("%s - %s - %s", topic.getTitle(), forum.getName(), SystemGlobals.getValue(ConfigKeys.FORUM_PAGE_TITLE));
         String description = HtmlUtil.removeAllHTML(helperList.get(0).getText());
         if (StringUtils.isNotBlank(description)) {
             description = description.trim();
