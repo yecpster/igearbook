@@ -52,12 +52,7 @@
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
 
-  <filter-mapping>
-    <filter-name>struts2</filter-name>
-    <url-pattern>*.action</url-pattern>
-    <dispatcher>FORWARD</dispatcher>
-    <dispatcher>REQUEST</dispatcher>
-  </filter-mapping>
+
 
   <listener>
     <listener-class>net.jforum.ForumSessionListener</listener-class>
@@ -90,6 +85,13 @@
     <servlet-name>jforum</servlet-name>
     <url-pattern>*.page</url-pattern>
   </servlet-mapping>
+
+  <filter-mapping>
+    <filter-name>struts2</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>FORWARD</dispatcher>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
 
   <!-- SESSION -->
   <session-config>
