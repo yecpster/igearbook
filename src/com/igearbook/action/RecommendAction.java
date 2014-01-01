@@ -35,7 +35,7 @@ import com.igearbook.dao.RecommendDao;
 import com.igearbook.entities.ImageVo;
 import com.igearbook.entities.PaginationData;
 import com.igearbook.entities.Recommendation;
-import com.igearbook.util.HtmlUtil;
+import com.igearbook.util.PostUtils;
 import com.opensymphony.xwork2.ActionContext;
 
 @Namespace("/recommend")
@@ -123,16 +123,8 @@ public class RecommendAction extends BaseAction {
         rtopic = recommendDao.getByTopicId(topicId);
         if (rtopic == null) {
             rtopic = new Recommendation();
-            String description = HtmlUtil.removeAllHTML(text);
-            if (StringUtils.isNotBlank(description)) {
-                description = description.trim();
-                description = description.replaceAll("\\s+", " ");
-                if (description.length() > 120) {
-                    description = description.substring(0, 120);
-                }
-            } else {
-                description = post.getSubject();
-            }
+            final String shotPostText = PostUtils.shortPostText(post, 120);
+            final String description = StringUtils.isBlank(shotPostText) ? post.getSubject() : shotPostText;
             final Forum forum = ForumRepository.getForum(topic.getForumId());
             rtopic.setType(forum.getType() == Forum.TYPE_TEAM ? Recommendation.TYPE_INDEX_TEAM : Recommendation.TYPE_INDEX_IMG);
             rtopic.setTitle(topic.getTitle());

@@ -676,7 +676,7 @@ public class PostAction extends Command {
             return;
         }
 
-        if (p.isModerationNeeded()) {
+        if (p.isModerate()) {
             this.notModeratedYet();
             return;
         }

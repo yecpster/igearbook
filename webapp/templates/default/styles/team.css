@@ -1375,20 +1375,20 @@ div#main h3, div#local h3, div.post_actions, div.crumbs, tr.mouse_over, div.main
 }
 
 .pagination a, .pagination a:link, .pagination a:visited {
-  border: 1px solid #AAAADD;
-  color: #069;
+  border: 1px solid #ccc;
+  color: #265827;
   background-color: white;
 }
 
 .pagination a:hover, .pagination a:active {
-  border: 1px solid #069;
-  color: #069;
+  border: 1px solid #265827;
+  color: #265827;
   background-color: white;
   text-decoration: none;
 }
 
 .pagination span.current{
-  background-color: #069;
+  background-color: #265827;
   color: white;
-  border: 1px solid #069;
+  border: 1px solid #265827;
 }

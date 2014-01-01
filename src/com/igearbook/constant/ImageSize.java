@@ -1,7 +1,7 @@
 package com.igearbook.constant;
 
 public enum ImageSize {
-    ORIGINAL(0, 0, 0), SIZE_480(1, 480, 320), SIZE_800(2, 800, 600);
+    ORIGINAL(0, 0, 0), LOGO(1000, 80, 80), SIZE_480(1, 480, 320), SIZE_800(2, 800, 600);
 
     private final int sizeNum;
     private final int width;

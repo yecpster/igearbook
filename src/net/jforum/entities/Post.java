@@ -8,13 +8,18 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.SecondaryTable;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import net.jforum.view.forum.common.ViewCommon;
 
+import org.hibernate.annotations.Type;
+
 @Entity
 @Table(name = "jforum_posts")
+@SecondaryTable(name = "jforum_posts_text")
 public class Post implements Serializable {
     private static final long serialVersionUID = -6067049478602005132L;
     private int id;
@@ -70,7 +75,7 @@ public class Post implements Serializable {
         this.setUserId(p.getUserId());
         this.setUserIp(p.getUserIp());
         this.setKarma(new KarmaStatus(p.getKarma()));
-        this.setModerate(p.isModerationNeeded());
+        this.setModerate(p.isModerate());
         this.hasAttachments(p.hasAttachments());
     }
 
@@ -78,13 +83,9 @@ public class Post implements Serializable {
         this.moderate = status;
     }
 
-    @Transient
+    @Column(name = "need_moderate", columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     public boolean isModerate() {
-        return this.isModerationNeeded();
-    }
-
-    @Transient
-    public boolean isModerationNeeded() {
         return this.moderate;
     }
 
@@ -102,7 +103,8 @@ public class Post implements Serializable {
      * 
      * @return boolean value representing the result
      */
-    @Transient
+    @Column(name = "enable_bbcode", columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     public boolean isBbCodeEnabled() {
         return this.bbCodeEnabled;
     }
@@ -112,7 +114,7 @@ public class Post implements Serializable {
      * 
      * @return int value with the total number of times the post was edited
      */
-    @Transient
+    @Column(name = "post_edit_count")
     public int getEditCount() {
         return this.editCount;
     }
@@ -122,7 +124,7 @@ public class Post implements Serializable {
      * 
      * @return long value representing the time
      */
-    @Transient
+    @Column(name = "post_edit_time")
     public Date getEditTime() {
         return this.editTime;
     }
@@ -142,7 +144,8 @@ public class Post implements Serializable {
      * 
      * @return boolean value representing the result
      */
-    @Transient
+    @Column(name = "enable_html", columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     public boolean isHtmlEnabled() {
         return this.htmlEnabled;
     }
@@ -169,7 +172,8 @@ public class Post implements Serializable {
      * 
      * @return boolean representing the result
      */
-    @Transient
+    @Column(name = "enable_sig", columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     public boolean isSignatureEnabled() {
         return this.signatureEnabled;
     }
@@ -179,7 +183,8 @@ public class Post implements Serializable {
      * 
      * @return boolean representing the result
      */
-    @Transient
+    @Column(name = "enable_smilies", columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     public boolean isSmiliesEnabled() {
         return this.smiliesEnabled;
     }
@@ -189,7 +194,7 @@ public class Post implements Serializable {
      * 
      * @return long representing the post time
      */
-    @Transient
+    @Column(name = "post_time")
     public Date getTime() {
         return this.time;
     }
@@ -199,7 +204,7 @@ public class Post implements Serializable {
      * 
      * @return int value with the topic id
      */
-    @Transient
+    @Column(name = "topic_id")
     public int getTopicId() {
         return this.topicId;
     }
@@ -209,7 +214,7 @@ public class Post implements Serializable {
      * 
      * @return int value with the user id
      */
-    @Transient
+    @Column(name = "user_id")
     public int getUserId() {
         return this.userId;
     }
@@ -219,7 +224,7 @@ public class Post implements Serializable {
      * 
      * @return String value with the user IP
      */
-    @Transient
+    @Column(name = "poster_ip")
     public String getUserIp() {
         return this.userIp;
     }
@@ -362,7 +367,8 @@ public class Post implements Serializable {
      * 
      * @return String containing the text
      */
-    @Transient
+    @Column(name = "post_text", table = "jforum_posts_text")
+    @Lob
     public String getText() {
         return this.text;
     }
@@ -382,7 +388,7 @@ public class Post implements Serializable {
      * 
      * @return String with the subject
      */
-    @Transient
+    @Column(name = "post_subject", table = "jforum_posts_text")
     public String getSubject() {
         return this.subject;
     }
@@ -419,7 +425,8 @@ public class Post implements Serializable {
     /**
      * @return Returns the hasAttachments.
      */
-    @Transient
+    @Column(name = "attach", columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     public boolean hasAttachments() {
         return this.hasAttachments;
     }

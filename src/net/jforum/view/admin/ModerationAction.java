@@ -69,7 +69,7 @@ public class ModerationAction extends AdminCommand
 {
 	public ModerationAction() {}
 	
-	public ModerationAction(SimpleHash context, RequestContext request)
+	public ModerationAction(final SimpleHash context, final RequestContext request)
 	{
 		this.context = context;
 		this.request = request;
@@ -78,7 +78,8 @@ public class ModerationAction extends AdminCommand
 	/**
 	 * @see net.jforum.Command#list()
 	 */
-	public void list()
+	@Override
+    public void list()
 	{
 		this.setTemplateName(TemplateKeys.MODERATION_ADMIN_LIST);
 		this.context.put("infoList", DataAccessDriver.getInstance().newModerationDAO().categoryPendingModeration());
@@ -86,7 +87,7 @@ public class ModerationAction extends AdminCommand
 	
 	public void view()
 	{
-		int forumId = this.request.getIntParameter("forum_id");
+		final int forumId = this.request.getIntParameter("forum_id");
 		
 		this.setTemplateName(TemplateKeys.MODERATION_ADMIN_VIEW);
 		this.context.put("forum", ForumRepository.getForum(forumId));
@@ -96,30 +97,30 @@ public class ModerationAction extends AdminCommand
 	
 	public void doSave()
 	{
-		String[] posts = this.request.getParameterValues("post_id");
+		final String[] posts = this.request.getParameterValues("post_id");
 
 		if (posts != null) {
-			TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
+			final TopicDAO topicDao = DataAccessDriver.getInstance().newTopicDAO();
 			
 			for (int i = 0; i < posts.length; i++) {
-				int postId = Integer.parseInt(posts[i]);
+				final int postId = Integer.parseInt(posts[i]);
 				
-				String status = this.request.getParameter("status_" + postId);
+				final String status = this.request.getParameter("status_" + postId);
 				
 				if ("defer".startsWith(status)) {
 					continue;
 				}
 				
 				if ("aprove".startsWith(status)) {
-					Post p = DataAccessDriver.getInstance().newPostDAO().selectById(postId);
+					final Post p = DataAccessDriver.getInstance().newPostDAO().selectById(postId);
 					
 					// Check is the post is in fact waiting for moderation
-					if (!p.isModerationNeeded()) {
+					if (!p.isModerate()) {
 						continue;
 					}
 					
-					UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
-					User u = userDao.selectById(p.getUserId());
+					final UserDAO userDao = DataAccessDriver.getInstance().newUserDAO();
+					final User u = userDao.selectById(p.getUserId());
 					
 					boolean first = false;
 					Topic t = TopicRepository.getTopic(new Topic(p.getTopicId()));
@@ -135,7 +136,7 @@ public class ModerationAction extends AdminCommand
 					
 					DataAccessDriver.getInstance().newModerationDAO().aprovePost(postId);
 					
-					boolean firstPost = (t.getFirstPostId() == postId);
+					final boolean firstPost = (t.getFirstPostId() == postId);
 					
 					if (!firstPost) {
 						t.setTotalReplies(t.getTotalReplies() + 1);
@@ -165,10 +166,10 @@ public class ModerationAction extends AdminCommand
 					}
 				}
 				else {
-					PostDAO pm = DataAccessDriver.getInstance().newPostDAO();
-					Post post = pm.selectById(postId);
+					final PostDAO pm = DataAccessDriver.getInstance().newPostDAO();
+					final Post post = pm.selectById(postId);
 					
-					if (post == null || !post.isModerationNeeded()) {
+					if (post == null || !post.isModerate()) {
 						continue;
 					}
 					
@@ -176,7 +177,7 @@ public class ModerationAction extends AdminCommand
 					
 					new AttachmentCommon(this.request, post.getForumId()).deleteAttachments(postId, post.getForumId());
 					
-					int totalPosts = topicDao.getTotalPosts(post.getTopicId());
+					final int totalPosts = topicDao.getTotalPosts(post.getTopicId());
 					
 					if (totalPosts == 0) {
 						TopicsCommon.deleteTopic(post.getTopicId(), post.getForumId(), true);

@@ -47,12 +47,10 @@ import java.io.Serializable;
 import net.jforum.dao.GroupSecurityDAO;
 
 /**
- * Methods and properties for all classes that need make use of security
- * actions.
+ * Methods and properties for all classes that need make use of security actions.
  * 
  * @author Rafael Steil
- * @version $Id: PermissionControl.java,v 1.19 2007/04/12 02:11:55 rafaelsteil
- *          Exp $
+ * @version $Id: PermissionControl.java,v 1.19 2007/04/12 02:11:55 rafaelsteil Exp $
  */
 public class PermissionControl implements Serializable {
     private static final long serialVersionUID = -7637111886973342962L;
@@ -61,27 +59,31 @@ public class PermissionControl implements Serializable {
 
     private transient GroupSecurityDAO smodel;
 
-    public void setRoles(RoleCollection roles) {
+    public void setRoles(final RoleCollection roles) {
         this.roles = roles;
     }
 
-    public void setSecurityModel(GroupSecurityDAO smodel) {
+    public RoleCollection getRoles() {
+        return roles;
+    }
+
+    public void setSecurityModel(final GroupSecurityDAO smodel) {
         this.smodel = smodel;
     }
 
-    public void addRole(int id, Role role) {
+    public void addRole(final int id, final Role role) {
         this.smodel.addRole(id, role);
     }
 
-    public void addRole(int id, Role role, RoleValueCollection roleValues) {
+    public void addRole(final int id, final Role role, final RoleValueCollection roleValues) {
         this.smodel.addRole(id, role, roleValues);
     }
 
-    public void addRoleValue(int id, Role role, RoleValueCollection roleValues) {
+    public void addRoleValue(final int id, final Role role, final RoleValueCollection roleValues) {
         this.smodel.addRoleValue(id, role, roleValues);
     }
 
-    public void deleteAllRoles(int id) {
+    public void deleteAllRoles(final int id) {
         this.smodel.deleteAllRoles(id);
     }
 
@@ -90,10 +92,9 @@ public class PermissionControl implements Serializable {
      * 
      * @param roleName
      *            The role's name
-     * @return A <code>Role</code> object if the role was found, or
-     *         <code>null</code> if not found.
+     * @return A <code>Role</code> object if the role was found, or <code>null</code> if not found.
      */
-    public Role getRole(String roleName) {
+    public Role getRole(final String roleName) {
         return this.roles.get(roleName);
     }
 
@@ -103,21 +104,20 @@ public class PermissionControl implements Serializable {
      *            String
      * @return boolean
      */
-    public boolean canAccess(String roleName) {
+    public boolean canAccess(final String roleName) {
         return this.roles.containsKey(roleName);
     }
 
     /**
-     * @see net.jforum.security.PermissionControl#canAccess(java.lang.String,
-     *      java.lang.String)
+     * @see net.jforum.security.PermissionControl#canAccess(java.lang.String, java.lang.String)
      * @return boolean
      * @param roleName
      *            String
      * @param roleValue
      *            String
      */
-    public boolean canAccess(String roleName, String roleValue) {
-        Role role = this.roles.get(roleName);
+    public boolean canAccess(final String roleName, final String roleValue) {
+        final Role role = this.roles.get(roleName);
 
         if (role == null) {
             return false;

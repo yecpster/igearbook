@@ -27,7 +27,11 @@
 <@s.else>
 <h3>修改群组：</h3>
 </@s.else>
-
+<@s.if test="hasActionErrors()">
+   <ul>
+    <li><span class="gen"><font color="red"><@s.actionerror /></font></span></li>
+  <ul>
+    </@s.if>
 <ul>
     <li><label>群组名称</label>
         <#if !team?exists || session.isAdmin()>

@@ -1,17 +1,12 @@
 package com.igearbook.action;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import javax.imageio.ImageIO;
 
 import net.jforum.SessionFacade;
 import net.jforum.dao.CategoryDAO;
@@ -29,6 +24,7 @@ import net.jforum.entities.Post;
 import net.jforum.entities.Topic;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
+import net.jforum.exceptions.AttachmentSizeTooBigException;
 import net.jforum.repository.ForumRepository;
 import net.jforum.repository.RolesRepository;
 import net.jforum.repository.SecurityRepository;
@@ -56,21 +52,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.igearbook.common.ImageCommon;
+import com.igearbook.constant.ImageSize;
 import com.igearbook.dao.ForumDao;
+import com.igearbook.dao.PostDao;
+import com.igearbook.dao.TopicDao;
 import com.igearbook.dao.UserDao;
+import com.igearbook.entities.ImageVo;
 import com.igearbook.entities.PaginationData;
 import com.igearbook.entities.PaginationParams;
-import com.igearbook.util.DateUtil;
-import com.igearbook.util.ImageHelper;
+import com.igearbook.util.PostUtils;
 import com.opensymphony.xwork2.ActionContext;
 
 @Namespace("/team")
 public class TeamAction extends BaseAction {
     private static final long serialVersionUID = 7587622153127430L;
-
-    private static final int WIDTH_RANGE = 80;
-
-    private static final int HEIGHT_RANGE = 80;
 
     private Forum team;
 
@@ -90,10 +86,24 @@ public class TeamAction extends BaseAction {
     private ForumDao forumDao;
 
     @Autowired
+    private TopicDao topicDao;
+
+    @Autowired
+    private PostDao postDao;
+
+    @Autowired
     private UserDao userDao;
 
     public void setForumDao(final ForumDao forumDao) {
         this.forumDao = forumDao;
+    }
+
+    public void setTopicDao(final TopicDao topicDao) {
+        this.topicDao = topicDao;
+    }
+
+    public void setPostDao(final PostDao postDao) {
+        this.postDao = postDao;
     }
 
     public void setUserDao(final UserDao userDao) {
@@ -102,6 +112,133 @@ public class TeamAction extends BaseAction {
 
     @Action(value = "list", results = { @Result(name = SUCCESS, location = "team_list.ftl") })
     public String list() {
+        final ActionContext context = ServletActionContext.getContext();
+        final boolean canCreateTeam = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_CREATE);
+        context.put("canCreateTeam", canCreateTeam);
+
+        final int userId = SessionFacade.getUserSession().getUserId();
+        final List<Category> allCategories = ForumRepository.getAllCategories(userId);
+        final List<Category> categories = Lists.newArrayList();
+        for (final Category category : allCategories) {
+            if (category.getType() == 1) {
+                categories.add(category);
+            }
+        }
+        final List<Forum> recommendTeams = forumDao.listRecommendTeam(8);
+        context.put("recommendTeams", recommendTeams);
+
+        final List<Forum> rankTeams = Lists.newArrayList();
+        for (final Category category : categories) {
+            rankTeams.addAll(category.getForums());
+        }
+        Collections.sort(rankTeams, new Comparator<Forum>() {
+            @Override
+            public int compare(final Forum o1, final Forum o2) {
+                return o2.getTotalPosts() - o1.getTotalPosts();
+            }
+        });
+        context.put("rankTeams", rankTeams);
+
+        final List<Forum> hotTeams = forumDao.listHostTeam(10);
+        context.put("hotTeams", hotTeams);
+
+        final List<Topic> topics = topicDao.listRecentTopics(Forum.TYPE_TEAM, 4);
+        for (final Topic topic : topics) {
+            final Forum forum = forumDao.get(topic.getForumId());
+            topic.setForum(forum);
+            final Post firstPost = postDao.get(topic.getFirstPostId());
+            final String shortPostText = PostUtils.shortPostText(firstPost, 120);
+            firstPost.setText(StringUtils.isBlank(shortPostText) ? I18n.getMessage("Post.pleaseViewImageInside") : shortPostText);
+            topic.setFirstPost(firstPost);
+        }
+        context.put("recentTopics", topics);
+        return SUCCESS;
+    }
+
+    @Action(value = "myteam", results = { @Result(name = SUCCESS, location = "team_myteam.ftl") })
+    public String myTeam() {
+        final ActionContext context = ServletActionContext.getContext();
+        final boolean canCreateTeam = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_CREATE);
+        context.put("canCreateTeam", canCreateTeam);
+
+        final int userId = SessionFacade.getUserSession().getUserId();
+        final List<Category> allCategories = ForumRepository.getAllCategories(userId);
+        final List<Category> categories = Lists.newArrayList();
+        for (final Category category : allCategories) {
+            if (category.getType() == 1) {
+                categories.add(category);
+            }
+        }
+        // Get my teams
+        final PermissionControl pc = SecurityRepository.get(userId);
+        final Role ownerTeamRole = pc.getRole(SecurityConstants.PERM_TEAMFORUM_OWNER);
+        final List<Forum> ownerTeams = Lists.newArrayList();
+        if (ownerTeamRole != null) {
+            @SuppressWarnings("unchecked")
+            final Iterator<RoleValue> it = ownerTeamRole.getValues().iterator();
+            while (it.hasNext()) {
+                final RoleValue roleValue = it.next();
+                if (!"0".equals(roleValue.getValue())) {
+                    final Forum team = forumDao.get(Integer.parseInt(roleValue.getValue()));
+                    ownerTeams.add(team);
+                }
+            }
+        }
+        context.put("ownerTeams", ownerTeams);
+        final Role moderatorTeamRole = pc.getRole(SecurityConstants.PERM_MODERATION_FORUMS);
+        final List<Forum> moderatorTeams = Lists.newArrayList();
+        if (moderatorTeamRole != null) {
+            @SuppressWarnings("unchecked")
+            final Iterator<RoleValue> it = moderatorTeamRole.getValues().iterator();
+            while (it.hasNext()) {
+                final RoleValue roleValue = it.next();
+                if (!"0".equals(roleValue.getValue())) {
+                    final Forum team = forumDao.get(Integer.parseInt(roleValue.getValue()));
+                    if (team.getType() == Forum.TYPE_TEAM) {
+                        moderatorTeams.add(team);
+                    }
+                }
+            }
+        }
+        context.put("moderatorTeams", moderatorTeams);
+        final Role userTeamRole = pc.getRole(SecurityConstants.PERM_TEAMFORUM_USER);
+        final List<Forum> userTeams = Lists.newArrayList();
+        if (userTeamRole != null) {
+            @SuppressWarnings("unchecked")
+            final Iterator<RoleValue> it = userTeamRole.getValues().iterator();
+            while (it.hasNext()) {
+                final RoleValue roleValue = it.next();
+                if (!"0".equals(roleValue.getValue())) {
+                    final Forum team = forumDao.get(Integer.parseInt(roleValue.getValue()));
+                    userTeams.add(team);
+                }
+            }
+        }
+        context.put("userTeams", userTeams);
+
+        final List<Forum> recommendTeams = forumDao.listRecommendTeam(8);
+        context.put("recommendTeams", recommendTeams);
+
+        final List<Forum> rankTeams = Lists.newArrayList();
+        for (final Category category : categories) {
+            rankTeams.addAll(category.getForums());
+        }
+        Collections.sort(rankTeams, new Comparator<Forum>() {
+            @Override
+            public int compare(final Forum o1, final Forum o2) {
+                return o2.getTotalPosts() - o1.getTotalPosts();
+            }
+        });
+        context.put("rankTeams", rankTeams);
+
+        final List<Forum> hotTeams = forumDao.listHostTeam(10);
+        context.put("hotTeams", hotTeams);
+
+        return SUCCESS;
+    }
+
+    @Action(value = "all", results = { @Result(name = SUCCESS, location = "team_all.ftl") })
+    public String all() {
         final ActionContext context = ServletActionContext.getContext();
         final boolean canCreateTeam = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_CREATE);
         context.put("canCreateTeam", canCreateTeam);
@@ -127,18 +264,17 @@ public class TeamAction extends BaseAction {
         });
         context.put("rankTeams", rankTeams);
 
-        final List<Forum> hotTeams = Lists.newArrayList();
-        for (final Category category : categories) {
-            hotTeams.addAll(category.getForums());
-        }
-        Collections.sort(hotTeams, new Comparator<Forum>() {
-            @Override
-            public int compare(final Forum o1, final Forum o2) {
-                return o2.getLastPostId() - o1.getLastPostId();
-            }
-        });
+        final List<Forum> hotTeams = forumDao.listHostTeam(10);
         context.put("hotTeams", hotTeams);
 
+        final List<Topic> topics = topicDao.listRecentTopics(Forum.TYPE_TEAM, 4);
+        for (final Topic topic : topics) {
+            final Forum forum = forumDao.get(topic.getForumId());
+            topic.setForum(forum);
+            final Post firstPost = postDao.get(topic.getFirstPostId());
+            topic.setFirstPost(firstPost);
+        }
+        context.put("recentTopics", topics);
         return SUCCESS;
     }
 
@@ -652,15 +788,23 @@ public class TeamAction extends BaseAction {
     }
 
     @Action(value = "save", interceptorRefs = {
-            @InterceptorRef("tokenSession"),
+            @InterceptorRef("igearbook"),
+            @InterceptorRef("token"),
             @InterceptorRef(value = "fileUpload", params = { "allowedExtensions ", ".gif,.jpg,.png", "allowedTypes",
-                    "image/png,image/gif,image/jpeg,image/pjpeg" }), @InterceptorRef("defaultStackIgearbook") }, results = { @Result(name = SUCCESS,
-            location = "/team/list.action", type = "redirect") })
+                    "image/png,image/gif,image/jpeg,image/pjpeg" }), @InterceptorRef("defaultStackIgearbook") }, results = {
+            @Result(name = SUCCESS, location = "/team/show.action", type = "redirect", params = { "teamId", "${team.id}" }),
+            @Result(name = INPUT, location = "team_form.ftl") })
     public String save() {
-        if (team.getId() == 0) {
-            return createSave();
-        } else {
-            return editSave();
+        try {
+            if (team.getId() == 0) {
+                return createSave();
+            } else {
+                return editSave();
+            }
+        } catch (final AttachmentSizeTooBigException e) {
+            this.team = ForumRepository.getForum(team.getId());
+            this.addActionError(e.getMessage());
+            return INPUT;
         }
     }
 
@@ -770,90 +914,13 @@ public class TeamAction extends BaseAction {
         if (upload == null) {
             return null;
         }
-        final String savePath = SystemGlobals.getValue(ConfigKeys.ATTACHMENTS_STORE_DIR) + "/teamlogo/";
-
-        final int suffixIndex = uploadFileName.lastIndexOf(".");
-        final String suffix = uploadFileName.substring(suffixIndex, uploadFileName.length());
-        final String timeFileName = DateUtil.getStringTime();
-        final String tmpFileSavePath = savePath + timeFileName + "_tmp" + suffix;
-        final String fileSaveName = timeFileName + suffix;
-        final String fileSavePath = savePath + fileSaveName;
-        saveImage(upload, tmpFileSavePath);// save tmp file
-        makeImage(tmpFileSavePath, fileSavePath, fileSaveName);
-
-        final File tmpFile = new File(tmpFileSavePath);
-        if (tmpFile.exists()) {
-            tmpFile.delete();
+        final ImageCommon imgCommon = new ImageCommon(upload, uploadFileName, 0, Lists.newArrayList(ImageSize.LOGO));
+        final Map<ImageSize, ImageVo> imgMap = imgCommon.doUpload();
+        ImageVo imageVo = imgMap.get(ImageSize.ORIGINAL);
+        if (imgMap.containsKey(ImageSize.LOGO)) {
+            imageVo = imgMap.get(ImageSize.LOGO);
         }
-
-        return ServletActionContext.getRequest().getContextPath() + "/upload/teamlogo/" + fileSaveName;
-    }
-
-    /**
-     * 用于生成上传完后的图片的副本，如缩略图
-     * 
-     * @param url
-     *            原图的绝对URL
-     * @param WidthRange
-     *            生成副本的宽度范围
-     * @param HeightRange
-     *            生成副本的高度范围
-     * @param newUrl
-     *            生成副本的地址
-     * @param formatName
-     *            生成图片的格式
-     */
-    public void makeImage(final String oldFileUrl, final String newUrl, final String newFileName) {
-        // 读取图片
-        BufferedImage bi = null;
-        try {
-            bi = ImageIO.read(new File(oldFileUrl));
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        // 判断读入图片的宽和高
-        final int oldWidth = bi.getWidth();
-        final int oldHeight = bi.getHeight();
-        if (oldWidth <= WIDTH_RANGE && oldHeight <= HEIGHT_RANGE)
-            saveImage(upload, newUrl);
-        else {
-            ImageHelper.zoomPicture(oldFileUrl, 80, 80, newFileName, true);
-        }
-
-    }
-
-    /**
-     * 把图片写入硬盘
-     * 
-     * @param file
-     *            要保存的图片文件
-     * @param savePath
-     *            保存的路径
-     * @throws Exception
-     */
-    private void saveImage(final File file, final String savePath) {
-        FileOutputStream outputStream = null;
-        FileInputStream fileIn = null;
-        try {
-            outputStream = new FileOutputStream(savePath);
-            fileIn = new FileInputStream(file);
-            final byte[] buffer = new byte[1024];
-            int len;
-            while ((len = fileIn.read(buffer)) > 0) {
-                outputStream.write(buffer, 0, len);
-            }
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            try {
-                fileIn.close();
-                outputStream.close();
-            } catch (final IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
+        return imageVo.getUrl();
     }
 
     private void addRole(final PermissionControl pc, final String roleName, final int forumId, final Group group) {

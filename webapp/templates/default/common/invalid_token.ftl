@@ -1,6 +1,6 @@
-<#include "header.htm"/>
-index
+<#include "/templates/default/header.htm"/>
+<@navHeader />
 <br/><br/><br/>
 <center><h2>请勿重复提交</h2></center>
 <br/><br/><br/>
-<#include "bottom.htm"/>
+<#include "/templates/default/bottom.htm"/>

@@ -56,46 +56,46 @@
       </table>
     </div>
 -->
+    
     <div class="clearfix">
-        <div class="groups_title"><span>最近更新</span> <#--<a href="#" class="more">更多文章</a>--></div>
-        <#list recentTopics as recentTopic>
-        <div class="group_topic clearfix">
-            <h4><a href="${JForumContext.encodeURL("/posts/list/${recentTopic.id}")}" target="_blank">${recentTopic.title}</a></h4>
-            <div style="float:right;">
-                <div class="logo">
-                <a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${recentTopic.forum.id}" /></@s.url>" target="_blank">
-                    <img src="<@s.url value="${recentTopic.forum.logo}" />" alt="${recentTopic.forum.name}" title="${recentTopic.forum.description?default("")}" height="48" width="48">
-                </a>
-                </div>
-            </div>
-            <div>${recentTopic.firstPost.text?default("")} ...</div>
-            <#--
-            <div class="page_tags">
-            
-            </div>
-            -->
-            <div class="topic_info clearfix">by 
-            <a href="${JForumContext.encodeURL("/user/profile/${recentTopic.postedBy.id}")}" target="_blank" title="${recentTopic.postedBy.username}">${recentTopic.postedBy.username}</a> ${recentTopic.time} 浏览 (${recentTopic.totalViews}) 
-            <a href="${JForumContext.encodeURL("/posts/reply/${recentTopic.totalReplies}/${recentTopic.id}")}" target="_blank">回复 (${recentTopic.totalReplies})</a> 群组: 
-            <a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${recentTopic.forum.id}" /></@s.url>" target="_blank">${recentTopic.forum.name}</a>
-            </div>
-        </div>
-        </#list>
-    </div>
-    <div class="clearfix">
-        <div class="groups_title"><span>推荐群组</span> <a href="<@s.url namespace="/team" action="all" />" class="more">更多群组</a></div>
+        <#if ownerTeams?has_content>
+        <div class="groups_title"><span>我创建的群组</span></div>
             <div class="clearfix">
-                <#list recommendTeams as team>
+                <#list ownerTeams as team>
                 <ul class="group">
                   <li class="logo"><div class="logo"><a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>" title="${team.description?default("")}"><img src="${team.logo?default("")}" alt="${team.name}" height="48" width="48"></a></div> </li>
                   <li class="clearfix"><a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>" title="${team.description?default("")}"><strong>${team.name}</strong></a> (${team.totalTopics})</li>
                 </ul>
                 </#list>
             </div>
-    </div>
         
-        
+        </#if>
+        <#if moderatorTeams?has_content>
+        <div class="groups_title"><span>我管理的群组</span></div>
+            <div class="clearfix">
+                <#list moderatorTeams as team>
+                <ul class="group">
+                  <li class="logo"><div class="logo"><a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>" title="${team.description?default("")}"><img src="${team.logo?default("")}" alt="${team.name}" height="48" width="48"></a></div> </li>
+                  <li class="clearfix"><a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>" title="${team.description?default("")}"><strong>${team.name}</strong></a> (${team.totalTopics})</li>
+                </ul>
+                </#list>
+            </div>
+        </#if>
+        <#if userTeams?has_content>
+        <div class="groups_title"><span>我加入的群组</span></div>
+            <div class="clearfix">
+                <#list userTeams as team>
+                <ul class="group">
+                  <li class="logo"><div class="logo"><a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>" title="${team.description?default("")}"><img src="${team.logo?default("")}" alt="${team.name}" height="48" width="48"></a></div> </li>
+                  <li class="clearfix"><a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>" title="${team.description?default("")}"><strong>${team.name}</strong></a> (${team.totalTopics})</li>
+                </ul>
+                </#list>
+            </div>
+        </#if>
+        </div>
     </div>
+    
+    
 
 
 </div>
@@ -110,13 +110,11 @@
       </form>
     </div>
     -->
-  <p> 
+    <p> 
       <#if canCreateTeam>
         <a href="<@s.url namespace="/team" action="insert" />" class="new_group_link">创建群组</a>  &nbsp;&nbsp;
       </#if>
-      <a href="<@s.url namespace="/team" action="myteam" />" class="my_group_link">我的群组</a>
   </p>
-
 <#--boxes-->
     <#--
     <div class="box">
@@ -140,7 +138,7 @@
       <#list hotTeams as hotTeam>
         <#if (hotTeam_index < 10)>
         <div class="clearfix hot_group">
-          <div class="logo"><a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${hotTeam.id}" /></@s.url>" title="${hotTeam.description}"><img src="${contextPath}${hotTeam.logo?default("")}" alt="${hotTeam.name}" height="48" width="48"></a></div>
+          <div class="logo"><a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${hotTeam.id}" /></@s.url>" title="${hotTeam.description}"><img src="${hotTeam.logo?default("")}" alt="${hotTeam.name}" height="48" width="48"></a></div>
           <div class="info" style="margin-left: 70px;">
             <a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${hotTeam.id}" /></@s.url>" title="${hotTeam.description}">${hotTeam.name}</a><br>
                 <#if hotTeam.description?exists && (hotTeam.description?length > 20)>
@@ -153,7 +151,6 @@
         </#if>
        </#list>
     </div>
-
 <#--boxes end-->
 
   

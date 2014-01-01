@@ -45,400 +45,475 @@ package net.jforum.entities;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.Type;
+
 /**
  * Represents every topic in the forum.
  * 
  * @author Rafael Steil
  * @version $Id: Topic.java,v 1.18 2007/08/01 22:09:03 rafaelsteil Exp $
  */
-public class Topic implements Serializable
-{
-	public static final int TYPE_NORMAL = 0;
-	public static final int TYPE_STICKY = 1;
-	public static final int TYPE_ANNOUNCE = 2;
-	public static final int TYPE_GOOD = 3;
+@Entity
+@Table(name = "jforum_topics")
+public class Topic implements Serializable {
+    private static final long serialVersionUID = 1L;
+    public static final int TYPE_NORMAL = 0;
+    public static final int TYPE_STICKY = 1;
+    public static final int TYPE_ANNOUNCE = 2;
+    public static final int TYPE_GOOD = 3;
 
-	public static final int STATUS_UNLOCKED = 0;
-	public static final int STATUS_LOCKED = 1;
-	
-	private int id;
-	private int forumId;
-	private int totalViews;
-	private int totalReplies;
-	private int status;
-	private int type;
-	private int firstPostId;
-	private int lastPostId;	
-	private int voteId;
-	private int movedId;
-	
-	private boolean read = true;
-	private boolean moderated;
-	private boolean isHot;
-	private boolean hasAttach;
-	private boolean paginate;
-	
-	private String firstPostTime;
-	private String lastPostTime;
-	private String title;
-	
-	private Date time;
-	private Date lastPostDate;
-	
-	private Double totalPages;
-	
-	private User postedBy;
-	private User lastPostBy;
-	
-	public Topic() {}
-	
-	public Topic(int topicId)
-	{
-		this.id = topicId;
-	}
-	
-	/**
-	 * Returns the ID of the firts topic
-	 * 
-	 * @return int value with the ID
-	 */
-	public int getFirstPostId() {
-		return this.firstPostId;
-	}
+    public static final int STATUS_UNLOCKED = 0;
+    public static final int STATUS_LOCKED = 1;
 
-	/**
-	 * Returns the ID of the topic
-	 * 
-	 * @return int value with the ID
-	 */
-	public int getId() {
-		return this.id;
-	}
+    private int id;
+    private int forumId;
+    private Forum forum;
+    private int totalViews;
+    private int totalReplies;
+    private int status;
+    private int type;
+    private int firstPostId;
+    private Post firstPost;
+    private int lastPostId;
+    private int voteId;
+    private int movedId;
 
-	/**
-	 * Returns the ID of the forum this topic belongs to
-	 * 
-	 * @return int value with the ID
-	 */
-	public int getForumId() {
-		return this.forumId;
-	}
+    private boolean read = true;
+    private boolean moderated;
+    private boolean isHot;
+    private boolean hasAttach;
+    private boolean paginate;
 
-	/**
-	 * Teturns the ID of the last post in the topic
-	 * 
-	 * @return int value with the ID
-	 */
-	public int getLastPostId() {
-		return this.lastPostId;
-	}
+    private String firstPostTime;
+    private String lastPostTime;
+    private String title;
 
-	/**
-	 * Returns the status 
-	 * 
-	 * @return int value with the status
-	 */
-	public int getStatus() {
-		return this.status;
-	}
+    private Date time;
+    private Date lastPostDate;
 
-	/**
-	 * Returns the time the topic was posted
-	 * 
-	 * @return int value representing the time
-	 */
-	public Date getTime() {
-		return this.time;
-	}
-	
-	public void setFirstPostTime(String d) {
-		this.firstPostTime = d;
-	}
-	
-	public void setLastPostTime(String d) {
-		this.lastPostTime = d;
-	}
+    private Double totalPages;
 
-	/**
-	 * Returns the title of the topci
-	 * 
-	 * @return String with the topic title
-	 */
-	public String getTitle() {
-		return (this.title == null ? "" : this.title);
-	}
+    private User postedBy;
+    private User lastPostBy;
 
-	/**
-	 * Returns the total number of replies
-	 * 
-	 * @return int value with the total
-	 */
-	public int getTotalReplies() {
-		return this.totalReplies;
-	}
+    public Topic() {
+    }
 
-	/**
-	 * Returns the total number of views
-	 * 
-	 * @return int value with the total number of views
-	 */
-	public int getTotalViews() {
-		return this.totalViews;
-	}
-	
-	public User getPostedBy() {
-		return this.postedBy;
-	}
-	
-	public User getLastPostBy() {
-		return this.lastPostBy;
-	}
+    public Topic(final int topicId) {
+        this.id = topicId;
+    }
 
-	/**
-	 * Returns the type
-	 * 
-	 * @return int value representing the type
-	 */
-	public int getType() {
-		return this.type;
-	}
+    /**
+     * Returns the ID of the firts topic
+     * 
+     * @return int value with the ID
+     */
+    @Column(name = "topic_first_post_id")
+    public int getFirstPostId() {
+        return this.firstPostId;
+    }
 
-	/**
-	 * Is a votation topic?
-	 * 
-	 * @return boolean value
-	 */
-	public boolean isVote() {
-		return this.voteId != 0;
-	}
+    @Transient
+    public Post getFirstPost() {
+        return firstPost;
+    }
 
-	/**
-	 * Is a votation topic? If so, this is the vote Id
-	 * 
-	 * @return boolean value
-	 */
-	public int getVoteId() {
-		return this.voteId;
-	}
+    public void setFirstPost(final Post firstPost) {
+        this.firstPost = firstPost;
+    }
 
-	/**
-	 * Sets the id of the firts post in the topic
-	 * 
-	 * @param firstPostId The post id 
-	 */
-	public void setFirstPostId(int firstPostId) {
-		this.firstPostId = firstPostId;
-	}
+    /**
+     * Returns the ID of the topic
+     * 
+     * @return int value with the ID
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "topic_id")
+    public int getId() {
+        return this.id;
+    }
 
-	/**
-	 * Sets the id to the topic
-	 * 
-	 * @param id The id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
-	}
+    /**
+     * Returns the ID of the forum this topic belongs to
+     * 
+     * @return int value with the ID
+     */
+    @Column(name = "forum_id")
+    public int getForumId() {
+        return this.forumId;
+    }
 
-	/**
-	 * Sets the id of the forum associeted with this topic
-	 * 
-	 * @param idForum The id of the forum to set
-	 */
-	public void setForumId(int idForum) {
-		this.forumId = idForum;
-	}
+    @Transient
+    public Forum getForum() {
+        return forum;
+    }
 
-	/**
-	 * Sets the id of the last post in the topic
-	 * 
-	 * @param lastPostId The post id
-	 */
-	public void setLastPostId(int lastPostId) {
-		this.lastPostId = lastPostId;
-	}
+    public void setForum(final Forum forum) {
+        this.forum = forum;
+    }
 
-	/**
-	 * Sets the status.
-	 * 
-	 * @param status The status to set
-	 */
-	public void setStatus(int status) {
-		this.status = status;
-	}
+    /**
+     * Teturns the ID of the last post in the topic
+     * 
+     * @return int value with the ID
+     */
+    @Column(name = "topic_last_post_id")
+    public int getLastPostId() {
+        return this.lastPostId;
+    }
 
-	/**
-	 * Sets the time.
-	 * 
-	 * @param time The time to set
-	 */
-	public void setTime(Date time) {
-		this.time = time;
-	}
+    /**
+     * Returns the status
+     * 
+     * @return int value with the status
+     */
+    @Column(name = "topic_status")
+    public int getStatus() {
+        return this.status;
+    }
 
-	/**
-	 * Sets the title.
-	 * 
-	 * @param title The title to set
-	 */
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    /**
+     * Returns the time the topic was posted
+     * 
+     * @return int value representing the time
+     */
+    @Column(name = "topic_time")
+    public Date getTime() {
+        return this.time;
+    }
 
-	/**
-	 * Sets the totalReplies.
-	 * 
-	 * @param totalReplies The totalReplies to set
-	 */
-	public void setTotalReplies(int totalReplies) {
-		this.totalReplies = totalReplies;
-	}
+    public void setFirstPostTime(final String d) {
+        this.firstPostTime = d;
+    }
 
-	/**
-	 * Sets the totalViews.
-	 * 
-	 * @param totalViews The totalViews to set
-	 */
-	public void setTotalViews(int totalViews) {
-		this.totalViews = totalViews;
-	}
+    public void setLastPostTime(final String d) {
+        this.lastPostTime = d;
+    }
 
-	/**
-	 * Sets the type.
-	 * 
-	 * @param type The type to set
-	 */
-	public void setType(int type) {
-		this.type = type;
-	}
+    /**
+     * Returns the title of the topci
+     * 
+     * @return String with the topic title
+     */
+    @Column(name = "topic_title")
+    public String getTitle() {
+        return (this.title == null ? "" : this.title);
+    }
 
-	/**
-	 * Sets the voteId.
-	 * 
-	 * @param voteId The voteId to set
-	 */
-	public void setVoteId(int voteId) {
-		this.voteId = voteId;
-	}
-	/**
-	 * @return
-	 */
-	public boolean isModerated() {
-		return this.moderated;
-	}
+    /**
+     * Returns the total number of replies
+     * 
+     * @return int value with the total
+     */
+    @Column(name = "topic_replies")
+    public int getTotalReplies() {
+        return this.totalReplies;
+    }
 
-	/**
-	 * @param b
-	 */
-	public void setModerated(boolean b) {
-		this.moderated = b;
-	}
-	
-	public void setPostedBy(User u) {
-		this.postedBy = u;
-	}
-	
-	public void setLastPostBy(User u) {
-		this.lastPostBy = u;
-	}
-	
-	public String getFirstPostTime() {
-		return this.firstPostTime;
-	}
-	
-	public String getLastPostTime() {
-		return this.lastPostTime;
-	}
+    /**
+     * Returns the total number of views
+     * 
+     * @return int value with the total number of views
+     */
+    @Column(name = "topic_views")
+    public int getTotalViews() {
+        return this.totalViews;
+    }
 
-	public void setRead(boolean read) {
-		this.read = read;
-	}
-	
-	public boolean getRead() {
-		return this.read;
-	}
-	
-	public void setLastPostDate(Date t) {
-		this.lastPostDate = t;
-	}
-	
-	public Date getLastPostDate() {
-		return this.lastPostDate;
-	}
-	
-	public void setPaginate(boolean paginate) {
-		this.paginate = paginate;
-	}
-	
-	public boolean getPaginate() {
-		return this.paginate;
-	}
-	
-	public void setTotalPages(Double total) {
-		this.totalPages = total;
-	}
-	
-	public Double getTotalPages() {
-		return this.totalPages;
-	}
-	
-	public void setHot(boolean hot) {
-		this.isHot = hot;
-	}
-	
-	public boolean isHot() {
-		return this.isHot;
-	}
-	
-	public void setHasAttach(boolean b)
-	{
-		this.hasAttach = b;
-	}
-	
-	public boolean hasAttach()
-	{
-		return this.hasAttach;
-	}
-	
-	/** 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	public boolean equals(Object o)
-	{
-		if (!(o instanceof Topic)) {
-			return false;
-		}
-		
-		return (((Topic)o).getId() == this.id);
-	}
-	/** 
-	 * @see java.lang.Object#hashCode()
-	 */
-	public int hashCode()
-	{
-		return this.id;
-	}
-	
-	/**
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString()
-	{
-		return "[" + this.id + ", " + this.title + "]";
-	}
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    public User getPostedBy() {
+        return this.postedBy;
+    }
 
-	/**
-	 * @return the movedId
-	 */
-	public int getMovedId()
-	{
-		return this.movedId;
-	}
+    @Transient
+    public User getLastPostBy() {
+        return this.lastPostBy;
+    }
 
-	/**
-	 * @param movedId the movedId to set
-	 */
-	public void setMovedId(int movedId)
-	{
-		this.movedId = movedId;
-	}
+    /**
+     * Returns the type
+     * 
+     * @return int value representing the type
+     */
+    @Column(name = "topic_type")
+    public int getType() {
+        return this.type;
+    }
+
+    /**
+     * Is a votation topic?
+     * 
+     * @return boolean value
+     */
+    @Transient
+    public boolean isVote() {
+        return this.voteId != 0;
+    }
+
+    /**
+     * Is a votation topic? If so, this is the vote Id
+     * 
+     * @return boolean value
+     */
+    @Column(name = "topic_vote_id")
+    public int getVoteId() {
+        return this.voteId;
+    }
+
+    /**
+     * Sets the id of the firts post in the topic
+     * 
+     * @param firstPostId
+     *            The post id
+     */
+    public void setFirstPostId(final int firstPostId) {
+        this.firstPostId = firstPostId;
+    }
+
+    /**
+     * Sets the id to the topic
+     * 
+     * @param id
+     *            The id to set
+     */
+    public void setId(final int id) {
+        this.id = id;
+    }
+
+    /**
+     * Sets the id of the forum associeted with this topic
+     * 
+     * @param idForum
+     *            The id of the forum to set
+     */
+    public void setForumId(final int idForum) {
+        this.forumId = idForum;
+    }
+
+    /**
+     * Sets the id of the last post in the topic
+     * 
+     * @param lastPostId
+     *            The post id
+     */
+    public void setLastPostId(final int lastPostId) {
+        this.lastPostId = lastPostId;
+    }
+
+    /**
+     * Sets the status.
+     * 
+     * @param status
+     *            The status to set
+     */
+    public void setStatus(final int status) {
+        this.status = status;
+    }
+
+    /**
+     * Sets the time.
+     * 
+     * @param time
+     *            The time to set
+     */
+    public void setTime(final Date time) {
+        this.time = time;
+    }
+
+    /**
+     * Sets the title.
+     * 
+     * @param title
+     *            The title to set
+     */
+    public void setTitle(final String title) {
+        this.title = title;
+    }
+
+    /**
+     * Sets the totalReplies.
+     * 
+     * @param totalReplies
+     *            The totalReplies to set
+     */
+    public void setTotalReplies(final int totalReplies) {
+        this.totalReplies = totalReplies;
+    }
+
+    /**
+     * Sets the totalViews.
+     * 
+     * @param totalViews
+     *            The totalViews to set
+     */
+    public void setTotalViews(final int totalViews) {
+        this.totalViews = totalViews;
+    }
+
+    /**
+     * Sets the type.
+     * 
+     * @param type
+     *            The type to set
+     */
+    public void setType(final int type) {
+        this.type = type;
+    }
+
+    /**
+     * Sets the voteId.
+     * 
+     * @param voteId
+     *            The voteId to set
+     */
+    public void setVoteId(final int voteId) {
+        this.voteId = voteId;
+    }
+
+    /**
+     * @return
+     */
+    @Column(name = "moderated", columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
+    public boolean isModerated() {
+        return this.moderated;
+    }
+
+    /**
+     * @param b
+     */
+    public void setModerated(final boolean b) {
+        this.moderated = b;
+    }
+
+    public void setPostedBy(final User u) {
+        this.postedBy = u;
+    }
+
+    public void setLastPostBy(final User u) {
+        this.lastPostBy = u;
+    }
+
+    @Transient
+    public String getFirstPostTime() {
+        return this.firstPostTime;
+    }
+
+    @Transient
+    public String getLastPostTime() {
+        return this.lastPostTime;
+    }
+
+    public void setRead(final boolean read) {
+        this.read = read;
+    }
+
+    @Transient
+    public boolean getRead() {
+        return this.read;
+    }
+
+    public void setLastPostDate(final Date t) {
+        this.lastPostDate = t;
+    }
+
+    @Transient
+    public Date getLastPostDate() {
+        return this.lastPostDate;
+    }
+
+    public void setPaginate(final boolean paginate) {
+        this.paginate = paginate;
+    }
+
+    @Transient
+    public boolean getPaginate() {
+        return this.paginate;
+    }
+
+    public void setTotalPages(final Double total) {
+        this.totalPages = total;
+    }
+
+    @Transient
+    public Double getTotalPages() {
+        return this.totalPages;
+    }
+
+    public void setHot(final boolean hot) {
+        this.isHot = hot;
+    }
+
+    @Transient
+    public boolean isHot() {
+        return this.isHot;
+    }
+
+    public void setHasAttach(final boolean b) {
+        this.hasAttach = b;
+    }
+
+    @Transient
+    public boolean hasAttach() {
+        return this.hasAttach;
+    }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    @Transient
+    public boolean equals(final Object o) {
+        if (!(o instanceof Topic)) {
+            return false;
+        }
+
+        return (((Topic) o).getId() == this.id);
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    @Transient
+    public int hashCode() {
+        return this.id;
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    @Transient
+    public String toString() {
+        return "[" + this.id + ", " + this.title + "]";
+    }
+
+    /**
+     * @return the movedId
+     */
+    @Column(name = "topic_moved_id")
+    public int getMovedId() {
+        return this.movedId;
+    }
+
+    /**
+     * @param movedId
+     *            the movedId to set
+     */
+    public void setMovedId(final int movedId) {
+        this.movedId = movedId;
+    }
 }
