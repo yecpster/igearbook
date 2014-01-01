@@ -83,8 +83,10 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
         final PaginationData<P> paginationData = new PaginationData<P>();
         enrichParams(paginationData, params);
         final Criteria criteria = getSession().createCriteria(theClass);
-        for (final Entry<String, Object> entry : params.getQueryParams().entrySet()) {
-            criteria.add(Restrictions.eq(entry.getKey(), entry.getValue()));
+        if (params.getQueryParams() != null) {
+            for (final Entry<String, Object> entry : params.getQueryParams().entrySet()) {
+                criteria.add(Restrictions.eq(entry.getKey(), entry.getValue()));
+            }
         }
 
         final BigDecimal recordsPerPage = BigDecimal.valueOf(params.getRecordsPerPage());
@@ -108,10 +110,11 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
         final PaginationData<P> paginationData = new PaginationData<P>();
         enrichParams(paginationData, params);
         final Query query = getSession().createQuery(hql);
-        for (final Entry<String, Object> entry : params.getQueryParams().entrySet()) {
-            query.setParameter(entry.getKey(), entry.getValue());
+        if (params.getQueryParams() != null) {
+            for (final Entry<String, Object> entry : params.getQueryParams().entrySet()) {
+                query.setParameter(entry.getKey(), entry.getValue());
+            }
         }
-
         final BigDecimal recordsPerPage = BigDecimal.valueOf(params.getRecordsPerPage());
         final BigDecimal totalRecords = getTotalRecords(hql, params);
         final int totalPages = totalRecords.divide(recordsPerPage, RoundingMode.CEILING).intValue();

@@ -69,7 +69,7 @@ Please check your browser settings or use a Javascript-capable browser.</p>
                     <a href="${JForumContext.encodeURL("/moderation/showActivityLog")}" class="nobg">${I18n.getMessage("ModerationLog.moderationLog")}</a>
                 </#if>
                 <#if session?exists && (session.isAdmin() || session.isWebAdmin())>
-                    <a href="${contextPath}/recommend/manage.action" class="nobg">推荐文章管理</a>
+                    <a href="${contextPath}/recommend/manage" class="nobg">推荐文章管理</a>
                 </#if>
                 <#if session?exists && session.isAdmin()>
                     <a href="${JForumContext.encodeURL("/admBase/login")}" target="_blank" class="nobg">${I18n.getMessage("ForumBase.admin")}</a>
@@ -124,7 +124,7 @@ Please check your browser settings or use a Javascript-capable browser.</p>
           <li><a href="${JForumContext.encodeURL("/hottestTopics/list")}" class="${hotTopicClass}">${I18n.getMessage("ForumBase.hottestTopics")}</a></li>
           -->
           <li class="${bbsClass}"><a href="${JForumContext.encodeURL("/forums/list")}">${I18n.getMessage("ForumListing.forumIndex")}</a></li>
-          <li class="${teamClass}"><a href="${contextPath}/team/list.action">群组</a></li>
+          <li class="${teamClass}"><a href="${contextPath}/team/list">群组</a></li>
           <li class="${userListClass}"><a href="${JForumContext.encodeURL("/user/list")}">${I18n.getMessage("ForumBase.usersList")}</a></li>
           <li class="${searchClass}"><a href="${JForumContext.encodeURL("/search/filters")}">${I18n.getMessage("ForumBase.search")}</a></li>
         </ul>
