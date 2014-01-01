@@ -250,7 +250,7 @@
     <div>
       <h3>群组信息</h3>
       <ul>
-        <li>个性域名 <a href="<@s.url namespace="/team" action="apply_url"><@s.param name="teamId" value="${team.id}" /></@s.url>">点这里申请一个！</a></li>
+        <li>个性域名 <a href="<@s.url namespace="/team" action="apply_url"><@s.param name="teamId" value="${team.id}" /></@s.url>">点这里注册一个！</a></li>
       </ul>
     </div>
     </#if>
