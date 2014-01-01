@@ -10,7 +10,13 @@
   <div class="crumbs">
     <a href="${contextPath}/team/list.action">群组首页</a>
     <span class="arrow">→</span>
-    <a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${teamId}" /></@s.url>">
+    <a href="
+    <#if team.uri?exists>
+        <@s.url value="/${team.uri}" />
+    <#else>
+        <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${teamId}" /></@s.url>
+    </#if>
+    ">
     ${team.name?html}
     </a>
     <span class="arrow">→</span>

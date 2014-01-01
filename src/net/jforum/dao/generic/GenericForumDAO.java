@@ -119,6 +119,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
         f.setTotalTopics(rs.getInt("forum_topics"));
         f.setLastPostId(rs.getInt("forum_last_post_id"));
         f.setModerated(rs.getInt("moderated") > 0);
+        f.setUri(rs.getString("forum_uri")); 
         f.setTotalPosts(this.countForumPosts(f.getId()));
 
         return f;

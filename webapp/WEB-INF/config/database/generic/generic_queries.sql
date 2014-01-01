@@ -261,15 +261,15 @@ PollModel.selectVoterByIP = SELECT vote_id, vote_user_id, vote_user_ip \
 # #############
 # ForumModel
 # #############
-ForumModel.selectById = SELECT forum_id, forum_type, forum_name, forum_logo, categories_id, forum_desc, forum_order, forum_topics, forum_last_post_id, moderated \
+ForumModel.selectById = SELECT forum_id, forum_type, forum_name, forum_logo, categories_id, forum_desc, forum_order, forum_topics, forum_last_post_id, moderated, forum_uri \
 	FROM jforum_forums \
 	WHERE forum_id = ?
 
-ForumModel.selectAll = SELECT forum_id, forum_type, forum_name, forum_logo, categories_id, forum_desc, forum_order, forum_topics, forum_last_post_id, moderated \
+ForumModel.selectAll = SELECT forum_id, forum_type, forum_name, forum_logo, categories_id, forum_desc, forum_order, forum_topics, forum_last_post_id, moderated, forum_uri \
 	FROM jforum_forums \
 	ORDER BY forum_order ASC
 
-ForumModel.selectByType = SELECT forum_id, forum_type, forum_name, forum_logo, categories_id, forum_desc, forum_order, forum_topics, forum_last_post_id, moderated \
+ForumModel.selectByType = SELECT forum_id, forum_type, forum_name, forum_logo, categories_id, forum_desc, forum_order, forum_topics, forum_last_post_id, moderated, forum_uri \
     FROM jforum_forums WHERE forum_type = ? \
     ORDER BY forum_order ASC
 

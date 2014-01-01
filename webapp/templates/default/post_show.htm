@@ -109,7 +109,11 @@
                         <#if isTeamForum>
                             <a class="nav" href="${contextPath}/team/list.action">群组首页</a> 
                             &raquo; 
-                            <a class="nav" href="${contextPath}/team/show.action?teamId=${forum.id}">${forum.name?html}</a>
+                            <#if forum.uri?exists>
+                                <a class="nav" href="${contextPath}/${forum.uri}">${forum.name?html}</a>
+                            <#else>
+                                <a class="nav" href="${contextPath}/team/show.action?teamId=${forum.id}">${forum.name?html}</a>
+                            </#if>
                             &raquo; 
                             <a class="nav" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">群组论坛</a>
                         <#else>

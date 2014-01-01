@@ -233,20 +233,26 @@
         <h3>群组链接</h3>
         <ul>
           
-            <li><a href="http://girl.group.iteye.com/" title="美女PP&amp;&amp;PLMM" target="_blank" rel="nofollow">美女PP&amp;&amp;PLMM</a></li>
+            <li><a href="" title="美女PP&amp;&amp;PLMM" target="_blank" rel="nofollow">美女PP&amp;&amp;PLMM</a></li>
           
         </ul>
       </div>
-    
-
+     -->
+    <#if customUrl?exists>
     <div>
       <h3>群组信息</h3>
       <ul>
-        <li>永久域名 <a href="./电脑DIY - ITeye技术社区_files/电脑DIY - ITeye技术社区.htm">http://pcdiy.group.iteye.com</a></li>
-        <li>订阅群组博客 <a href="http://pcdiy.group.iteye.com/rss"><img src="./电脑DIY - ITeye技术社区_files/rss.png"></a></li>
-        <li>创建于 2008-09-23
-      </li></ul>
+        <li>个性域名 <a href="<@s.url value="/${customUrl}" />">www.igearbook.com/${customUrl}</a></li>
+       <#-- <li>创建于 2008-09-23</li>-->
+      </ul>
     </div>
-  -->
+    <#elseif isTeamOwner>
+    <div>
+      <h3>群组信息</h3>
+      <ul>
+        <li>个性域名 <a href="<@s.url namespace="/team" action="apply_url"><@s.param name="teamId" value="${team.id}" /></@s.url>">点这里申请一个！</a></li>
+      </ul>
+    </div>
+    </#if>
 
 <#include "/templates/default/bottom.htm" />

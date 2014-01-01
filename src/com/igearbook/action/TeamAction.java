@@ -54,10 +54,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.igearbook.common.ImageCommon;
 import com.igearbook.constant.ImageSize;
+import com.igearbook.constant.UrlType;
+import com.igearbook.dao.CustomUrlDao;
 import com.igearbook.dao.ForumDao;
 import com.igearbook.dao.PostDao;
 import com.igearbook.dao.TopicDao;
 import com.igearbook.dao.UserDao;
+import com.igearbook.entities.CustomUrl;
 import com.igearbook.entities.ImageVo;
 import com.igearbook.entities.PaginationData;
 import com.igearbook.entities.PaginationParams;
@@ -94,6 +97,11 @@ public class TeamAction extends BaseAction {
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private CustomUrlDao customUrlDao;
+
+    private CustomUrl customUrl;
+
     public void setForumDao(final ForumDao forumDao) {
         this.forumDao = forumDao;
     }
@@ -108,6 +116,10 @@ public class TeamAction extends BaseAction {
 
     public void setUserDao(final UserDao userDao) {
         this.userDao = userDao;
+    }
+
+    public void setCustomUrlDao(final CustomUrlDao customUrlDao) {
+        this.customUrlDao = customUrlDao;
     }
 
     @Action(value = "list", results = { @Result(name = SUCCESS, location = "team_list.ftl") })
@@ -513,6 +525,12 @@ public class TeamAction extends BaseAction {
             }
         }
 
+        // Custom URL
+        final CustomUrl customUrl = customUrlDao.getByTypeModuleId(UrlType.Team, teamId);
+        if (customUrl != null) {
+            context.put("customUrl", customUrl.getUrl());
+        }
+
         // Moderation
         final UserSession userSession = SessionFacade.getUserSession();
         final boolean isLogged = SessionFacade.isLogged();
@@ -597,7 +615,7 @@ public class TeamAction extends BaseAction {
         }
     }
 
-    @Action(value = "saveAnnounce", interceptorRefs = { @InterceptorRef("tokenSession"), @InterceptorRef("defaultStackIgearbook") },
+    @Action(value = "saveAnnounce", interceptorRefs = { @InterceptorRef("defaultStackIgearbook"), @InterceptorRef("tokenSession") },
             results = { @Result(name = SUCCESS, location = "show.action", type = "redirect", params = { "teamId", "${teamId}" }) })
     public String saveAnnounce() {
         teamId = team.getId();
@@ -775,6 +793,43 @@ public class TeamAction extends BaseAction {
         }
     }
 
+    @Action(value = "apply_url", results = { @Result(name = SUCCESS, location = "team_url_form.ftl") })
+    public String applyUrl() {
+        final boolean canApply = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_OWNER, String.valueOf(teamId));
+        final CustomUrl customUrl = customUrlDao.getByTypeModuleId(UrlType.Team, teamId);
+        if (canApply && customUrl == null) {
+            this.team = ForumRepository.getForum(teamId);
+            return SUCCESS;
+        } else {
+            return PERMISSION;
+        }
+    }
+
+    @Action(value = "apply_url_save", interceptorRefs = { @InterceptorRef("defaultStackIgearbook"), @InterceptorRef("tokenSession") }, results = {
+            @Result(name = INPUT, location = "team_url_form.ftl"),
+            @Result(name = SUCCESS, location = "/team/show.action", type = "redirect", params = { "teamId", "${team.id}" }) })
+    public String applyUrlSave() {
+        final int teamId = team.getId();
+        final boolean canApply = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_OWNER, String.valueOf(teamId));
+        if (!canApply) {
+            return PERMISSION;
+
+        }
+        if (customUrlDao.getByUrl(customUrl.getUrl()) != null) {
+            this.addActionError(I18n.getMessage("Team.urlAlreadyBeenUsed"));
+            this.team = ForumRepository.getForum(teamId);
+            return INPUT;
+        }
+        customUrl.setModuleId(teamId);
+        customUrl.setType(UrlType.Team);
+        customUrlDao.add(customUrl);
+        final Forum teamUpdate = ForumRepository.getForum(team.getId());
+        teamUpdate.setUri(customUrl.getUrl());
+        forumDao.update(teamUpdate);
+        return SUCCESS;
+
+    }
+
     @Action(value = "edit", results = { @Result(name = SUCCESS, location = "team_form.ftl") })
     public String edit() {
         final boolean canEditTeam = SecurityRepository.canAccess(SecurityConstants.PERM_MODERATION_FORUMS, String.valueOf(teamId));
@@ -788,10 +843,10 @@ public class TeamAction extends BaseAction {
     }
 
     @Action(value = "save", interceptorRefs = {
-            @InterceptorRef("igearbook"),
-            @InterceptorRef("token"),
+            @InterceptorRef("defaultStackIgearbook"),
+            @InterceptorRef("tokenSession"),
             @InterceptorRef(value = "fileUpload", params = { "allowedExtensions ", ".gif,.jpg,.png", "allowedTypes",
-                    "image/png,image/gif,image/jpeg,image/pjpeg" }), @InterceptorRef("defaultStackIgearbook") }, results = {
+                    "image/png,image/gif,image/jpeg,image/pjpeg" }) }, results = {
             @Result(name = SUCCESS, location = "/team/show.action", type = "redirect", params = { "teamId", "${team.id}" }),
             @Result(name = INPUT, location = "team_form.ftl") })
     public String save() {
@@ -855,6 +910,7 @@ public class TeamAction extends BaseAction {
             team.setType(1);
             team.setCategoryId(category.getId());
             team.setLogo(logoUrl);
+            team.setCreateDate(new Date());
             forumDao.addNew(team);
             ForumRepository.addForum(team);
         } else {
@@ -1055,6 +1111,14 @@ public class TeamAction extends BaseAction {
 
     public void setBanPostUserIds(final int[] banPostUserIds) {
         this.banPostUserIds = banPostUserIds;
+    }
+
+    public CustomUrl getCustomUrl() {
+        return customUrl;
+    }
+
+    public void setCustomUrl(final CustomUrl customUrl) {
+        this.customUrl = customUrl;
     }
 
 }

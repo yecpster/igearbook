@@ -10,7 +10,14 @@
         <#list rankTeams as rankTeam>
         <#if (rankTeam_index < 10)>
             <div class="rank">
-              <div class="rank_info">${rankTeam_index + 1}.<a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${rankTeam.id}" /></@s.url>" title="${rankTeam.description?default("")}">${rankTeam.name}</a><br>文章数：${rankTeam.totalPosts}</div>
+              <div class="rank_info">${rankTeam_index + 1}.
+              <a href="
+              <#if rankTeam.uri?exists>
+                <@s.url value="/${rankTeam.uri}" />
+              <#else>
+                <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${rankTeam.id}" /></@s.url>
+              </#if>
+              " title="${rankTeam.description?default("")}">${rankTeam.name}</a><br>文章数：${rankTeam.totalPosts}</div>
               <div class="rank_logo"><div class="logo"><a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${rankTeam.id}" /></@s.url>" title="${rankTeam.description?default("")}"><img src="${contextPath}${rankTeam.logo?default("")}" alt="${rankTeam.name}" height="48" width="48"></a></div></div>
             </div>
         </#if>
@@ -28,8 +35,22 @@
                 <#list categories as category>
                 <#list category.getForums() as team>
                 <ul class="group">
-                  <li class="logo"><div class="logo"><a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>" title="${team.description?default("")}"><img src="${contextPath}${team.logo?default("")}" alt="${team.name}" height="48" width="48"></a></div> </li>
-                  <li class="clearfix"><a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>" title="${team.description?default("")}"><strong>${team.name}</strong></a> (${team.totalTopics})</li>
+                  <li class="logo"><div class="logo">
+                  <a href="
+                  <#if team.uri?exists>
+                     <@s.url value="/${team.uri}" />
+                  <#else>
+                    <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>
+                  </#if>
+                  " title="${team.description?default("")}"><img src="${contextPath}${team.logo?default("")}" alt="${team.name}" height="48" width="48"></a></div> </li>
+                  <li class="clearfix">
+                  <a href="
+                  <#if team.uri?exists>
+                     <@s.url value="/${team.uri}" />
+                  <#else>
+                    <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>
+                  </#if>
+                    " title="${team.description?default("")}"><strong>${team.name}</strong></a> (${team.totalTopics})</li>
                 </ul>
                 </#list>
                 </#list>
@@ -55,9 +76,22 @@
       <#list hotTeams as hotTeam>
         <#if (hotTeam_index < 10)>
         <div class="clearfix hot_group">
-          <div class="logo"><a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${hotTeam.id}" /></@s.url>" title="${hotTeam.description}"><img src="${contextPath}${hotTeam.logo?default("")}" alt="${hotTeam.name}" height="48" width="48"></a></div>
+          <div class="logo">
+          <a href="
+          <#if hotTeam.uri?exists>
+            <@s.url value="/${hotTeam.uri}" />
+          <#else>
+            <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${hotTeam.id}" /></@s.url>
+          </#if>
+            " title="${hotTeam.description}"><img src="${contextPath}${hotTeam.logo?default("")}" alt="${hotTeam.name}" height="48" width="48"></a></div>
           <div class="info" style="margin-left: 70px;">
-            <a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${hotTeam.id}" /></@s.url>" title="${hotTeam.description}">${hotTeam.name}</a><br>
+            <a href="
+            <#if hotTeam.uri?exists>
+            <@s.url value="/${hotTeam.uri}" />
+            <#else>
+                <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${hotTeam.id}" /></@s.url>
+            </#if>
+            " title="${hotTeam.description}">${hotTeam.name}</a><br>
                 <#if hotTeam.description?exists && (hotTeam.description?length > 20)>
                     ${hotTeam.description?substring(0, 20)} ...
                 <#else>

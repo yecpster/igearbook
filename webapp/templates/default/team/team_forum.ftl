@@ -23,7 +23,11 @@
 					   <span class="nav">
                             <a class="nav" href="${contextPath}/team/list.action">群组首页</a> 
                             &raquo; 
-                            <a class="nav" href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${teamId}" /></@s.url>">${team.name?html}</a>
+                             <#if team.uri?exists>
+                                <a class="nav" href="<@s.url value="/${team.uri}" />">${team.name?html}</a>
+                             <#else>
+                                <a class="nav" href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${teamId}" /></@s.url>">${team.name?html}</a>
+                             </#if>
                             &raquo; 群组论坛
                         </span>
 
@@ -38,7 +42,7 @@
 							<br />
 
 							<#if openModeration?default(false)>
-								<a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /><#if (start > 0)><@s.param name="start" value="${start}" /></#if></@s.url>">${I18n.getMessage("Moderation.CloseModeration")}</a>
+								    <a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /><#if (start > 0)><@s.param name="start" value="${start}" /></#if></@s.url>">${I18n.getMessage("Moderation.CloseModeration")}</a>
 							<#else>
 								<a href="<@s.url namespace="/team" action="moderation"><@s.param name="teamId" value="${team.id}" /><#if (start > 0)><@s.param name="start" value="${start}" /></#if></@s.url>">${I18n.getMessage("Moderation.OpenModeration")}</a>
 							</#if>

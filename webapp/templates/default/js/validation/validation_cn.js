@@ -50,6 +50,7 @@ Validator.messageSource['zh-cn'] = [
 	['validate-digits' , '请输入数字.'],
 	['validate-alpha' , '请输入英文字母.'],
 	['validate-alphanum' , '请输入英文字母或是数字,其它字符是不允许的.'],
+	['validate-alphanumNMinus' , '请输入英文字母, 数字或减号,其它字符是不允许的.'],
 	['validate-email' , '请输入有效的邮件地址,如 username@example.com.'],
 	['validate-url' , '请输入有效的URL地址.'],
 	['validate-currency-dollar' , 'Please enter a valid $ amount. For example $100.00 .'],
@@ -500,7 +501,8 @@ Validation.addAllThese([
 			},{ignoreEmptyValue : false}],
 			
 	['validate-digits',/^[\d]+$/],		
-	['validate-alphanum',/^[a-zA-Z0-9]+$/],		
+	['validate-alphanum',/^[a-zA-Z0-9]+$/],	
+	['validate-alphanumNMinus',/^[a-zA-Z0-9\-]+$/],    
 	['validate-alpha',/^[a-zA-Z]+$/],
 	['validate-email',/\w{1,}[@][\w\-]{1,}([.]([\w\-]{1,})){1,3}$/],
 	['validate-url',/^(http|https|ftp):\/\/(([A-Z0-9][A-Z0-9_-]*)(\.[A-Z0-9][A-Z0-9_-]*)+)(:(\d+))?\/?/i],

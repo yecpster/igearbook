@@ -1,6 +1,7 @@
 package net.jforum.entities;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -36,6 +37,7 @@ public class Forum implements Serializable {
     private boolean moderated;
     private boolean unread;
     private LastPostInfo lastPostInfo;
+    private Date createDate;
 
     public Forum() {
     }
@@ -192,6 +194,14 @@ public class Forum implements Serializable {
 
     public void setLastPostInfo(final LastPostInfo lastPostInfo) {
         this.lastPostInfo = lastPostInfo;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(final Date createDate) {
+        this.createDate = createDate;
     }
 
     /**

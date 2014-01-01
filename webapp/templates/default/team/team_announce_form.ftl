@@ -7,7 +7,11 @@
   <div class="crumbs">
     <a href="${contextPath}/team/list.action">群组首页</a>
     <span class="arrow">→</span>
-    <a href="${contextPath}/team/show.action?teamId=${teamId}">${team.name?html}</a>
+    <#if team.uri?exists>
+        <a href="<@s.url value="/${team.uri}" />">${team.name?html}</a>
+     <#else>
+        <a href="${contextPath}/team/show.action?teamId=${teamId}">${team.name?html}</a>
+    </#if>
     <span class="arrow">→</span>
              修改群组公告
   </div>

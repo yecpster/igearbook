@@ -8,7 +8,13 @@
            <span class="nav">
                <a class="nav" href="${contextPath}/team/list.action">群组首页</a> 
                &raquo; 
-               <a class="nav" href="${contextPath}/team/show.action?teamId=${teamId}">${team.name?html}</a>
+               <a class="nav" href="
+               <#if team.uri?exists>
+                    <@s.url value="/${team.uri}" />
+                <#else>
+                    ${contextPath}/team/show.action?teamId=${teamId}
+                </#if>    
+                ">${team.name?html}</a>
                &raquo;   管理会员
             </span>
        </td>
