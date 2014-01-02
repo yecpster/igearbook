@@ -104,7 +104,13 @@
   <h2>热门群组</h2>
   <#list hotTeams as hotTeam>
         <#if (hotTeam_index < 10)>
-  <a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${hotTeam.id}" /></@s.url>" title="${hotTeam.name}" target="_blank">
+  <a href="
+      <#if hotTeam.uri?exists>
+        <@s.url value="/${hotTeam.uri}" />
+      <#else>
+        <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${hotTeam.id}" /></@s.url>
+      </#if>
+  " title="${hotTeam.name}" target="_blank">
   <div class="row index-group"> <img src="${contextPath}${hotTeam.logo?default("")}" alt="${hotTeam.name}" width="60" height="60" border="0" />
     <p>
         <#if hotTeam.description?exists && (hotTeam.description?length > 23)>

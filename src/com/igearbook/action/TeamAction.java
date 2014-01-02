@@ -192,7 +192,9 @@ public class TeamAction extends BaseAction {
                 final RoleValue roleValue = it.next();
                 if (!"0".equals(roleValue.getValue())) {
                     final Forum team = forumDao.get(Integer.parseInt(roleValue.getValue()));
-                    ownerTeams.add(team);
+                    if (team != null) {
+                        ownerTeams.add(team);
+                    }
                 }
             }
         }
@@ -206,7 +208,7 @@ public class TeamAction extends BaseAction {
                 final RoleValue roleValue = it.next();
                 if (!"0".equals(roleValue.getValue())) {
                     final Forum team = forumDao.get(Integer.parseInt(roleValue.getValue()));
-                    if (team.getType() == Forum.TYPE_TEAM) {
+                    if (team != null && team.getType() == Forum.TYPE_TEAM) {
                         moderatorTeams.add(team);
                     }
                 }
@@ -222,7 +224,9 @@ public class TeamAction extends BaseAction {
                 final RoleValue roleValue = it.next();
                 if (!"0".equals(roleValue.getValue())) {
                     final Forum team = forumDao.get(Integer.parseInt(roleValue.getValue()));
-                    userTeams.add(team);
+                    if (team != null) {
+                        userTeams.add(team);
+                    }
                 }
             }
         }

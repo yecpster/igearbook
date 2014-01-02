@@ -136,7 +136,7 @@
     <input type="hidden" name="forum" value="${team.id}" />
     <input type="hidden" name="match_type" value="all" />
     
-    <input class="text" name="search_keywords" style="width: 182px;" type="text" onblur="if (this.value == '') this.value = '搜索这个群组...';" onclick="if (this.value == '搜索这个群组...') this.value = '';" value="搜索这个群组..." />
+    <input class="text" name="search_keywords" style="width: 180px;" type="text" onblur="if (this.value == '') this.value = '搜索这个群组...';" onclick="if (this.value == '搜索这个群组...') this.value = '';" value="搜索这个群组..." />
     <input type="submit" value="${I18n.getMessage("ForumBase.search")}" class="submit">
   </form>
 </div>

@@ -24,7 +24,9 @@ public class ForumDaoImpl extends BaseDaoImpl<Forum> implements ForumDao {
     @Override
     public Forum get(final int id) {
         final Forum forum = (Forum) getSession().get(Forum.class, id);
-        forum.setTotalPosts(getTotalPosts(forum));
+        if(forum!=null){
+            forum.setTotalPosts(getTotalPosts(forum));
+        }
         return forum;
     }
 

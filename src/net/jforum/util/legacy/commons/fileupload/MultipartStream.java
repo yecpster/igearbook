@@ -237,9 +237,9 @@ public class MultipartStream {
      * @see #MultipartStream(InputStream, byte[])
      *
      */
-    public MultipartStream(InputStream input,
-                           byte[] boundary,
-                           int bufSize) {
+    public MultipartStream(final InputStream input,
+                           final byte[] boundary,
+                           final int bufSize) {
         this.input = input;
         this.bufSize = bufSize;
         this.buffer = new byte[bufSize];
@@ -273,8 +273,8 @@ public class MultipartStream {
      * @see #MultipartStream(InputStream, byte[], int)
      *
      */
-    public MultipartStream(InputStream input,
-                           byte[] boundary)  {
+    public MultipartStream(final InputStream input,
+                           final byte[] boundary)  {
         this(input, boundary, DEFAULT_BUFSIZE);
     }
 
@@ -302,7 +302,7 @@ public class MultipartStream {
      *
      * @param encoding The encoding used to read part headers.
      */
-    public void setHeaderEncoding(String encoding) {
+    public void setHeaderEncoding(final String encoding) {
         headerEncoding = encoding;
     }
 
@@ -343,7 +343,7 @@ public class MultipartStream {
      */
     public boolean readBoundary()
         throws MalformedStreamException {
-        byte[] marker = new byte[2];
+        final byte[] marker = new byte[2];
         boolean nextChunk = false;
 
         head += boundaryLength;
@@ -368,7 +368,7 @@ public class MultipartStream {
                 throw new MalformedStreamException(
                         "Unexpected characters follow a boundary");
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new MalformedStreamException("Stream ended unexpectedly");
         }
         return nextChunk;
@@ -394,7 +394,7 @@ public class MultipartStream {
      *                                     has a different length than the one
      *                                     being currently parsed.
      */
-    public void setBoundary(byte[] boundary)
+    public void setBoundary(final byte[] boundary)
         throws IllegalBoundaryException {
         if (boundary.length != boundaryLength - 4) {
             throw new IllegalBoundaryException(
@@ -422,15 +422,15 @@ public class MultipartStream {
     public String readHeaders()
         throws MalformedStreamException {
         int i = 0;
-        byte[] b = new byte[1];
+        final byte[] b = new byte[1];
         // to support multi-byte characters
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        int sizeMax = HEADER_PART_SIZE_MAX;
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final int sizeMax = HEADER_PART_SIZE_MAX;
         int size = 0;
         while (i < 4) {
             try {
                 b[0] = readByte();
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 throw new MalformedStreamException("Stream ended unexpectedly");
             }
             size++;
@@ -448,7 +448,7 @@ public class MultipartStream {
         if (headerEncoding != null) {
             try {
                 headers = baos.toString(headerEncoding);
-            } catch (UnsupportedEncodingException e) {
+            } catch (final UnsupportedEncodingException e) {
                 // Fall back to platform default if specified encoding is not
                 // supported.
                 headers = baos.toString();
@@ -477,7 +477,7 @@ public class MultipartStream {
      * @exception MalformedStreamException if the stream ends unexpectedly.
      * @exception IOException              if an i/o error occurs.
      */
-    public int readBodyData(OutputStream output)
+    public int readBodyData(final OutputStream output)
         throws MalformedStreamException,
                IOException {
         boolean done = false;
@@ -615,7 +615,8 @@ public class MultipartStream {
             // Read boundary - if succeded, the stream contains an
             // encapsulation.
             return readBoundary();
-        } catch (MalformedStreamException e) {
+        } catch (final MalformedStreamException e) {
+            e.printStackTrace();
             return false;
         } finally {
             // Restore delimiter.
@@ -638,9 +639,9 @@ public class MultipartStream {
      * @return <code>true</code> if <code>count</code> first bytes in arrays
      *         <code>a</code> and <code>b</code> are equal.
      */
-    public static boolean arrayequals(byte[] a,
-                                      byte[] b,
-                                      int count) {
+    public static boolean arrayequals(final byte[] a,
+                                      final byte[] b,
+                                      final int count) {
         for (int i = 0; i < count; i++) {
             if (a[i] != b[i]) {
                 return false;
@@ -660,8 +661,8 @@ public class MultipartStream {
      * @return The position of byte found, counting from beginning of the
      *         <code>buffer</code>, or <code>-1</code> if not found.
      */
-    protected int findByte(byte value,
-                           int pos) {
+    protected int findByte(final byte value,
+                           final int pos) {
         for (int i = pos; i < tail; i++) {
             if (buffer[i] == value) {
                 return i;
@@ -683,7 +684,7 @@ public class MultipartStream {
     protected int findSeparator() {
         int first;
         int match = 0;
-        int maxpos = tail - boundaryLength;
+        final int maxpos = tail - boundaryLength;
         for (first = head;
              (first <= maxpos) && (match != boundaryLength);
              first++) {
@@ -708,8 +709,9 @@ public class MultipartStream {
      *
      * @return The string representation of this object.
      */
+    @Override
     public String toString() {
-        StringBuffer sbTemp = new StringBuffer();
+        final StringBuffer sbTemp = new StringBuffer();
         sbTemp.append("boundary='");
         sbTemp.append(String.valueOf(boundary));
         sbTemp.append("'\nbufSize=");
@@ -737,7 +739,7 @@ public class MultipartStream {
          *
          * @param message The detail message.
          */
-        public MalformedStreamException(String message) {
+        public MalformedStreamException(final String message) {
             super(message);
         }
     }
@@ -762,7 +764,7 @@ public class MultipartStream {
          *
          * @param message The detail message.
          */
-        public IllegalBoundaryException(String message) {
+        public IllegalBoundaryException(final String message) {
             super(message);
         }
     }
