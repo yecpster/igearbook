@@ -19,7 +19,7 @@
   </appender>
 
   <category name="org.jgroups">
-    <priority value="info" />
+    <priority value="warn" />
     <appender-ref ref="jforum-stdout" />
   </category>
 
@@ -29,21 +29,21 @@
   </category>
 
   <category name="net.jforum">
-    <priority value="debug" />
+    <priority value="warn" />
     <appender-ref ref="jforum-stdout" />
   </category>
 
   <category name="freemarker">
-    <priority value="info" />
+    <priority value="warn" />
     <appender-ref ref="jforum-stdout" />
   </category>
 
   <category name="com.mchange">
-    <priority value="info" />
+    <priority value="error" />
     <appender-ref ref="jforum-stdout" />
   </category>
-  <!-- <root> -->
-  <!-- <priority value="debug" /> -->
-  <!-- <appender-ref ref="jforum-stdout" /> -->
-  <!-- </root> -->
+  <root>
+  <priority value="warn" />
+  <appender-ref ref="jforum-stdout" />
+  </root>
 </log4j:configuration>

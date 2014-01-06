@@ -125,13 +125,13 @@
                     </td>
                     <td width="8%" align="left" valign="bottom" nowrap="nowrap">
                        <#if moderator && !topicRecommended>
-                            <a href="${contextPath}/recommend/add.action?topicId=${topic.id}" rel="nofollow" class="icon_recommend nav" target="_blank"><img src="${contextPath}/images/transp.gif" alt="" /></a>
+                            <a href="${contextPath}/recommend/add.action?topicId=${topic.id}" rel="nofollow" class="icon_recommend nav" target="_blank"><img src="${contextPath}/images/transp.gif" alt="推荐文章" /></a>
                         </#if>
                         <#if topic.status == STATUS_LOCKED>
-                            <span class="icon_reply_locked"><img src="${contextPath}/images/transp.gif" alt="" /></span>
+                            <span class="icon_reply_locked"><img src="${contextPath}/images/transp.gif" alt="文章已锁定" /></span>
                         <#else>
                             <#if !readonly>
-                                <a href="${JForumContext.encodeURL("/posts/reply/${start}/${topic.id}")}" rel="nofollow" class="icon_reply nav"><img src="${contextPath}/images/transp.gif" alt="" /></a>
+                                <a href="${JForumContext.encodeURL("/posts/reply/${start}/${topic.id}")}" rel="nofollow" class="icon_reply nav"><img src="${contextPath}/images/transp.gif" alt="回复文章" /></a>
                             <#else>
                                 <#assign colspan = "2"/>
                             </#if>
@@ -263,7 +263,7 @@
 					</tr>
 		
 					<tr>
-						<td class="spacerow" colspan="2" height="1"><img src="${contextPath}/templates/${templateName}/images/spacer.gif" alt="" width="1" height="1" /></td>
+						<td class="spacerow" colspan="2" height="1"><img src="${contextPath}/templates/${templateName}/images/spacer.gif" alt="空白" width="1" height="1" /></td>
 					</tr>
 				</#list>
 				<!-- END OF POST LISTING -->
@@ -351,7 +351,7 @@
                                         <tr>
                                             <td align="right" valign="center">
                                                 <input type="submit" id="btnSubmit" value="发表回复" class="submitBig" />
-                                                <img src="${contextPath}/images/transp.gif" id="icon_saving">
+                                                <img src="${contextPath}/images/transp.gif" id="icon_saving" alt="正在保存" />
                                             </td>
                                         </tr>
                                     </table>

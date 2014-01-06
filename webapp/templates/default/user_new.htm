@@ -63,13 +63,17 @@ function newCaptcha()
 </table>
 		
 <table class="forumline" cellspacing="1" cellpadding="3" width="100%" border="0">
+    <tr>
+        <th class="thhead" valign="middle" colspan="2" height="25">${I18n.getMessage("User.registerInformation")}</th>
+    </tr>
+    <#--
 	<tr>
 		<th class="thhead" valign="middle" height="25">${I18n.getMessage("User.registerInformation")}</th>
 		<th class="thhead" valign="middle" ><span style="font-size: 12px; color: #000;">或者先不注册</span><a href="${contextPath}/qqapi/login.action" class="qqlogin" title="QQ登录">
                         <img alt="QQ登录" src="${contextPath}/templates/${templateName}/images/QQ_Connect_logo_4.png" width="170" height="32" />
                         </a></th>
 	</tr>
-        
+    -->
 	<tr>
 		<td class="row2" colspan="2" align="center"><span class="gensmall"><font color="red">${I18n.getMessage("User.requiredFields")}</font></span></td>
 	</tr>

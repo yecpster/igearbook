@@ -60,7 +60,7 @@
       <span>讨论</span>
       <#if !replyOnly>
       <div class="more">
-        <img src="${contextPath}/images/team/icon_plus.gif">
+        <img src="${contextPath}/images/team/icon_plus.gif" alt="发表新文章" />
         <a href="${JForumContext.encodeURL("/jforum${extension}?module=posts&amp;action=insert&amp;forum_id=${team.id}", "")}">发表新帖</a>
       </div>
       </#if>
@@ -170,13 +170,13 @@
                 <#if (user.avatar?exists && user.avatar?length > 0)>
                     <#if user.isExternalAvatar() || user.avatar.startsWith("http://")>
                         <#if avatarAllowExternalUrl>
-                            <img class="logo" src="${user.avatar?html}" alt="[Avatar]" />
+                            <img class="logo" src="${user.avatar?html}" alt="Avatar of ${user.username}" />
                         </#if>
                     <#else>
-                        <img class="logo" src="${contextPath}/images/avatar/${user.avatar}" alt="[Avatar]" />
+                        <img class="logo" src="${contextPath}/images/avatar/${user.avatar}" alt="Avatar of ${user.username}" />
                     </#if>
                 <#else>
-                    <img class="logo" src="${contextPath}/images/team/photo_not_available.png" alt="[Avatar]" />
+                    <img class="logo" src="${contextPath}/images/team/photo_not_available.png" alt="Avatar of ${user.username}" />
                 </#if>
               </a>
           </div>
