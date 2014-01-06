@@ -108,7 +108,7 @@
       <#if hotTeam.uri?exists>
         <@s.url value="/${hotTeam.uri}" />
       <#else>
-        <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${hotTeam.id}" /></@s.url>
+        <@s.url value="/team/show/${hotTeam.id}" />
       </#if>
   " title="${hotTeam.name}" target="_blank">
   <div class="row index-group"> <img src="${contextPath}${hotTeam.logo?default("")}" alt="${hotTeam.name}" width="60" height="60" border="0" />

@@ -43,11 +43,13 @@ public final class CustomUrlFilter implements Filter {
         if (uri.startsWith(contextPath)) {
             uri = uri.substring(contextPath.length() + 1);
         }
-        final CustomUrl customUrl = customUrlDao.getByUrl(uri);
+        final CustomUrl customUrl = customUrlDao.getByUrl(uri.replaceAll(";.+", ""));
         if (customUrl != null && customUrl.getType() == UrlType.Team) {
             final int moduleId = customUrl.getModuleId();
             hsRequest.getRequestDispatcher("/team/show.action?teamId=" + moduleId).forward(hsRequest, hsResponse);
+        } else {
+            chain.doFilter(hsRequest, hsResponse);
         }
-        chain.doFilter(hsRequest, hsResponse);
+
     }
 }

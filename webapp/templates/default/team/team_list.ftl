@@ -3,35 +3,7 @@
 <link href="${contextPath}/templates/${templateName}/styles/teams.css?${startupTime}" media="screen" rel="stylesheet" type="text/css" />
 
 <#--side-->
-<div id="side">
-  
-    <div class="box">
-      <h3>群组排名</h3>
-        <#list rankTeams as rankTeam>
-        <#if (rankTeam_index < 10)>
-            <div class="rank">
-              <div class="rank_info">${rankTeam_index + 1}.
-              <a href="
-              <#if rankTeam.uri?exists>
-                <@s.url value="/${rankTeam.uri}" />
-              <#else>
-                <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${rankTeam.id}" /></@s.url>
-              </#if>
-              " title="${rankTeam.description?default("")}">${rankTeam.name}</a><br>文章数：${rankTeam.totalPosts}</div>
-              <div class="rank_logo"><div class="logo">
-                    <a href="
-                    <#if rankTeam.uri?exists>
-                      <@s.url value="/${rankTeam.uri}" />
-                    <#else>
-                        <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${rankTeam.id}" /></@s.url>
-                    </#if>
-                    " title="${rankTeam.description?default("")}"><img src="${rankTeam.logo?default("")}" alt="${rankTeam.name}" height="48" width="48"></a></div></div>
-            </div>
-        </#if>
-        </#list>
-    </div>
-
-</div>
+<#include "team_rank.ftl"/>
 <#--side end-->
 
 <#--index_main-->
@@ -81,7 +53,7 @@
                 <#if recentTopic.forum.uri?exists>
                    <@s.url value="/${recentTopic.forum.uri}" />
                 <#else>
-                    <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${recentTopic.forum.id}" /></@s.url>
+                    <@s.url value="/team/show/${recentTopic.forum.id}" />
                 </#if>
                     " target="_blank">
                     <img src="<@s.url value="${recentTopic.forum.logo}" />" alt="${recentTopic.forum.name}" title="${recentTopic.forum.description?default("")}" height="48" width="48">
@@ -97,7 +69,12 @@
             <div class="topic_info clearfix">by 
             <a href="${JForumContext.encodeURL("/user/profile/${recentTopic.postedBy.id}")}" target="_blank" title="${recentTopic.postedBy.username}">${recentTopic.postedBy.username}</a> ${recentTopic.time} 浏览 (${recentTopic.totalViews}) 
             <a href="${JForumContext.encodeURL("/posts/reply/${recentTopic.totalReplies}/${recentTopic.id}")}" target="_blank">回复 (${recentTopic.totalReplies})</a> 群组: 
-            <a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${recentTopic.forum.id}" /></@s.url>" target="_blank">${recentTopic.forum.name}</a>
+            <a href="<#if recentTopic.forum.uri?exists>
+                   <@s.url value="/${recentTopic.forum.uri}" />
+                <#else>
+                    <@s.url value="/team/show/${recentTopic.forum.id}" />
+                </#if>
+                " target="_blank">${recentTopic.forum.name}</a>
             </div>
         </div>
         </#list>
@@ -112,14 +89,14 @@
                   <#if team.uri?exists>
                    <@s.url value="/${team.uri}" />
                   <#else>
-                    <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>
+                    <@s.url value="/team/show/${team.id}" />
                   </#if>
                   " title="${team.description?default("")}"><img src="${team.logo?default("")}" alt="${team.name}" height="48" width="48"></a></div> </li>
                   <li class="clearfix"><a href="
                   <#if team.uri?exists>
                    <@s.url value="/${team.uri}" />
                   <#else>
-                    <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>
+                    <@s.url value="/team/show/${team.id}" />
                   </#if>
                   " title="${team.description?default("")}"><strong>${team.name}</strong></a> (${team.totalTopics})</li>
                 </ul>
@@ -168,31 +145,7 @@
       </ul>
     </div>
     -->
-    <div class="box">
-      <h3>近期热门群组</h3>
-      <#list hotTeams as hotTeam>
-        <#if (hotTeam_index < 10)>
-        <div class="clearfix hot_group">
-          <div class="logo">
-                <a href="
-                <#if hotTeam.uri?exists>
-                    <@s.url value="/${hotTeam.uri}" />
-                <#else>
-                    <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${hotTeam.id}" /></@s.url>
-                </#if>
-                " title="${hotTeam.description}"><img src="${contextPath}${hotTeam.logo?default("")}" alt="${hotTeam.name}" height="48" width="48"></a></div>
-          <div class="info" style="margin-left: 70px;">
-            <a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${hotTeam.id}" /></@s.url>" title="${hotTeam.description}">${hotTeam.name}</a><br>
-                <#if hotTeam.description?exists && (hotTeam.description?length > 20)>
-                    ${hotTeam.description?substring(0, 20)} ...
-                <#else>
-                    ${hotTeam.description}
-                </#if>
-          </div>
-        </div>
-        </#if>
-       </#list>
-    </div>
+    <#include "team_hot.ftl"/>
 
 <#--boxes end-->
 

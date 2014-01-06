@@ -11,6 +11,7 @@
     <meta name="description" content="${metaDescription?default("")?html}" />
     <meta name="keywords" content="${metaKeywords?default("")?html}" />
     <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+    <meta property="qc:admins" content="247221672161751227736375" />
      <#-- 
     <link href="/rss/forum" rel="alternate" title="ITeye" type="application/rss+xml" />
     <link rel="search" type="application/opensearchdescription+xml" href="/open_search.xml" title="ITeye" />
@@ -63,6 +64,9 @@ Please check your browser settings or use a Javascript-capable browser.</p>
                 <#if !logged && !sso>
                     <a href="${JForumContext.encodeURL("/user/login")}" class="welcome" title="${I18n.getMessage("ForumBase.login")}">${I18n.getMessage("Admin.notYetLogin")}</a>
                     <a href="${JForumContext.encodeURL("/user/login")}" class="nobg">${I18n.getMessage("ForumBase.login")}</a>
+                    <#--
+                    <a href="${contextPath}/qqapi/login.action" class="qqlogin">QQ登录</a>
+                    -->
                     <a href="${JForumContext.encodeURL("/user/insert")}" class="nobg">${I18n.getMessage("ForumBase.register")}</a>
                 </#if>
                 <#if canAccessModerationLog?default(false)>

@@ -91,8 +91,8 @@ public class UserAction extends Command {
     private static final Logger logger = Logger.getLogger(UserAction.class);
 
     private boolean canEdit() {
-        int tmpId = SessionFacade.getUserSession().getUserId();
-        boolean canEdit = SessionFacade.isLogged() && tmpId == this.request.getIntParameter("user_id");
+        final int tmpId = SessionFacade.getUserSession().getUserId();
+        final boolean canEdit = SessionFacade.isLogged() && tmpId == this.request.getIntParameter("user_id");
 
         if (!canEdit) {
             this.profile();
@@ -103,9 +103,9 @@ public class UserAction extends Command {
 
     public void edit() {
         if (this.canEdit()) {
-            int userId = this.request.getIntParameter("user_id");
-            UserDAO um = DataAccessDriver.getInstance().newUserDAO();
-            User u = um.selectById(userId);
+            final int userId = this.request.getIntParameter("user_id");
+            final UserDAO um = DataAccessDriver.getInstance().newUserDAO();
+            final User u = um.selectById(userId);
 
             this.context.put("u", u);
             this.context.put("action", "editSave");
@@ -122,8 +122,8 @@ public class UserAction extends Command {
 
     public void editSave() {
         if (this.canEdit()) {
-            int userId = this.request.getIntParameter("user_id");
-            List warns = UserCommon.saveUser(userId);
+            final int userId = this.request.getIntParameter("user_id");
+            final List warns = UserCommon.saveUser(userId);
 
             if (warns.size() > 0) {
                 this.context.put("warns", warns);
@@ -140,8 +140,8 @@ public class UserAction extends Command {
         this.context.put("message", I18n.getMessage("User.registrationDisabled"));
     }
 
-    private void insert(boolean hasErrors) {
-        int userId = SessionFacade.getUserSession().getUserId();
+    private void insert(final boolean hasErrors) {
+        final int userId = SessionFacade.getUserSession().getUserId();
 
         if ((!SystemGlobals.getBoolValue(ConfigKeys.REGISTRATION_ENABLED) && !SecurityRepository.get(userId).canAccess(
                 SecurityConstants.PERM_ADMINISTRATION))
@@ -187,7 +187,7 @@ public class UserAction extends Command {
         FileReader fileReader = null;
 
         try {
-            String directory = new StringBuffer().append(SystemGlobals.getApplicationPath())
+            final String directory = new StringBuffer().append(SystemGlobals.getApplicationPath())
                     .append(SystemGlobals.getValue(ConfigKeys.AGREEMENT_FILES_PATH)).append('/').toString();
 
             String filename = "terms_" + SystemGlobals.getValue(ConfigKeys.I18N_DEFAULT) + ".txt";
@@ -206,26 +206,26 @@ public class UserAction extends Command {
             fileReader = new FileReader(file);
             reader = new BufferedReader(fileReader);
 
-            char[] buffer = new char[2048];
+            final char[] buffer = new char[2048];
             int c = 0;
 
             while ((c = reader.read(buffer, 0, buffer.length)) > -1) {
                 contents.append(buffer, 0, c);
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             logger.warn("Failed to read agreement data: " + e, e);
             contents = new StringBuffer(I18n.getMessage("User.agreement.noAgreement"));
         } finally {
             if (fileReader != null) {
                 try {
                     fileReader.close();
-                } catch (Exception e) {
+                } catch (final Exception e) {
                 }
             }
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (Exception e) {
+                } catch (final Exception e) {
                 }
             }
         }
@@ -238,8 +238,8 @@ public class UserAction extends Command {
     }
 
     public void insertSave() {
-        UserSession userSession = SessionFacade.getUserSession();
-        int userId = userSession.getUserId();
+        final UserSession userSession = SessionFacade.getUserSession();
+        final int userId = userSession.getUserId();
 
         if ((!SystemGlobals.getBoolValue(ConfigKeys.REGISTRATION_ENABLED) && !SecurityRepository.get(userId).canAccess(
                 SecurityConstants.PERM_ADMINISTRATION))
@@ -248,13 +248,13 @@ public class UserAction extends Command {
             return;
         }
 
-        User u = new User();
-        UserDAO dao = DataAccessDriver.getInstance().newUserDAO();
+        final User u = new User();
+        final UserDAO dao = DataAccessDriver.getInstance().newUserDAO();
 
         String username = this.request.getParameter("username");
-        String password = this.request.getParameter("password");
-        String email = this.request.getParameter("email");
-        String captchaResponse = this.request.getParameter("captchaResponse");
+        final String password = this.request.getParameter("password");
+        final String email = this.request.getParameter("email");
+        final String captchaResponse = this.request.getParameter("captchaResponse");
 
         boolean error = false;
         if (username == null || username.trim().equals("") || password == null || password.trim().equals("")) {
@@ -300,13 +300,13 @@ public class UserAction extends Command {
         u.setPassword(MD5.crypt(password));
         u.setEmail(email);
 
-        boolean requiresMailActivation = SystemGlobals.getBoolValue(ConfigKeys.MAIL_USER_EMAIL_AUTH);
+        final boolean requiresMailActivation = SystemGlobals.getBoolValue(ConfigKeys.MAIL_USER_EMAIL_AUTH);
 
         if (requiresMailActivation) {
             u.setActivationKey(MD5.crypt(username + System.currentTimeMillis()));
         }
 
-        int newUserId = dao.addNew(u);
+        final int newUserId = dao.addNew(u);
 
         if (requiresMailActivation) {
             Executor.execute(new EmailSenderTask(new ActivationKeySpammer(u)));
@@ -326,13 +326,13 @@ public class UserAction extends Command {
     }
 
     public void activateAccount() {
-        String hash = this.request.getParameter("hash");
-        int userId = (new Integer(this.request.getParameter("user_id"))).intValue();
+        final String hash = this.request.getParameter("hash");
+        final int userId = (new Integer(this.request.getParameter("user_id"))).intValue();
 
-        UserDAO um = DataAccessDriver.getInstance().newUserDAO();
-        User u = um.selectById(userId);
+        final UserDAO um = DataAccessDriver.getInstance().newUserDAO();
+        final User u = um.selectById(userId);
 
-        boolean isValid = um.validateActivationKeyHash(userId, hash);
+        final boolean isValid = um.validateActivationKeyHash(userId, hash);
 
         if (isValid) {
             // Activate the account
@@ -352,10 +352,10 @@ public class UserAction extends Command {
         this.setTemplateName(TemplateKeys.ACTIVATE_ACCOUNT_MANUAL);
     }
 
-    private void logNewRegisteredUserIn(int userId, User u) {
+    private void logNewRegisteredUserIn(final int userId, final User u) {
         SessionFacade.makeLogged();
 
-        UserSession userSession = new UserSession();
+        final UserSession userSession = new UserSession();
         userSession.setAutoLogin(true);
         userSession.setUserId(userId);
         userSession.setUsername(u.getUsername());
@@ -364,22 +364,22 @@ public class UserAction extends Command {
 
         SessionFacade.add(userSession);
         this.registrationComplete();
-//        // Finalizing.. show to user the congrats page
-//        JForumExecutionContext.setRedirect(this.request.getContextPath() + "/user/registrationComplete"
-//                + SystemGlobals.getValue(ConfigKeys.SERVLET_EXTENSION));
-        
+        // // Finalizing.. show to user the congrats page
+        // JForumExecutionContext.setRedirect(this.request.getContextPath() + "/user/registrationComplete"
+        // + SystemGlobals.getValue(ConfigKeys.SERVLET_EXTENSION));
+
     }
 
     private void registrationComplete() {
-        int userId = SessionFacade.getUserSession().getUserId();
+        final int userId = SessionFacade.getUserSession().getUserId();
 
         ForumRepository.setLastRegisteredUser(DataAccessDriver.getInstance().newUserDAO().selectById(userId));
         ForumRepository.incrementTotalUsers();
 
-        String profilePage = JForumExecutionContext.getForumContext().encodeURL("/user/edit/" + userId);
-        String homePage = JForumExecutionContext.getForumContext().encodeURL("/forums/list");
+        final String profilePage = JForumExecutionContext.getForumContext().encodeURL("/user/edit/" + userId);
+        final String homePage = JForumExecutionContext.getForumContext().encodeURL("/forums/list");
 
-        String message = I18n.getMessage("User.RegistrationCompleteMessage", new Object[] { profilePage, homePage });
+        final String message = I18n.getMessage("User.RegistrationCompleteMessage", new Object[] { profilePage, homePage });
         this.context.put("message", message);
         this.setTemplateName(TemplateKeys.USER_REGISTRATION_COMPLETE);
     }
@@ -399,7 +399,7 @@ public class UserAction extends Command {
         boolean validInfo = false;
 
         if (password.length() > 0) {
-            User user = this.validateLogin(username, password);
+            final User user = this.validateLogin(username, password);
 
             if (user != null) {
                 // Note: here we only want to set the redirect location if it
@@ -410,21 +410,21 @@ public class UserAction extends Command {
 
                 SessionFacade.makeLogged();
 
-                String sessionId = SessionFacade.isUserInSession(user.getId());
-                UserSession userSession = new UserSession(SessionFacade.getUserSession());
+                final String sessionId = SessionFacade.isUserInSession(user.getId());
+                final UserSession userSession = new UserSession(SessionFacade.getUserSession());
 
                 // Remove the "guest" session
                 SessionFacade.remove(userSession.getSessionId());
 
                 userSession.dataToUser(user);
-                String userAgent = request.getHeader("User-Agent");
+                final String userAgent = request.getHeader("User-Agent");
                 boolean isMobileUser = false;
                 if (userAgent != null && userAgent.toLowerCase().indexOf("mobile") > -1) {
                     isMobileUser = true;
                 }
                 userSession.setMobileUser(isMobileUser);
 
-                UserSession currentUs = SessionFacade.getUserSession(sessionId);
+                final UserSession currentUs = SessionFacade.getUserSession(sessionId);
 
                 // Check if the user is returning to the system
                 // before its last session has expired ( hypothesis )
@@ -435,7 +435,7 @@ public class UserAction extends Command {
                     tmpUs = new UserSession(currentUs);
                     SessionFacade.remove(sessionId);
                 } else {
-                    UserSessionDAO sm = DataAccessDriver.getInstance().newUserSessionDAO();
+                    final UserSessionDAO sm = DataAccessDriver.getInstance().newUserSessionDAO();
                     tmpUs = sm.selectById(userSession, JForumExecutionContext.getConnection());
                 }
 
@@ -447,10 +447,10 @@ public class UserAction extends Command {
 
                     // Generate the user-specific hash
                     String systemHash = MD5.crypt(SystemGlobals.getValue(ConfigKeys.USER_HASH_SEQUENCE) + user.getId());
-                    String userHash = MD5.crypt(System.currentTimeMillis() + systemHash);
+                    final String userHash = MD5.crypt(System.currentTimeMillis() + systemHash);
 
                     // Persist the user hash
-                    UserDAO dao = DataAccessDriver.getInstance().newUserDAO();
+                    final UserDAO dao = DataAccessDriver.getInstance().newUserDAO();
                     dao.saveUserAuthHash(user.getId(), userHash);
 
                     systemHash = MD5.crypt(userHash);
@@ -494,7 +494,7 @@ public class UserAction extends Command {
 
     private void buildSucessfulLoginRedirect() {
         if (JForumExecutionContext.getRedirectTo() == null) {
-            String forwaredHost = request.getHeader("X-Forwarded-Host");
+            final String forwaredHost = request.getHeader("X-Forwarded-Host");
 
             if (forwaredHost == null || SystemGlobals.getBoolValue(ConfigKeys.LOGIN_IGNORE_XFORWARDEDHOST)) {
                 JForumExecutionContext.setRedirect(this.request.getContextPath() + "/forums/list"
@@ -506,28 +506,28 @@ public class UserAction extends Command {
         }
     }
 
-    public void validateLogin(RequestContext request) {
+    public void validateLogin(final RequestContext request) {
         this.request = request;
         validateLogin();
     }
 
-    public static boolean hasBasicAuthentication(RequestContext request) {
-        String auth = request.getHeader("Authorization");
+    public static boolean hasBasicAuthentication(final RequestContext request) {
+        final String auth = request.getHeader("Authorization");
         return (auth != null && auth.startsWith("Basic "));
     }
 
     private boolean parseBasicAuthentication() {
         if (hasBasicAuthentication(request)) {
-            String auth = request.getHeader("Authorization");
+            final String auth = request.getHeader("Authorization");
             String decoded;
 
             try {
                 decoded = new String(new sun.misc.BASE64Decoder().decodeBuffer(auth.substring(6)));
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 throw new ForumException(e);
             }
 
-            int p = decoded.indexOf(':');
+            final int p = decoded.indexOf(':');
 
             if (p != -1) {
                 request.setAttribute("username", decoded.substring(0, p));
@@ -538,16 +538,16 @@ public class UserAction extends Command {
         return false;
     }
 
-    private User validateLogin(String name, String password) {
-        UserDAO um = DataAccessDriver.getInstance().newUserDAO();
+    private User validateLogin(final String name, final String password) {
+        final UserDAO um = DataAccessDriver.getInstance().newUserDAO();
         return um.validateLogin(name, password);
     }
 
     public void profile() {
-        DataAccessDriver da = DataAccessDriver.getInstance();
-        UserDAO udao = da.newUserDAO();
+        final DataAccessDriver da = DataAccessDriver.getInstance();
+        final UserDAO udao = da.newUserDAO();
 
-        User u = udao.selectById(this.request.getIntParameter("user_id"));
+        final User u = udao.selectById(this.request.getIntParameter("user_id"));
 
         if (u.getId() == 0) {
             this.userNotFound();
@@ -558,12 +558,12 @@ public class UserAction extends Command {
             this.context.put("u", u);
             this.context.put("avatarAllowExternalUrl", SystemGlobals.getBoolValue(ConfigKeys.AVATAR_ALLOW_EXTERNAL_URL));
 
-            int loggedId = SessionFacade.getUserSession().getUserId();
+            final int loggedId = SessionFacade.getUserSession().getUserId();
             int count = 0;
 
-            List bookmarks = da.newBookmarkDAO().selectByUser(u.getId());
-            for (Iterator iter = bookmarks.iterator(); iter.hasNext();) {
-                Bookmark b = (Bookmark) iter.next();
+            final List bookmarks = da.newBookmarkDAO().selectByUser(u.getId());
+            for (final Iterator iter = bookmarks.iterator(); iter.hasNext();) {
+                final Bookmark b = (Bookmark) iter.next();
 
                 if (b.isPublicVisible() || loggedId == u.getId()) {
                     count++;
@@ -585,7 +585,7 @@ public class UserAction extends Command {
     public void logout() {
         JForumExecutionContext.setRedirect(this.request.getContextPath() + "/forums/list" + SystemGlobals.getValue(ConfigKeys.SERVLET_EXTENSION));
 
-        UserSession userSession = SessionFacade.getUserSession();
+        final UserSession userSession = SessionFacade.getUserSession();
         SessionFacade.storeSessionData(userSession.getSessionId(), JForumExecutionContext.getConnection());
 
         SessionFacade.makeUnlogged();
@@ -607,10 +607,11 @@ public class UserAction extends Command {
         if (this.request.getParameter("returnPath") != null) {
             this.context.put("returnPath", this.request.getParameter("returnPath"));
         } else if (!SystemGlobals.getBoolValue(ConfigKeys.LOGIN_IGNORE_REFERER)) {
-            String referer = this.request.getHeader("Referer");
+            final String referer = this.request.getHeader("Referer");
 
             if (referer != null) {
                 this.context.put("returnPath", referer);
+                SessionFacade.setAttribute(SessionFacade.REDIRECT_KEY, referer);
             }
         }
 
@@ -624,16 +625,16 @@ public class UserAction extends Command {
         this.context.put("pageTitle", I18n.getMessage("PasswordRecovery.title"));
     }
 
-    public User prepareLostPassword(String username, String email) {
+    public User prepareLostPassword(String username, final String email) {
         User user = null;
-        UserDAO um = DataAccessDriver.getInstance().newUserDAO();
+        final UserDAO um = DataAccessDriver.getInstance().newUserDAO();
 
         if (email != null && !email.trim().equals("")) {
             username = um.getUsernameByEmail(email);
         }
 
         if (username != null && !username.trim().equals("")) {
-            List l = um.findByName(username, true);
+            final List l = um.findByName(username, true);
             if (l.size() > 0) {
                 user = (User) l.get(0);
             }
@@ -643,7 +644,7 @@ public class UserAction extends Command {
             return null;
         }
 
-        String hash = MD5.crypt(user.getEmail() + System.currentTimeMillis() + SystemGlobals.getValue(ConfigKeys.USER_HASH_SEQUENCE)
+        final String hash = MD5.crypt(user.getEmail() + System.currentTimeMillis() + SystemGlobals.getValue(ConfigKeys.USER_HASH_SEQUENCE)
                 + new Random().nextInt(999999));
 
         um.writeLostPasswordHash(user.getEmail(), hash);
@@ -655,10 +656,10 @@ public class UserAction extends Command {
 
     // Send lost password email
     public void lostPasswordSend() {
-        String email = this.request.getParameter("email");
-        String username = this.request.getParameter("username");
+        final String email = this.request.getParameter("email");
+        final String username = this.request.getParameter("username");
 
-        User user = this.prepareLostPassword(username, email);
+        final User user = this.prepareLostPassword(username, email);
         if (user == null) {
             // user could not be found
             this.context.put("message", I18n.getMessage("PasswordRecovery.invalidUserEmail"));
@@ -677,21 +678,21 @@ public class UserAction extends Command {
 
     // Recover user password ( aka, ask him a new one )
     public void recoverPassword() {
-        String hash = this.request.getParameter("hash");
+        final String hash = this.request.getParameter("hash");
 
         this.setTemplateName(TemplateKeys.USER_RECOVERPASSWORD);
         this.context.put("recoverHash", hash);
     }
 
     public void recoverPasswordValidate() {
-        String hash = this.request.getParameter("recoverHash");
-        String email = this.request.getParameter("email");
+        final String hash = this.request.getParameter("recoverHash");
+        final String email = this.request.getParameter("email");
 
         String message;
-        boolean isOk = DataAccessDriver.getInstance().newUserDAO().validateLostPasswordHash(email, hash);
+        final boolean isOk = DataAccessDriver.getInstance().newUserDAO().validateLostPasswordHash(email, hash);
 
         if (isOk) {
-            String password = this.request.getParameter("newPassword");
+            final String password = this.request.getParameter("newPassword");
             DataAccessDriver.getInstance().newUserDAO().saveNewPassword(MD5.crypt(password), email);
 
             message = I18n.getMessage("PasswordRecovery.ok",
@@ -704,23 +705,24 @@ public class UserAction extends Command {
         this.context.put("message", message);
     }
 
+    @Override
     public void list() {
-        int start = this.preparePagination(DataAccessDriver.getInstance().newUserDAO().getTotalUsers());
-        int usersPerPage = SystemGlobals.getIntValue(ConfigKeys.USERS_PER_PAGE);
+        final int start = this.preparePagination(DataAccessDriver.getInstance().newUserDAO().getTotalUsers());
+        final int usersPerPage = SystemGlobals.getIntValue(ConfigKeys.USERS_PER_PAGE);
 
-        List users = DataAccessDriver.getInstance().newUserDAO().selectAll(start, usersPerPage);
+        final List users = DataAccessDriver.getInstance().newUserDAO().selectAll(start, usersPerPage);
         this.context.put("users", users);
         this.context.put("pageTitle", I18n.getMessage("ForumBase.usersList"));
         this.setTemplateName(TemplateKeys.USER_LIST);
     }
 
     public void listGroup() {
-        int groupId = this.request.getIntParameter("group_id");
+        final int groupId = this.request.getIntParameter("group_id");
 
-        int start = this.preparePagination(DataAccessDriver.getInstance().newUserDAO().getTotalUsersByGroup(groupId));
-        int usersPerPage = SystemGlobals.getIntValue(ConfigKeys.USERS_PER_PAGE);
+        final int start = this.preparePagination(DataAccessDriver.getInstance().newUserDAO().getTotalUsersByGroup(groupId));
+        final int usersPerPage = SystemGlobals.getIntValue(ConfigKeys.USERS_PER_PAGE);
 
-        List users = DataAccessDriver.getInstance().newUserDAO().selectAllByGroup(groupId, start, usersPerPage);
+        final List users = DataAccessDriver.getInstance().newUserDAO().selectAllByGroup(groupId, start, usersPerPage);
 
         this.context.put("users", users);
         this.setTemplateName(TemplateKeys.USER_LIST);
@@ -729,19 +731,20 @@ public class UserAction extends Command {
     /**
      * @deprecated probably will be removed. Use KarmaAction to load Karma
      */
+    @Deprecated
     public void searchKarma() {
-        int start = this.preparePagination(DataAccessDriver.getInstance().newUserDAO().getTotalUsers());
-        int usersPerPage = SystemGlobals.getIntValue(ConfigKeys.USERS_PER_PAGE);
+        final int start = this.preparePagination(DataAccessDriver.getInstance().newUserDAO().getTotalUsers());
+        final int usersPerPage = SystemGlobals.getIntValue(ConfigKeys.USERS_PER_PAGE);
 
         // Load all users with your karma
-        List users = DataAccessDriver.getInstance().newUserDAO().selectAllWithKarma(start, usersPerPage);
+        final List users = DataAccessDriver.getInstance().newUserDAO().selectAllWithKarma(start, usersPerPage);
         this.context.put("users", users);
         this.setTemplateName(TemplateKeys.USER_SEARCH_KARMA);
     }
 
-    private int preparePagination(int totalUsers) {
-        int start = ViewCommon.getStartPage();
-        int usersPerPage = SystemGlobals.getIntValue(ConfigKeys.USERS_PER_PAGE);
+    private int preparePagination(final int totalUsers) {
+        final int start = ViewCommon.getStartPage();
+        final int usersPerPage = SystemGlobals.getIntValue(ConfigKeys.USERS_PER_PAGE);
 
         ViewCommon.contextToPagination(start, totalUsers, usersPerPage);
 

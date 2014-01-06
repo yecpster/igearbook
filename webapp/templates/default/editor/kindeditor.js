@@ -3171,7 +3171,7 @@ _extend(KCmd, {
 		this.win.print();
 		return this;
 	},
-	insertimage : function(url, title, width, height, border, align) {
+	insertimage : function(url, title, alt, width, height, border, align) {
 		title = _undef(title, '');
 		border = _undef(border, 0);
 		var html = '<img src="' + _escape(url) + '" data-ke-src="' + _escape(url) + '" ';
@@ -3184,10 +3184,12 @@ _extend(KCmd, {
 		if (title) {
 			html += 'title="' + _escape(title) + '" ';
 		}
+		if (alt) {
+            html += 'alt="' + _escape(alt) + '" ';
+        }
 		if (align) {
 			html += 'align="' + _escape(align) + '" ';
 		}
-		html += 'alt="' + _escape(title) + '" ';
 		html += '/>';
 		return this.inserthtml(html);
 	},

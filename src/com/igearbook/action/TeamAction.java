@@ -308,6 +308,10 @@ public class TeamAction extends BaseAction {
 
     @Action(value = "join", results = { @Result(name = SUCCESS, location = "show", type = "chain") })
     public String joinTeam() {
+        final int anonymousUserId = SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID);
+        if (SessionFacade.getUserSession().getUserId() == anonymousUserId) {
+            return PERMISSION;
+        }
         final boolean isTeamMember = SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_USER, String.valueOf(teamId))
                 || SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_OWNER, String.valueOf(teamId))
                 || SecurityRepository.canAccess(SecurityConstants.PERM_TEAMFORUM_USER_CANDIDATE, String.valueOf(teamId))
@@ -847,12 +851,10 @@ public class TeamAction extends BaseAction {
     }
 
     @Action(value = "save", interceptorRefs = {
-            @InterceptorRef("defaultStackIgearbook"),
-            @InterceptorRef("tokenSession"),
             @InterceptorRef(value = "fileUpload", params = { "allowedExtensions ", ".gif,.jpg,.png", "allowedTypes",
-                    "image/png,image/gif,image/jpeg,image/pjpeg" }) }, results = {
-            @Result(name = SUCCESS, location = "/team/show.action", type = "redirect", params = { "teamId", "${team.id}" }),
-            @Result(name = INPUT, location = "team_form.ftl") })
+                    "image/png,image/gif,image/jpeg,image/pjpeg" }), @InterceptorRef("defaultStackIgearbook"), @InterceptorRef("tokenSession") },
+            results = { @Result(name = SUCCESS, location = "/team/show.action", type = "redirect", params = { "teamId", "${team.id}" }),
+                    @Result(name = INPUT, location = "team_form.ftl") })
     public String save() {
         try {
             if (team.getId() == 0) {

@@ -19,7 +19,7 @@
   <ul>
     <li>1.申请群组主题明确,简介翔实清晰。</li>
     <li>2.新申请的群组不能和已有群组内容重复,类似。</li>
-  <ul>
+  </ul>
 </@s.if>
 <@s.if test="team==null">
 <h3>创建群组：</h3>
@@ -30,8 +30,8 @@
 <@s.if test="hasActionErrors()">
    <ul>
     <li><span class="gen"><font color="red"><@s.actionerror /></font></span></li>
-  <ul>
-    </@s.if>
+  </ul>
+</@s.if>
 <ul>
     <li><label>群组名称</label>
         <#if !team?exists || session.isAdmin()>

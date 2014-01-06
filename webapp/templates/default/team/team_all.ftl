@@ -3,28 +3,7 @@
 <link href="${contextPath}/templates/${templateName}/styles/teams.css?${startupTime}" media="screen" rel="stylesheet" type="text/css" />
 
 <#--side-->
-<div id="side">
-  
-    <div class="box">
-      <h3>群组排名</h3>
-        <#list rankTeams as rankTeam>
-        <#if (rankTeam_index < 10)>
-            <div class="rank">
-              <div class="rank_info">${rankTeam_index + 1}.
-              <a href="
-              <#if rankTeam.uri?exists>
-                <@s.url value="/${rankTeam.uri}" />
-              <#else>
-                <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${rankTeam.id}" /></@s.url>
-              </#if>
-              " title="${rankTeam.description?default("")}">${rankTeam.name}</a><br>文章数：${rankTeam.totalPosts}</div>
-              <div class="rank_logo"><div class="logo"><a href="<@s.url namespace="/team" action="show"><@s.param name="teamId" value="${rankTeam.id}" /></@s.url>" title="${rankTeam.description?default("")}"><img src="${contextPath}${rankTeam.logo?default("")}" alt="${rankTeam.name}" height="48" width="48"></a></div></div>
-            </div>
-        </#if>
-        </#list>
-    </div>
-
-</div>
+<#include "team_rank.ftl"/>
 <#--side end-->
 
 <#--index_main-->
@@ -40,7 +19,7 @@
                   <#if team.uri?exists>
                      <@s.url value="/${team.uri}" />
                   <#else>
-                    <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>
+                    <@s.url value="/team/show/${team.id}" />
                   </#if>
                   " title="${team.description?default("")}"><img src="${contextPath}${team.logo?default("")}" alt="${team.name}" height="48" width="48"></a></div> </li>
                   <li class="clearfix">
@@ -48,7 +27,7 @@
                   <#if team.uri?exists>
                      <@s.url value="/${team.uri}" />
                   <#else>
-                    <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>
+                    <@s.url value="/team/show/${team.id}" />
                   </#if>
                     " title="${team.description?default("")}"><strong>${team.name}</strong></a> (${team.totalTopics})</li>
                 </ul>
@@ -71,37 +50,7 @@
       <a href="" class="my_group_link">我的群组</a>
       -->
   </p>
-    <div class="box">
-      <h3>近期热门群组</h3>
-      <#list hotTeams as hotTeam>
-        <#if (hotTeam_index < 10)>
-        <div class="clearfix hot_group">
-          <div class="logo">
-          <a href="
-          <#if hotTeam.uri?exists>
-            <@s.url value="/${hotTeam.uri}" />
-          <#else>
-            <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${hotTeam.id}" /></@s.url>
-          </#if>
-            " title="${hotTeam.description}"><img src="${contextPath}${hotTeam.logo?default("")}" alt="${hotTeam.name}" height="48" width="48"></a></div>
-          <div class="info" style="margin-left: 70px;">
-            <a href="
-            <#if hotTeam.uri?exists>
-            <@s.url value="/${hotTeam.uri}" />
-            <#else>
-                <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${hotTeam.id}" /></@s.url>
-            </#if>
-            " title="${hotTeam.description}">${hotTeam.name}</a><br>
-                <#if hotTeam.description?exists && (hotTeam.description?length > 20)>
-                    ${hotTeam.description?substring(0, 20)} ...
-                <#else>
-                    ${hotTeam.description}
-                </#if>
-          </div>
-        </div>
-        </#if>
-       </#list>
-    </div>
+    <#include "team_hot.ftl"/>
 
 <#--boxes end-->
 

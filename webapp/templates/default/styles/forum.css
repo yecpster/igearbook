@@ -233,9 +233,12 @@ div#user_nav {
     text-align: right;
     float: right;
 }
-
 div#user_nav a.nobg {
     background: none;
+}
+div#user_nav a.qqlogin {
+   background: url(../images/QQ_Connect_logo_1.png) no-repeat left;
+   padding: 0 6px 0 17px;
 }
 
 div#user_nav a.welcome {

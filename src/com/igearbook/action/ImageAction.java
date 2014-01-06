@@ -49,7 +49,8 @@ public class ImageAction extends BaseAction {
 
     @Action(value = "upload", interceptorRefs = {
             @InterceptorRef(value = "fileUpload", params = { "allowedExtensions ", ".gif,.jpg,.png", "allowedTypes",
-                    "image/png,image/gif,image/jpeg,image/pjpeg", "maximumSize", "5242880" }), @InterceptorRef("defaultStackIgearbook") }, results = { @Result(name = SUCCESS, location = "uploadJson.ftl"),@Result(name = INPUT, location = "upload_input.ftl") })
+                    "image/png,image/gif,image/jpeg,image/pjpeg", "maximumSize", "5242880" }), @InterceptorRef("defaultStackIgearbook") },
+            results = { @Result(name = SUCCESS, location = "uploadJson.ftl"), @Result(name = INPUT, location = "upload_input.ftl") })
     public String upload() {
         final Map<String, Object> data = Maps.newHashMap();
         try {
@@ -118,7 +119,7 @@ public class ImageAction extends BaseAction {
         result.put("url", imgUrl);
         result.put("width", String.valueOf(width));
         result.put("height", String.valueOf(height));
-        // result.put("title", I18n.getMessage("Image.clickToZoom"));
+        result.put("alt", String.format("_IGBImageAlt%s_", System.currentTimeMillis()));
 
         return result;
     }

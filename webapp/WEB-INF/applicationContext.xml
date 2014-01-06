@@ -12,7 +12,7 @@
   <bean id="customUrlFilter" class="com.igearbook.web.filter.CustomUrlFilter" />
   <bean id="filterChainProxy" class="org.springframework.security.web.FilterChainProxy">
     <security:filter-chain-map path-type="regex">
-      <security:filter-chain pattern="/[\w\-]+" filters="customUrlFilter" />
+      <security:filter-chain pattern="/[\w\-]+(;.+)?" filters="customUrlFilter" />
     </security:filter-chain-map>
   </bean>
 </beans>

@@ -12,12 +12,20 @@
 <@s.hidden name="team.id" />
 
 <fieldset class="groups_new">
-<h3申请个性域名：</h3>
+
+<ul>
+    <li>注册后你能得到类似 www.igearbook.com/abcde 的域名</li>
+    <li>日后我们会开通二级域名服务，此个性域名将作为你的二级域名，如 abcde.igearbook.com</li>
+    <@s.if test="hasActionErrors()">
+    <li><span class="gen"><font color="red"><@s.actionerror /></font></span></li>
+    </@s.if>
+ </ul>
+<h3>注册个性域名：</h3>
 <@s.if test="hasActionErrors()">
    <ul>
     <li><span class="gen"><font color="red"><@s.actionerror /></font></span></li>
-  <ul>
-    </@s.if>
+  </ul>
+</@s.if>
 <ul>
     <li><label>群组名称</label>
         <@s.textfield cssClass="text" size="30" name="team.name" disabled="true" />

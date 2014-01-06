@@ -616,7 +616,7 @@ public class MultipartStream {
             // encapsulation.
             return readBoundary();
         } catch (final MalformedStreamException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         } finally {
             // Restore delimiter.

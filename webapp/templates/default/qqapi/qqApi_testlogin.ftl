@@ -1,4 +1,4 @@
-<#include "header.htm"/>
+<#include "/templates/default/header.htm" />
 <@navHeader />
 <form action="${JForumContext.encodeURL("/jforum")}" method="post" name="loginform" id="loginform" accept-charset="${encoding}">
   <input type="hidden" name="module" value="user" />
@@ -83,4 +83,4 @@
 	</tr>
 </table>
 </form>
-<#include "bottom.htm"/>
+<#include "/templates/default/bottom.htm"/>

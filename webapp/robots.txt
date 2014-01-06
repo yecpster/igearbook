@@ -1,4 +1,6 @@
 User-agent: *
 Disallow: /templates/
 Disallow: /tmp/
+Disallow: /user/profile/
+Disallow: /posts/listByUser/
 Sitemap: http://www.igearbook.com/sitemap.xml

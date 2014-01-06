@@ -128,6 +128,8 @@ public class User implements Serializable {
     private KarmaStatus karma;
     private double karmaColumn;
     private boolean active;
+    private boolean apiUser;
+    private boolean apiUserActive;
     private String activationKey;
     private boolean deleted;
     private String firstName;
@@ -292,6 +294,22 @@ public class User implements Serializable {
     @Column(name = "user_regdate")
     public Date getRegistrationDate() {
         return registrationDate;
+    }
+
+    public boolean isApiUser() {
+        return apiUser;
+    }
+
+    public void setApiUser(final boolean apiUser) {
+        this.apiUser = apiUser;
+    }
+
+    public boolean isApiUserActive() {
+        return apiUserActive;
+    }
+
+    public void setApiUserActive(final boolean apiUserActive) {
+        this.apiUserActive = apiUserActive;
     }
 
     @Transient
