@@ -6,48 +6,48 @@
 		<#if topic.read>
 			<#if topic.status == STATUS_UNLOCKED>
 				<#if topic.type == TOPIC_ANNOUNCE>
-					<img class="icon_folder_announce" src="${contextPath}/images/transp.gif" alt="" />
+					<img class="icon_folder_announce" src="${contextPath}/images/transp.gif" alt="公告" />
 				<#elseif topic.type == TOPIC_STICKY>
-					<img class="icon_folder_sticky" src="${contextPath}/images/transp.gif" alt="" />
+					<img class="icon_folder_sticky" src="${contextPath}/images/transp.gif" alt="置顶" />
 			    <#elseif topic.type == TOPIC_GOOD>
-                    <img class="icon_folder_good" src="${contextPath}/images/transp.gif" alt="" />
+                    <img class="icon_folder_good" src="${contextPath}/images/transp.gif" alt="精华" />
                 <#elseif topic.type == (TOPIC_STICKY+TOPIC_GOOD)>
-                    <img class="icon_folder_sticky" src="${contextPath}/images/transp.gif" alt="" />
-                    <img class="icon_folder_good" src="${contextPath}/images/transp.gif" alt="" />
+                    <img class="icon_folder_sticky" src="${contextPath}/images/transp.gif" alt="置顶" />
+                    <img class="icon_folder_good" src="${contextPath}/images/transp.gif" alt="精华" />
 				<#else>
 					<#if topic.isHot()>
-						<img class="icon_folder_hot" src="${contextPath}/images/transp.gif" alt="" />
+						<img class="icon_folder_hot" src="${contextPath}/images/transp.gif" alt="热门" />
 					<#else>
-						<img class="icon_folder" src="${contextPath}/images/transp.gif" alt="" />
+						<img class="icon_folder" src="${contextPath}/images/transp.gif" alt="普通主题" />
 					</#if>
 				</#if>
 			<#else>
-				<img class="icon_folder_lock" src="${contextPath}/images/transp.gif" alt="" />
+				<img class="icon_folder_lock" src="${contextPath}/images/transp.gif" alt="锁定主题" />
 			</#if>
 		<#else>
 			<#if topic.status == STATUS_UNLOCKED>
 				<#if topic.type == TOPIC_ANNOUNCE>
-					<img class="icon_folder_announce_new" src="${contextPath}/images/transp.gif" alt="" />
+					<img class="icon_folder_announce_new" src="${contextPath}/images/transp.gif" alt="新公告" />
 				<#elseif topic.type == TOPIC_STICKY>
-					<img class="icon_folder_sticky" src="${contextPath}/images/transp.gif" alt="" />
+					<img class="icon_folder_sticky" src="${contextPath}/images/transp.gif" alt="新置顶" />
 			    <#elseif topic.type == TOPIC_GOOD>
-                    <img class="icon_folder_good" src="${contextPath}/images/transp.gif" alt="" />
+                    <img class="icon_folder_good" src="${contextPath}/images/transp.gif" alt="新精华" />
                 <#elseif topic.type == (TOPIC_STICKY+TOPIC_GOOD)>
-                    <img class="icon_folder_sticky" src="${contextPath}/images/transp.gif" alt="" />
-                    <img class="icon_folder_good" src="${contextPath}/images/transp.gif" alt="" />
+                    <img class="icon_folder_sticky" src="${contextPath}/images/transp.gif" alt="新置顶" />
+                    <img class="icon_folder_good" src="${contextPath}/images/transp.gif" alt="新精华" />
 				<#else>
 					<#if topic.isHot()>
-						<img class="icon_folder_new_hot" src="${contextPath}/images/transp.gif" alt="" />
+						<img class="icon_folder_new_hot" src="${contextPath}/images/transp.gif" alt="新热门" />
 					<#else>
-						<img class="icon_folder_new" src="${contextPath}/images/transp.gif" alt="" />
+						<img class="icon_folder_new" src="${contextPath}/images/transp.gif" alt="新普通主题" />
 					</#if>
 				</#if>
 			<#else>
-				<img class="icon_folder_lock_new" src="${contextPath}/images/transp.gif" alt="" />
+				<img class="icon_folder_lock_new" src="${contextPath}/images/transp.gif" alt="新锁定主题" />
 			</#if>
 		</#if>
 	<#else>
-		<img class="icon_topic_move" src="${contextPath}/images/transp.gif" alt="" />
+		<img class="icon_topic_move" src="${contextPath}/images/transp.gif" alt="已移动主题" />
 	</#if>
 </#macro>
 

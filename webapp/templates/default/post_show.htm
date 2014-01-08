@@ -112,7 +112,7 @@
                             <#if forum.uri?exists>
                                 <a class="nav" href="${contextPath}/${forum.uri}">${forum.name?html}</a>
                             <#else>
-                                <a class="nav" href="${contextPath}/team/show.action?teamId=${forum.id}">${forum.name?html}</a>
+                                <a class="nav" href="${contextPath}/team/show/${forum.id}">${forum.name?html}</a>
                             </#if>
                             &raquo; 
                             <a class="nav" href="${JForumContext.encodeURL("/forums/show/${forum.id}")}">群组论坛</a>
@@ -186,7 +186,7 @@
 				
 				<tr>
 					<th class="thleft" nowrap="nowrap" width="150" height="26">${I18n.getMessage("PostShow.author")}</th>
-					<th class="thright" nowrap="nowrap" width="100%">${I18n.getMessage("PostShow.messageTitle")}</th>
+					<th class="thright" nowrap="nowrap" width="820">${I18n.getMessage("PostShow.messageTitle")}</th>
 				</tr>
 
 				<!-- POST LISTING --> 
@@ -218,7 +218,7 @@
 						</td>
 		
 						<!-- Message -->
-						<td class="${rowColor}" valign="top" id="post_text_${post.id}">
+						<td class="${rowColor}" valign="top" id="post_text_${post.id}" style="word-break:break-all;">
 							<div style="height: auto !important; min-height: 265px !important;">
                                  <span class="postbody">
                                 <#if canEditCurrentMessage>

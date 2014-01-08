@@ -197,7 +197,11 @@ function smiliePopup()
                             <#if isTeamForum>
                             <a class="nav" href="${contextPath}/team/list.action">群组首页</a> 
                             &raquo; 
-                            <a class="nav" href="${contextPath}/team/show.action?teamId=${forum.id}">${forum.name?html}</a>
+                            <#if forum.uri?exists>
+                                <a class="nav" href="${contextPath}/${forum.uri}">${forum.name?html}</a>
+                            <#else>
+                                <a class="nav" href="${contextPath}/team/show/${forum.id}">${forum.name?html}</a>
+                            </#if>
                             &raquo; 
                             <a class="nav" href="${contextPath}/team/forum.action?teamId=${forum.id}">群组论坛</a>
                             <#elseif forum?exists>
@@ -396,7 +400,7 @@ function smiliePopup()
 								<!-- Textarea -->
 								<tr>
 									<td valign="top">
-										<textarea id="messageEditor" class="message" onkeyup="storeCaret(this);" onclick="storeCaret(this);" onselect="storeCaret(this);" tabindex="3" name="message" rows="15"  cols="35"><#if post?exists><#if quote?exists>[quote=${quoteUser}]${post.text?html}[/quote]<#else>${post.text?html}</#if></#if></textarea> 
+										<textarea id="messageEditor" class="message" onkeyup="storeCaret(this);" onclick="storeCaret(this);" onselect="storeCaret(this);" tabindex="3" name="message" rows="15"  cols="35"><#if post?exists><#if quote?exists><blockquote><div><cite>${quoteUser} 说道:</cite>${post.text?html}</div></blockquote><br/><br/><#else>${post.text?html}</#if></#if></textarea> 
 									</td>
 								</tr>
 							</table>

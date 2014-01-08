@@ -12,7 +12,7 @@
                <#if team.uri?exists>
                     <@s.url value="/${team.uri}" />
                 <#else>
-                    ${contextPath}/team/show.action?teamId=${teamId}
+                    ${contextPath}/team/show/${teamId}
                 </#if>    
                 ">${team.name?html}</a>
                &raquo;   管理会员

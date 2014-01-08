@@ -1,5 +1,5 @@
 <#macro littlePostPagination topicId postsPerPage totalReplies>
-	[ <img class="icon_latest_reply" src="${contextPath}/images/transp.gif" alt="" /> ${I18n.getMessage("goToPage")}: 
+	[ <img class="icon_latest_reply" src="${contextPath}/images/transp.gif" alt="Go to Page" /> ${I18n.getMessage("goToPage")}: 
 
 	<#assign totalPostPages = ((totalReplies + 1) / postsPerPage)?int/>
 

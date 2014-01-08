@@ -16,6 +16,7 @@ import net.jforum.entities.UserSession;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Namespace;
 import org.apache.struts2.convention.annotation.Result;
@@ -44,13 +45,20 @@ public class SitemapAction extends BaseAction {
         WebSitemapGenerator wsg;
         try {
             wsg = new WebSitemapGenerator("http://www.igearbook.com", dir);
-            final String urlStrIndex = "http://www.igearbook.com/portal/index.action";
+            final String urlStrIndex = "http://www.igearbook.com";
             final WebSitemapUrl urlIndex = new WebSitemapUrl.Options(urlStrIndex).changeFreq(ChangeFreq.DAILY).build();
             wsg.addUrl(urlIndex);
             int urlCount = 1;
             for (final Forum forum : forums) {
                 if (forum.getType() == Forum.TYPE_TEAM) {
-                    final String urlStr = "http://www.igearbook.com/team/show.action?teamId=" + forum.getId();
+                    final String customUrl = forum.getUri();
+                    String urlStr = null;
+                    if (StringUtils.isBlank(customUrl)) {
+                        urlStr = "http://www.igearbook.com/team/show/" + forum.getId();
+                    } else {
+                        urlStr = "http://www.igearbook.com/" + customUrl;
+                    }
+
                     final WebSitemapUrl url = new WebSitemapUrl.Options(urlStr).build();
                     wsg.addUrl(url);
                     urlCount++;

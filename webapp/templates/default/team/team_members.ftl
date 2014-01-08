@@ -14,7 +14,7 @@
     <#if team.uri?exists>
         <@s.url value="/${team.uri}" />
     <#else>
-        <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${teamId}" /></@s.url>
+        <@s.url value="/team/show/${teamId}" />
     </#if>
     ">
     ${team.name?html}

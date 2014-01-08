@@ -54,14 +54,14 @@
                          <#if team.uri?exists>
                              <@s.url value="/${team.uri}" />
                          <#else>
-                             <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>
+                            <@s.url value="/team/show/${team.id}" />
                         </#if>
                         " title="${team.description?default("")}"><img src="${team.logo?default("")}" alt="${team.name}" height="48" width="48"></a></div> </li>
                   <li class="clearfix"><a href="
                         <#if team.uri?exists>
                              <@s.url value="/${team.uri}" />
                          <#else>
-                            <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>
+                            <@s.url value="/team/show/${team.id}" />
                          </#if>
                         " title="${team.description?default("")}"><strong>${team.name}</strong></a> (${team.totalTopics})</li>
                 </ul>
@@ -78,7 +78,7 @@
                   <#if team.uri?exists>
                       <@s.url value="/${team.uri}" />
                   <#else>
-                    <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>
+                    <@s.url value="/team/show/${team.id}" />
                   </#if>
                     " title="${team.description?default("")}"><img src="${team.logo?default("")}" alt="${team.name}" height="48" width="48"></a></div> </li>
                   <li class="clearfix">
@@ -86,7 +86,7 @@
                         <#if team.uri?exists>
                             <@s.url value="/${team.uri}" />
                         <#else>
-                            <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>
+                            <@s.url value="/team/show/${team.id}" />
                         </#if>
                         " title="${team.description?default("")}"><strong>${team.name}</strong></a> (${team.totalTopics})</li>
                 </ul>
@@ -102,14 +102,14 @@
                   <#if team.uri?exists>
                       <@s.url value="/${team.uri}" />
                   <#else>
-                      <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>
+                      <@s.url value="/team/show/${team.id}" />
                   </#if>
                   " title="${team.description?default("")}"><img src="${team.logo?default("")}" alt="${team.name}" height="48" width="48"></a></div> </li>
                   <li class="clearfix"><a href="
                   <#if team.uri?exists>
                       <@s.url value="/${team.uri}" />
                   <#else>
-                      <@s.url namespace="/team" action="show"><@s.param name="teamId" value="${team.id}" /></@s.url>
+                      <@s.url value="/team/show/${team.id}" />
                   </#if>
                     " title="${team.description?default("")}"><strong>${team.name}</strong></a> (${team.totalTopics})</li>
                 </ul>

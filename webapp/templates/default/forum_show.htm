@@ -32,7 +32,7 @@
                             <#if forum.uri?exists>
                                 <a class="nav" href="${contextPath}/${forum.uri}">${forum.name?html}</a>
                             <#else>
-                                <a class="nav" href="${contextPath}/team/show.action?teamId=${forum.id}">${forum.name?html}</a>
+                                <a class="nav" href="${contextPath}/team/show/${forum.id}">${forum.name?html}</a>
                             </#if>
                             &raquo; 
                             <span>群组论坛</span>
@@ -94,7 +94,7 @@
                     
                     <#if !replyOnly>
                         <td valign="middle" align="left" width="50">
-                            <a href="${JForumContext.encodeURL("/jforum${extension}?module=posts&amp;action=insert&amp;forum_id=${forum.id}", "")}" rel="nofollow" class="icon_new_topic"><img src="${contextPath}/images/transp.gif" alt="" /></a>
+                            <a href="${JForumContext.encodeURL("/jforum${extension}?module=posts&amp;action=insert&amp;forum_id=${forum.id}", "")}" rel="nofollow" class="icon_new_topic"><img src="${contextPath}/images/transp.gif" alt="发表新帖" /></a>
                         </td>
                     </#if>
 				</tr>
@@ -162,7 +162,7 @@
 
 										<#if (post_index + 1 < topic.posts.size())>
 											<tr>
-												<td colspan="2" height="1" class="spacerow"><img src="${contextPath}/templates/${templateName}/images/spacer.gif" alt="" width="1" height="1" /></td>
+												<td colspan="2" height="1" class="spacerow"><img src="${contextPath}/templates/${templateName}/images/spacer.gif" alt="空白" width="1" height="1" /></td>
 											</tr>
 										</#if>
 									</#list>
@@ -298,7 +298,7 @@
                             <#if forum.uri?exists>
                                 <a class="nav" href="${contextPath}/${forum.uri}">${forum.name?html}</a>
                             <#else>
-                                <a class="nav" href="${contextPath}/team/show.action?teamId=${forum.id}">${forum.name?html}</a>
+                                <a class="nav" href="${contextPath}/team/show/${forum.id}">${forum.name?html}</a>
                             </#if>
                             &raquo; 
                             <span>群组论坛</span>
@@ -312,7 +312,7 @@
 					<td nowrap="nowrap" align="left" class="nav">${paginationData}</td>
 					<#if !readonly && !replyOnly>
                         <td valign="middle"  align="left" width="50">
-                            <a href="${JForumContext.encodeURL("/jforum${extension}?module=posts&amp;action=insert&amp;forum_id=${forum.id}","")}" rel="nofollow" class="icon_new_topic"><img src="${contextPath}/images/transp.gif" alt="" /></a>
+                            <a href="${JForumContext.encodeURL("/jforum${extension}?module=posts&amp;action=insert&amp;forum_id=${forum.id}","")}" rel="nofollow" class="icon_new_topic"><img src="${contextPath}/images/transp.gif" alt="发新文章" /></a>
                         </td>
                     <#else>
                         <#assign colspan = "2"/>

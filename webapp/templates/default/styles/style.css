@@ -90,7 +90,7 @@ border-bottom: 1px solid #eee;
 }
 blockquote {
 	background:#E1EBF2 none no-repeat scroll 6px 8px;
-	border:1px dashed #DBDBDB;
+	border:1px dashed #575750;;
 	font-size:0.95em;
 	margin:0.5em 10px 0pt 10px;
 	overflow:hidden;
@@ -100,7 +100,8 @@ blockquote {
 blockquote {
 	background-color:#E1EBF2;
 	background-image:url(../images/quote.gif);
-	border-color:#DBDBCE;
+	border-color:#575750;
+	pointer-events: none;
 }
 
 blockquote cite {

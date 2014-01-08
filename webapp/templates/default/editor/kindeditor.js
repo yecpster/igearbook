@@ -172,6 +172,18 @@ function _json(text) {
 	}
 	throw 'JSON parse error';
 }
+function isInQuoteTag(range) {
+    var isInQuote = false;
+    var ancestor = K(range.commonAncestor());
+    while (ancestor) {
+        if (ancestor.name=='blockquote') {
+           isInQuote = true;
+           break;
+        }
+        ancestor = ancestor.parent();
+    }
+    return isInQuote;
+}
 var _round = Math.round;
 var K = {
 	DEBUG : false,
@@ -295,7 +307,7 @@ K.options = {
 		a : ['id', 'class', 'href', 'target', 'name'],
 		embed : ['id', 'class', 'src', 'width', 'height', 'type', 'loop', 'autostart', 'quality', '.width', '.height', 'align', 'allowscriptaccess'],
 		img : ['id', 'class', 'src', 'width', 'height', 'border', 'alt', 'title', 'align', '.width', '.height', '.border'],
-		'p,ol,ul,li,blockquote,h1,h2,h3,h4,h5,h6' : [
+		'p,ol,ul,li,blockquote,cite,h1,h2,h3,h4,h5,h6' : [
 			'id', 'class', 'align', '.text-align', '.color', '.background-color', '.font-size', '.font-family', '.background',
 			'.font-weight', '.font-style', '.text-decoration', '.vertical-align', '.text-indent', '.margin-left'
 		],
@@ -732,6 +744,7 @@ function _formatHtml(html, htmlTags, urlType, wellFormatted, indentChar) {
 			html = html.replace(/(<(?:style|style\s[^>]*)>)([\s\S]*?)(<\/style>)/ig, '');
 		}
 	}
+	
 	var re = /([ \t\n\r]*)<(\/)?([\w\-:]+)((?:\s+|(?:\s+[\w\-:]+)|(?:\s+[\w\-:]+=[^\s"'<>]+)|(?:\s+[\w\-:"]+="[^"]*")|(?:\s+[\w\-:"]+='[^']*'))*)(\/)?>([ \t\n\r]*)/g;
 	var tagStack = [];
 	html = html.replace(re, function($0, $1, $2, $3, $4, $5, $6) {
@@ -745,6 +758,7 @@ function _formatHtml(html, htmlTags, urlType, wellFormatted, indentChar) {
 		if (htmlTags && !htmlTagMap[tagName]) {
 			return '';
 		}
+		
 		if (endSlash === '' && _SINGLE_TAG_MAP[tagName]) {
 			endSlash = ' /';
 		}
@@ -3143,6 +3157,9 @@ _extend(KCmd, {
 			self.select(false);
 		}
 		function insertHtml(range, val) {
+		    if(isInQuoteTag(range)){
+		        return;
+		    }
 			var doc = range.doc,
 				frag = doc.createDocumentFragment();
 			K('@' + val, doc).each(function() {
@@ -3567,7 +3584,8 @@ function _getInitHtml(themesPath, bodyClass, cssPath, cssData) {
         'blockquote {',
         '   background-color:#E1EBF2;',
         '   background-image:url(../images/quote.gif);',
-        '   border-color:#DBDBCE;',
+        '   border-color:#575750;',
+        '   pointer-events: none;',
         '}',
         'blockquote cite {',
         '   display:block;',
@@ -4618,12 +4636,17 @@ function _bindNewlineEvent() {
 		}
 		return ancestor.name;
 	}
+	
 	K(doc).keydown(function(e) {
+        if(isInQuoteTag(self.cmd.range)){
+            e.preventDefault();
+        }
 		if (e.which != 13 || e.shiftKey || e.ctrlKey || e.altKey) {
 			return;
 		}
 		self.cmd.selection();
 		var tagName = getAncestorTagName(self.cmd.range);
+		
 		if (tagName == 'marquee' || tagName == 'select') {
 			return;
 		}
@@ -5844,14 +5867,6 @@ _plugin('core', function(K) {
             flashHtml += '[/flash]';
             return flashHtml;
         })
-        .replace(/<blockquote><div><cite>(.*?) wrote:<\/cite>(.*?)<\/div><\/blockquote>/ig, function(str, author, content, offset, s) {
-            var quoteHtml = "[quote=";
-            quoteHtml += author;
-            quoteHtml += "]";
-            quoteHtml += content;
-            quoteHtml += "[/quote]";
-            return quoteHtml;
-        })
 		.replace(/<img[^>]*class="?ke-(rm|media)"?[^>]*>/ig, function(full) {
 			var imgAttrs = _getAttrList(full),
 				styles = _getCssList(imgAttrs.style || ''),
@@ -5905,14 +5920,6 @@ _plugin('core', function(K) {
             attrs.width = _undef(attrs.width, 480);
             attrs.height = _undef(attrs.height, 360);
             return _mediaImg(self.themesPath + 'common/blank.gif', attrs);
-        })
-        .replace(/\[quote=(.*?)\](.*?)\[\/quote\]/ig, function(str, author, content, offset, s) {
-            var quoteHtml = "<blockquote><div><cite>";
-            quoteHtml += author;
-            quoteHtml += " wrote:</cite>";
-            quoteHtml += content;
-            quoteHtml += "</div></blockquote><br/>";
-            return quoteHtml;
         })
 		.replace(/<a[^>]*name="([^"]+)"[^>]*>(?:<\/a>)?/ig, function(full) {
 			var attrs = _getAttrList(full);

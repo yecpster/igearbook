@@ -69,6 +69,11 @@
 										<a href="${postUrl}">${post.subject?html}</a>
 									</strong>, 
 									<#if post.forum.type==1>
+									    <#if post.forum.uri?exists>
+									       <#assign forumUrl = "${contextPath}/${post.forum.uri}" />
+                                        <#else>
+                                           <#assign forumUrl = "${contextPath}/team/show/${post.forum.id}" />
+                                        </#if>
 									   <#assign forumUrl = "${contextPath}/team/show.action?teamId=${post.forum.id}" />
                                     <#else>
                                         <#assign forumUrl = JForumContext.encodeURL("/forums/show/${post.forum.id}") />

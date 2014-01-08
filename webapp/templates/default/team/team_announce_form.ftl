@@ -10,7 +10,7 @@
     <#if team.uri?exists>
         <a href="<@s.url value="/${team.uri}" />">${team.name?html}</a>
      <#else>
-        <a href="${contextPath}/team/show.action?teamId=${teamId}">${team.name?html}</a>
+        <a href="${contextPath}/team/show/${teamId}">${team.name?html}</a>
     </#if>
     <span class="arrow">→</span>
              修改群组公告
