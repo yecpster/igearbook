@@ -342,6 +342,13 @@ color: #333;
 font-size: 15px;
 text-decoration: none;
 }
+.category-bar span {
+position: absolute;
+right: 225px;
+}
+.category-bar span a{
+font-size: 13px;
+}
 #index-category .item {
 width: 249px;
 float: left;

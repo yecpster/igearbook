@@ -1,58 +1,26 @@
 <#include "/templates/default/header.htm"/>
 <@navHeader "index" />
-
-<div id="forum_tab_show" class="clearfix">
-  <div id="slides">
-    <#if recommendTopic?exists>
-    <a href="${JForumContext.encodeURL("/posts/list/${recommendTopic.topicId}")}" title="${recommendTopic.title?default("")}" target="_blank">
-    <img src="${recommendTopic.imageUrl?default("")}" alt="${recommendTopic.title?default("")}-封面图片" width="380" height="285">
-    <h4>${recommendTopic.title?default("")}</h4>
-    <p>${recommendTopic.desc?default("")}...</p>
-    </a>
-    </#if>
-  </div>
-  <div id="new_topics" class="box middle" >
-    <h4>最近更新</h4>
-    <ul>
-        <#list recentTopics as topic>
-        <li><a href="${JForumContext.encodeURL("/posts/list/${topic.id}")}" title="${topic.title?default("")}" target="_blank">${topic.title?html} </a></li>
-        </#list>
-    </ul>
-  </div>
-  <div class="last">
-    <h4>${I18n.getMessage("ForumBase.hottestTopics")}</h4>
-    <ul>
-      <#list hotTopics as topic>
-      <li><a href="${JForumContext.encodeURL("/posts/list/${topic.id}")}" title="${topic.title?default("")}" target="_blank">${topic.title?html}</a></li>
-      </#list>
-    </ul>
-            <div id="top_entry" class="tab_wrapper">
-              <div style="float:left;"><a href="${contextPath}/team/list.action" title="进入群组频道"><img src="${contextPath}/images/team_btn.jpg" width="147" height="78" border="0" alt="群组入口" /></a></div>
-              <div style="float:right;"><a href="${contextPath}/forums/show/5.page" title="进入团购频道"><img src="${contextPath}/images/group_buy_btn.jpg" width="147" height="78" border="0" alt="团购入口" /></a></div>
-            </div>
-  </div>
-</div>
-
+<#import "/templates/macros/paginationStruts.ftl" as pagination/>
 
     <div id="index-category" class="index-group">
       <div class="category"> 
+        <table width="100%">
+           <tr>
+            <td align="right">
+                <#assign paginationData><@pagination.doPagination "/portal", "recommend-more", pageData /></#assign>${paginationData}
+            </td>
+          </tr>
+        </table>
       
         <div class="row index-group">
-        <h2 class="category-bar"><a href="<@s.url value="/recommend-more" />">装备网编辑推荐</a><span class="index-cate-bar-more"><a href="<@s.url value="/recommend-more" />">更多文章...</a></span></h2>
-         <#list igearbookTopics as recommendTopic>
-          <div class="item">                        
-            <a href="${JForumContext.encodeURL("/posts/list/${recommendTopic.topicId}")}" title="${recommendTopic.title?default("")}" class="index-group"> 
-            <img src="${recommendTopic.imageUrl?default("")}" width="246" height="184" alt="${recommendTopic.title?default("")}-封面图片" />
-            <h3>${recommendTopic.title?default("")}</h3>
-            <p>${recommendTopic.desc?default("")}</p>
-            </a>            
-          </div>
-         </#list>
-        </div>
-        
-        <div class="row index-group">
-        <h2 class="category-bar"><a href="<@s.url value="/team-recommend-more" />">装备网群组精华</a><span class="index-cate-bar-more"><a href="<@s.url value="/team-recommend-more" />">更多文章...</a></span></h2>
-        <#list teamRecommends as recommendTopic>
+        <h2 class="category-bar">
+        <#if type==0>
+            <a href="<@s.url value="/recommend-more" />">装备网编辑推荐</a>
+        <#elseif type==1>
+            <a href="<@s.url value="/team-recommend-more" />">装备网群组精华</a>
+        </#if>
+        </h2>
+        <#list pageData.list as recommendTopic>
            <#if recommendTopic_index < 3>
            <div class="item">                        
             <a href="${JForumContext.encodeURL("/posts/list/${recommendTopic.topicId}")}" title="${recommendTopic.title?default("")}" class="index-group"> 
@@ -67,7 +35,7 @@
         
         <div class="row index-group">
         <h2 class="category-bar"></h2>
-        <#list teamRecommends as recommendTopic>
+        <#list pageData.list as recommendTopic>
            <#if (recommendTopic_index >= 3) && (recommendTopic_index < 6)>
            <div class="item">                        
             <a href="${JForumContext.encodeURL("/posts/list/${recommendTopic.topicId}")}" title="${recommendTopic.title?default("")}" class="index-group"> 
@@ -82,7 +50,7 @@
         
        <div class="row index-group">
         <h2 class="category-bar"></h2>
-        <#list teamRecommends as recommendTopic>
+        <#list pageData.list as recommendTopic>
            <#if (recommendTopic_index >= 6) && (recommendTopic_index < 9)>
            <div class="item">                        
             <a href="${JForumContext.encodeURL("/posts/list/${recommendTopic.topicId}")}" title="${recommendTopic.title?default("")}" class="index-group"> 
@@ -94,8 +62,28 @@
           </#if>
         </#list>
         </div>
-       
-       
+        
+        <div class="row index-group">
+        <h2 class="category-bar"></h2>
+        <#list pageData.list as recommendTopic>
+           <#if (recommendTopic_index >= 9) && (recommendTopic_index < 12)>
+           <div class="item">                        
+            <a href="${JForumContext.encodeURL("/posts/list/${recommendTopic.topicId}")}" title="${recommendTopic.title?default("")}" class="index-group"> 
+            <img src="${recommendTopic.imageUrl?default("")}" width="246" height="184" alt="${recommendTopic.title?default("")}" />
+            <h3>${recommendTopic.title?default("")}</h3>
+            <p>${recommendTopic.desc?default("")}</p>
+            </a>            
+          </div>
+          </#if>
+        </#list>
+        </div>
+       <table width="100%">
+           <tr>
+            <td align="right">
+            ${paginationData}
+            </td>
+          </tr>
+        </table>
       </div>
       <!-- category end -->
       <div class="sidebar">

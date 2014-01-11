@@ -8,6 +8,22 @@
     <from>/team/show/([0-9]+)(;.+)?</from>
     <to>/team/show.action?teamId=$1</to>
   </rule>
+  <rule>
+    <from>/recommend-more/([0-9]+)(;.+)?</from>
+    <to>/portal/recommend-more.action?type=0&amp;start=$1</to>
+  </rule>
+  <rule>
+    <from>^/recommend-more/?(;.+)?$</from>
+    <to>/portal/recommend-more.action?type=0</to>
+  </rule>
+  <rule>
+    <from>/team-recommend-more/([0-9]+)(;.+)?</from>
+    <to>/portal/recommend-more.action?type=1&amp;start=$1</to>
+  </rule>
+  <rule>
+    <from>^/team-recommend-more/?(;.+)?$</from>
+    <to>/portal/recommend-more.action?type=1</to>
+  </rule>
   <!-- <rule> -->
   <!-- <note> -->
   <!-- The rule means that requests to /test/status/ will be redirected to /rewrite-status -->

@@ -23,17 +23,38 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Lists;
 import com.igearbook.dao.RecommendDao;
+import com.igearbook.entities.PaginationData;
 import com.igearbook.entities.Recommendation;
 import com.opensymphony.xwork2.ActionContext;
 
 @Namespace("/portal")
 public class PortalAction extends BaseAction {
     private static final long serialVersionUID = 7587622153127430L;
+
+    private int type;
+    private PaginationData<Recommendation> pageData;
+
     @Autowired
     private RecommendDao recommendDao;
 
     public void setRecommendDao(final RecommendDao recommendDao) {
         this.recommendDao = recommendDao;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(final int type) {
+        this.type = type;
+    }
+
+    public PaginationData<Recommendation> getPageData() {
+        return pageData;
+    }
+
+    public void setPageData(final PaginationData<Recommendation> pageData) {
+        this.pageData = pageData;
     }
 
     @Action(value = "index", results = { @Result(name = SUCCESS, location = "portal_index.ftl") })
@@ -113,6 +134,31 @@ public class PortalAction extends BaseAction {
         });
         context.put("hotTeams", hotTeams);
 
+        return SUCCESS;
+    }
+
+    @Action(value = "recommend-more", results = { @Result(name = SUCCESS, location = "portal_recommend_more.ftl") })
+    public String recommendMore() {
+        this.pageData = recommendDao.doPaginationByType(type, getPaginationParams());
+        final List<Category> categories = Lists.newArrayList();
+
+        final List<Category> allCategories = ForumRepository.getAllCategories(SessionFacade.getUserSession().getUserId());
+        for (final Category category : allCategories) {
+            if (category.getType() == 1) {
+                categories.add(category);
+            }
+        }
+        final List<Forum> hotTeams = Lists.newArrayList();
+        for (final Category category : categories) {
+            hotTeams.addAll(category.getForums());
+        }
+        Collections.sort(hotTeams, new Comparator<Forum>() {
+            @Override
+            public int compare(final Forum o1, final Forum o2) {
+                return o2.getLastPostId() - o1.getLastPostId();
+            }
+        });
+        this.getContext().put("hotTeams", hotTeams);
         return SUCCESS;
     }
 

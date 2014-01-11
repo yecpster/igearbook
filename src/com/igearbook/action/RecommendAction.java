@@ -63,7 +63,7 @@ public class RecommendAction extends BaseAction {
         final UserSession userSession = SessionFacade.getUserSession();
         final boolean canEdit = userSession.isWebAdmin() || userSession.isAdmin();
         if (!canEdit) {
-            return ERROR;
+            return PERMISSION;
         }
         data = recommendDao.doPagination(getPaginationParams());
         return SUCCESS;
@@ -74,7 +74,7 @@ public class RecommendAction extends BaseAction {
         final UserSession userSession = SessionFacade.getUserSession();
         final boolean canEdit = userSession.isWebAdmin() || userSession.isAdmin();
         if (!canEdit) {
-            return ERROR;
+            return PERMISSION;
         }
         if (selectedRtopics != null) {
             for (final Integer selectedRtopic : selectedRtopics) {
@@ -105,7 +105,7 @@ public class RecommendAction extends BaseAction {
         final boolean isModerator = userSession.isModerator(topic.getForumId());
         final boolean canEditTeam = isModerator || userSession.isAdmin() || userSession.isWebAdmin();
         if (!canEditTeam) {
-            return ERROR;
+            return PERMISSION;
         }
 
         final Post post = PostRepository.selectAllByTopicByLimit(topicId, 0, 1).get(0);
@@ -115,7 +115,7 @@ public class RecommendAction extends BaseAction {
         while (matcher.find()) {
             final String src = matcher.group(1).trim();
             if (IMG_SRC_PT.matcher(src).matches()) {
-                imgList.add(src.replaceAll("_[023456789]\\.", "_1."));
+                imgList.add(src.replaceAll("_[23456789]\\.", "_1."));
             } else {
                 imgList.add(src);
             }
@@ -146,10 +146,9 @@ public class RecommendAction extends BaseAction {
     }
 
     @Action(value = "save", interceptorRefs = {
-            @InterceptorRef("defaultStackIgearbook"),
-            @InterceptorRef("tokenSession"),
             @InterceptorRef(value = "fileUpload", params = { "allowedExtensions ", ".gif,.jpg,.png", "allowedTypes",
-                    "image/png,image/gif,image/jpeg,image/pjpeg" }) }, results = { @Result(name = SUCCESS, location = "/", type = "redirect") })
+                    "image/png,image/gif,image/jpeg,image/pjpeg" }), @InterceptorRef("defaultStackIgearbook"), @InterceptorRef("tokenSession") },
+            results = { @Result(name = SUCCESS, location = "/", type = "redirect") })
     public String save() {
         Topic topic = TopicRepository.getTopic(new Topic(rtopic.getTopicId()));
         if (topic == null) {
@@ -160,7 +159,7 @@ public class RecommendAction extends BaseAction {
         final boolean isModerator = userSession.isModerator(topic.getForumId());
         final boolean canEditTeam = isModerator || userSession.isAdmin() || userSession.isWebAdmin();
         if (!canEditTeam) {
-            return ERROR;
+            return PERMISSION;
         }
 
         if ("upload".equals(coverImgType)) {

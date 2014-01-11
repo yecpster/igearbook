@@ -3,8 +3,6 @@ package com.igearbook.action;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.struts2.ServletActionContext;
-
 import com.google.common.collect.Maps;
 import com.igearbook.entities.PaginationParams;
 import com.opensymphony.xwork2.ActionContext;
@@ -14,8 +12,6 @@ public abstract class BaseAction extends ActionSupport {
     private static final long serialVersionUID = -7109541755686605891L;
 
     public static final String PERMISSION = "permission";
-
-    protected ActionContext context = ServletActionContext.getContext();
 
     private int id;
     private int start;
@@ -51,4 +47,9 @@ public abstract class BaseAction extends ActionSupport {
         params.setWebParams(webParams);
         return params;
     }
+
+    protected ActionContext getContext() {
+        return ActionContext.getContext();
+    }
+
 }

@@ -18,7 +18,7 @@ GroupModel.appendChild = INSERT INTO jforum_groups_groups (group1_id, group2_id)
 # #############
 # CategoryModel
 # #############
-CategoryModel.selectById = SELECT categories_id, title, display_order, moderated FROM jforum_categories WHERE categories_id = ? ORDER BY title 
+CategoryModel.selectById = SELECT categories_id, category_type, title, display_order, moderated FROM jforum_categories WHERE categories_id = ? ORDER BY title 
 CategoryModel.selectAll = SELECT categories_id, category_type, title, display_order, moderated FROM jforum_categories ORDER BY display_order
 CategoryModel.selectByType = SELECT categories_id, category_type, title, display_order, moderated FROM jforum_categories  WHERE category_type = ? ORDER BY display_order
 CategoryModel.canDelete = SELECT COUNT(1) AS total FROM jforum_forums WHERE categories_id = ?
