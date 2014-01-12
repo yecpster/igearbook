@@ -51,6 +51,7 @@ import java.util.Map;
 
 import net.jforum.cache.CacheEngine;
 import net.jforum.cache.Cacheable;
+import net.jforum.context.RequestContext;
 import net.jforum.dao.DataAccessDriver;
 import net.jforum.entities.UserSession;
 import net.jforum.repository.SecurityRepository;
@@ -93,7 +94,14 @@ public class SessionFacade implements Cacheable {
      * @see #add(UserSession, String)
      */
     public static void add(final UserSession us) {
-        add(us, JForumExecutionContext.getRequest().getSessionContext().getId());
+        final RequestContext request = JForumExecutionContext.getRequest();
+        final String userAgent = request.getHeader("User-Agent");
+        boolean isMobileUser = false;
+        if (userAgent != null && userAgent.toLowerCase().indexOf("mobile") > -1) {
+            isMobileUser = true;
+        }
+        us.setMobileUser(isMobileUser);
+        add(us, request.getSessionContext().getId());
     }
 
     /**

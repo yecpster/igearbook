@@ -296,6 +296,7 @@ public class User implements Serializable {
         return registrationDate;
     }
 
+    @Column(name = "apiUser", columnDefinition = "bit default false")
     public boolean isApiUser() {
         return apiUser;
     }
@@ -304,6 +305,7 @@ public class User implements Serializable {
         this.apiUser = apiUser;
     }
 
+    @Column(name = "apiUserActive", columnDefinition = "bit default false")
     public boolean isApiUserActive() {
         return apiUserActive;
     }

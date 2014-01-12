@@ -420,9 +420,9 @@ function smiliePopup()
 									<li target="postPoll"><a href="javascript:void(0);" onClick="activateTab('postPoll', this);"><span>${I18n.getMessage("PostForm.pollOption")}</span></a></li>
 								</#if>
 								<#if logged && session.isMobileUser()>
-								<#if attachmentsEnabled>
+								<#--if attachmentsEnabled> -->
 								    <li target="postAttachments"><a href="javascript:void(0);" onClick="activateTab('postAttachments', this);"><span>${I18n.getMessage("Attachments.attach")}</span></a></li>
-								</#if>
+								<#--</#if>-->
 								</#if>
 							</ul>
 						</div>

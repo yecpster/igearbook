@@ -1,24 +1,35 @@
 package com.igearbook.action;
 
+import java.io.IOException;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.jforum.ControllerUtils;
+import net.jforum.JForumExecutionContext;
 import net.jforum.SessionFacade;
 import net.jforum.dao.DataAccessDriver;
 import net.jforum.dao.UserDAO;
+import net.jforum.dao.UserSessionDAO;
 import net.jforum.entities.User;
 import net.jforum.entities.UserSession;
+import net.jforum.repository.SecurityRepository;
+import net.jforum.util.I18n;
 import net.jforum.util.MD5;
+import net.jforum.util.preferences.ConfigKeys;
+import net.jforum.util.preferences.SystemGlobals;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Namespace;
 import org.apache.struts2.convention.annotation.Result;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.collect.Maps;
 import com.igearbook.constant.UserAPISource;
 import com.igearbook.dao.UserApiDao;
+import com.igearbook.dao.UserDao;
 import com.igearbook.entities.UserApi;
 import com.opensymphony.xwork2.ActionContext;
 import com.qq.connect.api.OpenID;
@@ -27,17 +38,52 @@ import com.qq.connect.javabeans.AccessToken;
 import com.qq.connect.javabeans.qzone.UserInfoBean;
 import com.qq.connect.javabeans.weibo.TweetInfo;
 import com.qq.connect.oauth.Oauth;
-import com.qq.connect.utils.json.JSONObject;
 
 @Namespace("/qqapi")
 public class QQApiAction extends BaseAction {
     private static final long serialVersionUID = 7587622153127430L;
     private static final long FIVE_DAYS_MILLISECONDS = 1000 * 3600 * 24 * 5;
 
+    @Autowired
     private UserApiDao userApiDao;
+
+    @Autowired
+    private UserDao userDao;
+
+    private String password_confirm;
+    private String autologin;
+    private User user;
 
     public void setUserApiDao(final UserApiDao userApiDao) {
         this.userApiDao = userApiDao;
+    }
+
+    public void setUserDao(final UserDao userDao) {
+        this.userDao = userDao;
+    }
+
+    public String getPassword_confirm() {
+        return password_confirm;
+    }
+
+    public void setPassword_confirm(final String password_confirm) {
+        this.password_confirm = password_confirm;
+    }
+
+    public String getAutologin() {
+        return autologin;
+    }
+
+    public void setAutologin(final String autologin) {
+        this.autologin = autologin;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(final User user) {
+        this.user = user;
     }
 
     @Action(value = "login", results = { @Result(name = SUCCESS, location = "${authUrl}", type = "redirect") })
@@ -70,13 +116,6 @@ public class QQApiAction extends BaseAction {
         final AccessToken accessTokenObj = (new Oauth()).getAccessTokenByRequest(request);
 
         if (StringUtils.isBlank(accessTokenObj.getAccessToken())) {
-            // Mock user
-            final JSONObject json = new JSONObject();
-            json.put("nickname", "testQQUser");
-            final String url = "http://www.igearbook.com/upload/teamlogo/20131106223450742.jpg";
-            final UserInfoBean userInfoBean = new UserInfoBean(json);
-            context.put("qzoneUser", userInfoBean);
-            context.put("avatar", url);
             // 我们的网站被CSRF攻击了或者用户取消了授权
         } else {
             final String accessToken = accessTokenObj.getAccessToken();
@@ -93,17 +132,17 @@ public class QQApiAction extends BaseAction {
                 throw new Exception(userInfoBean.getMsg());
             }
 
-            final UserApi userApi = userApiDao.getByOpenId(openId);
+            UserApi userApi = userApiDao.getByOpenId(openId);
             final Date now = new Date();
             if (userApi == null) {
                 final User user = insertUser(userInfoBean);
-                final UserApi userApiAdd = new UserApi();
-                userApiAdd.setAccessToken(accessToken);
-                userApiAdd.setLastUpdateDate(now);
-                userApiAdd.setOpenId(openId);
-                userApiAdd.setSource(UserAPISource.QQ);
-                userApiAdd.setTokenExpireIn(tokenExpireIn);
-                userApiAdd.setUser(user);
+                userApi = new UserApi();
+                userApi.setAccessToken(accessToken);
+                userApi.setLastUpdateDate(now);
+                userApi.setOpenId(openId);
+                userApi.setSource(UserAPISource.QQ);
+                userApi.setTokenExpireIn(tokenExpireIn);
+                userApi.setUser(user);
                 userApiDao.add(userApi);
             }
 
@@ -143,9 +182,37 @@ public class QQApiAction extends BaseAction {
         return fiveDaysTestTime > now.getTime();
     }
 
-    @Action(value = "bind", results = { @Result(name = SUCCESS, location = "${redirectPath}", type = "redirect") })
+    @Action(value = "bind", results = { @Result(name = SUCCESS, location = "${redirectPath}", type = "redirect"),
+            @Result(name = INPUT, location = "qqApi_afterLogin.ftl") })
     public String bind() throws Exception {
-        final ActionContext context = ServletActionContext.getContext();
+        final UserSession userSession = SessionFacade.getUserSession();
+        final int anonymousUserId = SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID);
+        if (userSession.getUserId() == anonymousUserId) {
+            return PERMISSION;
+        }
+
+        final ActionContext context = getContext();
+        parseBasicAuthentication();
+        final UserDAO um = DataAccessDriver.getInstance().newUserDAO();
+        final User vUser = um.validateLogin(user.getUsername(), user.getPassword());
+        if (vUser != null) {
+            final int oldUserId = userSession.getUserId();
+            final User oldUser = userDao.get(oldUserId);
+            if (oldUser.isApiUser() && !oldUser.isApiUserActive()) {
+                final UserApi userApi = userApiDao.getByUserAndUserAPISource(vUser, UserAPISource.QQ);
+                userApi.setUser(vUser);
+                userApiDao.update(userApi);
+                vUser.setApiUser(true);
+                vUser.setApiUserActive(true);
+                userDao.update(vUser);
+                um.delete(oldUser.getId());
+                logUserIn(vUser);
+            }
+        } else {
+            this.addActionError(I18n.getMessage("Login.invalidLogin"));
+            return INPUT;
+        }
+
         final String redirectPath = (String) SessionFacade.getAttribute(SessionFacade.REDIRECT_KEY);
         context.put(SessionFacade.REDIRECT_KEY, "/");
         if (StringUtils.isNotBlank(redirectPath)) {
@@ -156,6 +223,34 @@ public class QQApiAction extends BaseAction {
         }
 
         return SUCCESS;
+    }
+
+    private static boolean hasBasicAuthentication(final HttpServletRequest request) {
+        final String auth = request.getHeader("Authorization");
+        return (auth != null && auth.startsWith("Basic "));
+    }
+
+    private boolean parseBasicAuthentication() {
+        final HttpServletRequest request = ServletActionContext.getRequest();
+        if (hasBasicAuthentication(request)) {
+            final String auth = request.getHeader("Authorization");
+            String decoded;
+
+            try {
+                decoded = new String(new sun.misc.BASE64Decoder().decodeBuffer(auth.substring(6)));
+            } catch (final IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            final int p = decoded.indexOf(':');
+
+            if (p != -1) {
+                user.setUsername(decoded.substring(0, p));
+                user.setPassword(decoded.substring(p + 1));
+                return true;
+            }
+        }
+        return false;
     }
 
     private User insertUser(final UserInfoBean userInfoBean) {
@@ -176,6 +271,9 @@ public class QQApiAction extends BaseAction {
         u.setPassword(MD5.crypt("*IgearbookIgnore53681"));
         final int newUserId = dao.addNew(u);
         dao.writeUserActive(newUserId);
+        final User setApiUser = userDao.get(newUserId);
+        setApiUser.setApiUser(true);
+        userDao.update(setApiUser);
         final User userUpdate = dao.selectById(newUserId);
         userUpdate.setAvatar(userInfoBean.getAvatar().getAvatarURL100());
         userUpdate.setGender(userInfoBean.getGender());
@@ -184,14 +282,63 @@ public class QQApiAction extends BaseAction {
 
     private void logUserIn(final User u) {
         SessionFacade.makeLogged();
-        final UserSession userSession = new UserSession();
-        userSession.setAutoLogin(true);
-        userSession.setUserId(u.getId());
-        userSession.setUsername(u.getUsername());
-        userSession.setLastVisit(new Date(System.currentTimeMillis()));
-        userSession.setStartTime(new Date(System.currentTimeMillis()));
-        SessionFacade.add(userSession);
+        final String sessionId = SessionFacade.isUserInSession(user.getId());
+        final UserSession userSession = new UserSession(SessionFacade.getUserSession());
+        // Remove the "guest" session
+        SessionFacade.remove(userSession.getSessionId());
+        userSession.dataToUser(u);
+        final UserSession currentUs = SessionFacade.getUserSession(sessionId);
+        // Check if the user is returning to the system
+        // before its last session has expired ( hypothesis )
+        UserSession tmpUs;
+        if (sessionId != null && currentUs != null) {
+            // Write its old session data
+            SessionFacade.storeSessionData(sessionId, JForumExecutionContext.getConnection());
+            tmpUs = new UserSession(currentUs);
+            SessionFacade.remove(sessionId);
+        } else {
+            final UserSessionDAO sm = DataAccessDriver.getInstance().newUserSessionDAO();
+            tmpUs = sm.selectById(userSession, JForumExecutionContext.getConnection());
+        }
+        // Autologin
+        if (StringUtils.isNotBlank(autologin) && SystemGlobals.getBoolValue(ConfigKeys.AUTO_LOGIN_ENABLED)) {
+            userSession.setAutoLogin(true);
 
+            // Generate the user-specific hash
+            String systemHash = MD5.crypt(SystemGlobals.getValue(ConfigKeys.USER_HASH_SEQUENCE) + user.getId());
+            final String userHash = MD5.crypt(System.currentTimeMillis() + systemHash);
+
+            // Persist the user hash
+            final UserDAO dao = DataAccessDriver.getInstance().newUserDAO();
+            dao.saveUserAuthHash(user.getId(), userHash);
+
+            systemHash = MD5.crypt(userHash);
+
+            ControllerUtils.addCookie(SystemGlobals.getValue(ConfigKeys.COOKIE_AUTO_LOGIN), "1");
+            ControllerUtils.addCookie(SystemGlobals.getValue(ConfigKeys.COOKIE_USER_HASH), systemHash);
+        } else {
+            // Remove cookies for safety
+            ControllerUtils.addCookie(SystemGlobals.getValue(ConfigKeys.COOKIE_USER_HASH), null);
+            ControllerUtils.addCookie(SystemGlobals.getValue(ConfigKeys.COOKIE_AUTO_LOGIN), null);
+        }
+
+        if (tmpUs == null) {
+            userSession.setLastVisit(new Date(System.currentTimeMillis()));
+        } else {
+            // Update last visit and session start time
+            userSession.setLastVisit(new Date(tmpUs.getStartTime().getTime() + tmpUs.getSessionTime()));
+        }
+
+        SessionFacade.add(userSession);
+        SessionFacade.setAttribute(ConfigKeys.TOPICS_READ_TIME, Maps.newHashMap());
+        ControllerUtils.addCookie(SystemGlobals.getValue(ConfigKeys.COOKIE_NAME_DATA), Integer.toString(user.getId()));
+
+        SecurityRepository.load(user.getId(), true);
+
+        SessionFacade.makeLogged();
+        SessionFacade.remove(SessionFacade.getUserSession().getSessionId());
+
+        getContext().put("logged", SessionFacade.isLogged());
     }
 
 }

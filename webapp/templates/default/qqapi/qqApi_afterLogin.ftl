@@ -10,13 +10,21 @@
     <tr>
         <th class="thhead" nowrap="nowrap" height="25">登录成功</th>
     </tr>
-
+    <@s.if test="hasActionErrors()">
+    <tr>
+       <td align="center">
+       <span class="gen">
+           <font color="red"><@s.actionerror /></font>
+       </span>
+       </td>
+    </tr>
+    </@s.if>
     <tr>
         <td class="row1">
             <table cellspacing="1" cellpadding="3" width="100%" border="0">
                 <tr>
                     <td align="center" colspan="3">
-                    <img src="${avatar?default("")}" height="48" width="48">&nbsp;&nbsp;欢迎你，来自&nbsp;&nbsp;<img alt="QQ登录" src="${contextPath}/templates/${templateName}/images/QQ_Connect_logo_1.png" width="16" height="16" />
+                    <img src="${qzoneUser.getAvatar().getAvatarURL100()?default("")}" height="48" width="48">&nbsp;&nbsp;欢迎你，来自&nbsp;&nbsp;<img alt="QQ登录" src="${contextPath}/templates/${templateName}/images/QQ_Connect_logo_1.png" width="16" height="16" />
                     QQ登录&nbsp;&nbsp;的 &nbsp;&nbsp;${qzoneUser.nickname}
                     </td>
                 </tr>
@@ -39,14 +47,14 @@
                 
                 <tr>
                     <td align="right" width="45%"><span class="gen">${I18n.getMessage("Login.user")}: * </span></td>
-                    <td width="205px"><input class="post required min-length-3 max-length-15" maxlength="40" size="25" name="username" type="text"/> </td>
+                    <td width="205px"><input class="post required min-length-3 max-length-15" maxlength="40" size="25" name="user.username" type="text"/> </td>
                     <td align="left">&nbsp;
                     </td>
                 </tr>
                 
                 <tr>
                     <td align="right"><span class="gen">${I18n.getMessage("Login.password")}: * </span></td>
-                    <td width="205px"><input class="post required" id="password" type="password" maxlength="25" size="25" name="password" /> </td>
+                    <td width="205px"><input class="post required" id="password" type="password" maxlength="25" size="25" name="user.password" /> </td>
                     <td align="left">
                         <@s.submit id="bind" action="bind" cssClass="submitBig" value="   绑定   " />
                     </td>

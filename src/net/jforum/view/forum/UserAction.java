@@ -82,6 +82,7 @@ import net.jforum.view.forum.common.UserCommon;
 import net.jforum.view.forum.common.ViewCommon;
 
 import org.apache.log4j.Logger;
+import org.tuckey.web.filters.urlrewrite.utils.StringUtils;
 
 /**
  * @author Rafael Steil
@@ -257,7 +258,7 @@ public class UserAction extends Command {
         final String captchaResponse = this.request.getParameter("captchaResponse");
 
         boolean error = false;
-        if (username == null || username.trim().equals("") || password == null || password.trim().equals("")) {
+        if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             this.context.put("error", I18n.getMessage("UsernamePasswordCannotBeNull"));
             error = true;
         }
@@ -417,12 +418,6 @@ public class UserAction extends Command {
                 SessionFacade.remove(userSession.getSessionId());
 
                 userSession.dataToUser(user);
-                final String userAgent = request.getHeader("User-Agent");
-                boolean isMobileUser = false;
-                if (userAgent != null && userAgent.toLowerCase().indexOf("mobile") > -1) {
-                    isMobileUser = true;
-                }
-                userSession.setMobileUser(isMobileUser);
 
                 final UserSession currentUs = SessionFacade.getUserSession(sessionId);
 
