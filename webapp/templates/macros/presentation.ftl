@@ -61,9 +61,9 @@
 				<tr>
 					<td>${option.text}</td>
 					<td nowrap="nowrap" width="210">
-						<img class="icon_vote_lcap" src="${contextPath}/images/transp.gif" alt="" /><img 
-							src="${contextPath}/templates/${templateName}/images/voting_bar.gif" width="${option.votePercentage * 2}" height="12" alt="" /><img 
-							class="icon_vote_rcap" src="${contextPath}/images/transp.gif" alt="" />
+						<img class="icon_vote_lcap" src="${contextPath}/images/transp.gif" alt="Vote left cap" /><img 
+							src="${contextPath}/templates/${templateName}/images/voting_bar.gif" width="${option.votePercentage * 2}" height="12" alt="voting bar" /><img 
+							class="icon_vote_rcap" src="${contextPath}/images/transp.gif" alt="Vote right cap" />
 					</td>
 					<td nowrap="nowrap" class="strong">${option.votePercentage}%</td>
 					<td nowrap="nowrap">[ ${option.voteCount} ]</td>

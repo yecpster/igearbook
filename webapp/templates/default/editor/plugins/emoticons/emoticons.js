@@ -54,7 +54,7 @@ KindEditor.plugin('emoticons', function(K) {
 				K(this).removeClass('ke-on');
 			});
 			cell.click(function(e) {
-				self.insertHtml('<img src="' + path + num + '.gif" border="0" alt="" />').hideMenu().focus();
+				self.insertHtml('<img src="' + path + num + '.gif" border="0" alt="'+'emotion'+num+'" />').hideMenu().focus();
 				e.stop();
 			});
 		}

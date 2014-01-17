@@ -35,7 +35,7 @@
 <ul>
     <li><label>群组名称</label>
         <#if !team?exists || session.isAdmin()>
-            <@s.textfield cssClass="text" size="30" name="team.name" cssClass="required max-length-20" />
+            <@s.textfield cssClass="text required max-length-20" size="30" name="team.name" />
         <#else>
             <@s.textfield cssClass="text" size="30" name="team.name" disabled="true" />
         </#if>
