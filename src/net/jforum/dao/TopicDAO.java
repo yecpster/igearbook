@@ -283,7 +283,15 @@ public interface TopicDAO
 	 * @param limit The number of topics to retrieve
      * @return List
 	 */
-	public List selectRecentTopics (int limit) ;
+	public List<Topic> selectRecentTopics (int limit) ;
+	
+	/**
+     * Selects recent replied topics 
+     *
+     * @param limit The number of topics to retrieve
+     * @return List
+     */
+    public List<Topic> selectRecentReplied (int limit) ;
 
 	/**
 	 * Selects hottest topics

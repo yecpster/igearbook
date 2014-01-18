@@ -114,7 +114,7 @@ public class PortalAction extends BaseAction {
         context.put("teamRecommends", teamRecommends);
         context.put("topicsPerPage", SystemGlobals.getIntValue(ConfigKeys.TOPICS_PER_PAGE));
         context.put("recentTopics", TopicRepository.getRecentTopics());
-        context.put("hotTopics", TopicRepository.getHottestTopics());
+        context.put("recentRepliedTopics", TopicRepository.getRecentRepliedTopics());
 
         final List<Category> allCategories = ForumRepository.getAllCategories(SessionFacade.getUserSession().getUserId());
         final List<Category> categories = Lists.newArrayList();

@@ -60,6 +60,8 @@ import net.jforum.entities.TopicTypeComparator;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
 
+import com.google.common.collect.Lists;
+
 /**
  * Repository for the last n topics for each forum.
  * 
@@ -72,6 +74,7 @@ public class TopicRepository implements Cacheable {
 
     private static final String FQN = "topics";
     private static final String RECENT = "recent";
+    private static final String RECENT_REPLIED = "recentReplied";
     private static final String HOTTEST = "hottest";
     private static final String FQN_FORUM = FQN + "/byforum";
     private static final String RELATION = "relation";
@@ -100,21 +103,21 @@ public class TopicRepository implements Cacheable {
      */
     public synchronized static void pushTopic(final Topic topic) {
         if (SystemGlobals.getBoolValue(ConfigKeys.TOPIC_CACHE_ENABLED)) {
-            final int limit = SystemGlobals.getIntValue(ConfigKeys.RECENT_TOPICS);
+            final boolean hasReply = topic.getTotalReplies() > 0;
+            final String limitKey = hasReply ? ConfigKeys.HOTTEST_TOPICS : ConfigKeys.RECENT_TOPICS;
+            final int limit = SystemGlobals.getIntValue(limitKey);
 
-            LinkedList l = (LinkedList) cache.get(FQN, RECENT);
-            if (l == null || l.size() == 0) {
-                l = new LinkedList(loadMostRecentTopics());
+            final String recentType = hasReply ? RECENT_REPLIED : RECENT;
+            final List<Topic> topics = hasReply ? getRecentRepliedTopics() : getRecentTopics();
+            final LinkedList<Topic> topicsLinkedList = Lists.newLinkedList(topics);
+            topicsLinkedList.remove(topic);
+            topicsLinkedList.addFirst(topic);
+
+            while (topicsLinkedList.size() > limit) {
+                topicsLinkedList.removeLast();
             }
 
-            l.remove(topic);
-            l.addFirst(topic);
-
-            while (l.size() > limit) {
-                l.removeLast();
-            }
-
-            cache.add(FQN, RECENT, l);
+            cache.add(FQN, recentType, topicsLinkedList);
         }
     }
 
@@ -129,7 +132,22 @@ public class TopicRepository implements Cacheable {
             l = loadMostRecentTopics();
         }
 
-        return new ArrayList(l);
+        return new ArrayList<Topic>(l);
+    }
+
+    /**
+     * Get all cached recent replied topics.
+     * 
+     */
+    public static List<Topic> getRecentRepliedTopics() {
+        @SuppressWarnings("unchecked")
+        List<Topic> l = (List<Topic>) cache.get(FQN, RECENT_REPLIED);
+
+        if (l == null || l.size() == 0 || !SystemGlobals.getBoolValue(ConfigKeys.TOPIC_CACHE_ENABLED)) {
+            l = loadMostRecentRepliedTopics();
+        }
+
+        return new ArrayList<Topic>(l);
     }
 
     /**
@@ -149,12 +167,25 @@ public class TopicRepository implements Cacheable {
     /**
      * Add recent topics to the cache
      */
-    public synchronized static List loadMostRecentTopics() {
+    public synchronized static LinkedList<Topic> loadMostRecentTopics() {
         final TopicDAO tm = DataAccessDriver.getInstance().newTopicDAO();
         final int limit = SystemGlobals.getIntValue(ConfigKeys.RECENT_TOPICS);
 
-        final List l = tm.selectRecentTopics(limit);
-        cache.add(FQN, RECENT, new LinkedList(l));
+        final LinkedList<Topic> l = new LinkedList<Topic>(tm.selectRecentTopics(limit));
+        cache.add(FQN, RECENT, l);
+
+        return l;
+    }
+
+    /**
+     * Add recent replied topics to the cache
+     */
+    public synchronized static LinkedList<Topic> loadMostRecentRepliedTopics() {
+        final TopicDAO tm = DataAccessDriver.getInstance().newTopicDAO();
+        final int limit = SystemGlobals.getIntValue(ConfigKeys.HOTTEST_TOPICS);
+
+        final LinkedList<Topic> l = new LinkedList<Topic>(tm.selectRecentReplied(limit));
+        cache.add(FQN, RECENT_REPLIED, l);
 
         return l;
     }

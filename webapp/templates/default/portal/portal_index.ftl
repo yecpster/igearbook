@@ -12,9 +12,17 @@
     </#if>
   </div>
   <div id="new_topics" class="box middle" >
-    <h4>最近更新</h4>
+    <h4>最新主题</h4>
     <ul>
         <#list recentTopics as topic>
+        <li><a href="${JForumContext.encodeURL("/posts/list/${topic.id}")}" title="${topic.title?default("")}" target="_blank">${topic.title?html} </a></li>
+        </#list>
+    </ul>
+  </div>
+  <div class="last">
+    <h4>最新回复</h4>
+    <ul>
+      <#list recentRepliedTopics as topic>
             <#assign startPage = ""/>
             <#if (topic.totalReplies + 1 > topicsPerPage)>
                 <#assign startPage = ((topic.totalReplies / topicsPerPage)?int * topicsPerPage) +"/"/>
@@ -24,15 +32,7 @@
                 <#assign lastPostAnchorLink = "#" + topic.lastPostId />
             </#if>
             <#assign url = JForumContext.encodeURL("/posts/list/${startPage}${topic.id}") + "${lastPostAnchorLink}" />
-        <li><a href="${url}" title="${topic.title?default("")}" target="_blank">${topic.title?html} </a></li>
-        </#list>
-    </ul>
-  </div>
-  <div class="last">
-    <h4>${I18n.getMessage("ForumBase.hottestTopics")}</h4>
-    <ul>
-      <#list hotTopics as topic>
-      <li><a href="${JForumContext.encodeURL("/posts/list/${topic.id}")}" title="${topic.title?default("")}" target="_blank">${topic.title?html}</a></li>
+      <li><a href="${url}" title="${topic.title?default("")}" target="_blank">${topic.title?html}</a></li>
       </#list>
     </ul>
             <div id="top_entry" class="tab_wrapper">
