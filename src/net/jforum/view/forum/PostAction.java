@@ -312,7 +312,23 @@ public class PostAction extends Command {
         final int pollId = this.request.getIntParameter("poll_id");
         final int topicId = this.request.getIntParameter("topic_id");
 
-        if (SessionFacade.isLogged() && this.request.getParameter("poll_option") != null) {
+        final int delay = SystemGlobals.getIntValue(ConfigKeys.POSTS_NEW_DELAY);
+        boolean frequencyValid = true;
+        if (delay > 0) {
+            final Long lastPostTime = (Long) SessionFacade.getAttribute(ConfigKeys.LAST_POST_TIME);
+            if (lastPostTime != null) {
+                if (System.currentTimeMillis() < (lastPostTime.longValue() + delay)) {
+                    frequencyValid = false;
+                    this.context.put("error", I18n.getMessage("PostForm.tooSoon"));
+                    this.list();
+                    return;
+                }
+            }
+        }
+
+        if (frequencyValid && SessionFacade.isLogged() && this.request.getParameter("poll_option") != null) {
+            // Check the elapsed time since the last post from the user
+
             Topic topic = TopicRepository.getTopic(new Topic(topicId));
 
             if (topic == null) {
@@ -330,8 +346,14 @@ public class PostAction extends Command {
             final PollDAO dao = DataAccessDriver.getInstance().newPollDAO();
 
             // vote on the poll
-            final UserSession user = SessionFacade.getUserSession();
-            dao.voteOnPoll(pollId, optionId, user.getUserId(), request.getRemoteAddr());
+            final int userId = SessionFacade.getUserSession().getUserId();
+            if (!dao.hasUserVotedOnPoll(pollId, userId)) {
+                dao.voteOnPoll(pollId, optionId, userId, request.getRemoteAddr());
+            }
+        }
+
+        if (delay > 0) {
+            SessionFacade.setAttribute(ConfigKeys.LAST_POST_TIME, new Long(System.currentTimeMillis()));
         }
 
         JForumExecutionContext.setRedirect(this.request.getContextPath() + "/posts/list/" + topicId

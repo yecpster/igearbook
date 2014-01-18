@@ -122,7 +122,7 @@ public class TopicRepository implements Cacheable {
      * Get all cached recent topics.
      * 
      */
-    public static List getRecentTopics() {
+    public static List<Topic> getRecentTopics() {
         List l = (List) cache.get(FQN, RECENT);
 
         if (l == null || l.size() == 0 || !SystemGlobals.getBoolValue(ConfigKeys.TOPIC_CACHE_ENABLED)) {

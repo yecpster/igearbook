@@ -15,7 +15,16 @@
     <h4>最近更新</h4>
     <ul>
         <#list recentTopics as topic>
-        <li><a href="${JForumContext.encodeURL("/posts/list/${topic.id}")}" title="${topic.title?default("")}" target="_blank">${topic.title?html} </a></li>
+            <#assign startPage = ""/>
+            <#if (topic.totalReplies + 1 > topicsPerPage)>
+                <#assign startPage = ((topic.totalReplies / topicsPerPage)?int * topicsPerPage) +"/"/>
+            </#if>
+            <#assign lastPostAnchorLink = ""/>
+            <#if ((topic.totalReplies + 1) % topicsPerPage) != 1>
+                <#assign lastPostAnchorLink = "#" + topic.lastPostId />
+            </#if>
+            <#assign url = JForumContext.encodeURL("/posts/list/${startPage}${topic.id}") + "${lastPostAnchorLink}" />
+        <li><a href="${url}" title="${topic.title?default("")}" target="_blank">${topic.title?html} </a></li>
         </#list>
     </ul>
   </div>

@@ -85,6 +85,7 @@ public class Topic implements Serializable {
     private int firstPostId;
     private Post firstPost;
     private int lastPostId;
+    private Post lastPost;
     private int voteId;
     private int movedId;
 
@@ -130,6 +131,15 @@ public class Topic implements Serializable {
 
     public void setFirstPost(final Post firstPost) {
         this.firstPost = firstPost;
+    }
+
+    @Transient
+    public Post getLastPost() {
+        return lastPost;
+    }
+
+    public void setLastPost(final Post lastPost) {
+        this.lastPost = lastPost;
     }
 
     /**

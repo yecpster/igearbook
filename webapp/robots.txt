@@ -3,4 +3,5 @@ Disallow: /templates/
 Disallow: /tmp/
 Disallow: /user/profile/
 Disallow: /posts/listByUser/
+Disallow: /*.page?
 Sitemap: http://www.igearbook.com/sitemap.xml

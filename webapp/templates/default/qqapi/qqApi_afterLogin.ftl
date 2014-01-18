@@ -24,8 +24,9 @@
             <table cellspacing="1" cellpadding="3" width="100%" border="0">
                 <tr>
                     <td align="center" colspan="3">
-                    <img src="${qzoneUser.getAvatar().getAvatarURL100()?default("")}" height="48" width="48">&nbsp;&nbsp;欢迎你，来自&nbsp;&nbsp;<img alt="QQ登录" src="${contextPath}/templates/${templateName}/images/QQ_Connect_logo_1.png" width="16" height="16" />
-                    QQ登录&nbsp;&nbsp;的 &nbsp;&nbsp;${qzoneUser.nickname}
+                    
+                    <img src="${user.avatar?default("")}" height="48" width="48">&nbsp;&nbsp;欢迎你，来自&nbsp;&nbsp;<img alt="QQ登录" src="${contextPath}/templates/${templateName}/images/QQ_Connect_logo_1.png" width="16" height="16" />
+                    QQ登录&nbsp;&nbsp;的 &nbsp;&nbsp;${user.username}
                     </td>
                 </tr>
                 <tr align="center">
@@ -37,9 +38,9 @@
                 </tr>
                 <tr>
                     <td align="right"  colspan="2">
-                    <input type="radio" name="accountType" value="hasAccount" id="accountTypeYes" checked="checked" />
+                    <input type="radio" name="accountType" value="hasAccount" id="accountTypeYes" <#if !accountType?exists || accountType=="hasAccount"> checked="checked" </#if> />
                     <label for="accountTypeYes">已经有装备网帐号</label>
-                    <input type="radio" name="accountType" value="noAccount" id="accountTypeNo" />
+                    <input type="radio" name="accountType" value="noAccount" id="accountTypeNo" <#if accountType?exists && accountType=="noAccount"> checked="checked" </#if> />
                     <label for="accountTypeNo">一步注册装备网帐号</label>
                     </td>
                     <td align="left">&nbsp;</td>
@@ -47,14 +48,18 @@
                 
                 <tr>
                     <td align="right" width="45%"><span class="gen">${I18n.getMessage("Login.user")}: * </span></td>
-                    <td width="205px"><input class="post required min-length-3 max-length-15" maxlength="40" size="25" name="user.username" type="text"/> </td>
+                    <td width="205px">
+                        <@s.textfield cssClass="post required min-length-3 max-length-15" maxlength="40" size="25" name="user.username" />
+                     </td>
                     <td align="left">&nbsp;
                     </td>
                 </tr>
                 
                 <tr>
                     <td align="right"><span class="gen">${I18n.getMessage("Login.password")}: * </span></td>
-                    <td width="205px"><input class="post required" id="password" type="password" maxlength="25" size="25" name="user.password" /> </td>
+                    <td width="205px">
+                        <@s.password id="password" cssClass="post required" maxlength="25" size="25" name="user.password" />
+                    </td>
                     <td align="left">
                         <@s.submit id="bind" action="bind" cssClass="submitBig" value="   绑定   " />
                     </td>

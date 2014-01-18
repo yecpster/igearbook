@@ -104,15 +104,14 @@ public class QQApiAction extends BaseAction {
 
     @Action(value = "testlogin", results = { @Result(name = SUCCESS, location = "qqApi_testlogin.ftl") })
     public String testlogin() throws Exception {
-
-        return SUCCESS;
+        return this.login();
     }
 
-    @Action(value = "afterlogin", results = { @Result(name = SUCCESS, location = "qqApi_afterLogin.ftl") })
+    @Action(value = "afterlogin", results = { @Result(name = SUCCESS, location = "qqApi_afterLogin.ftl"),
+            @Result(name = SessionFacade.REDIRECT_KEY, location = "${redirectPath}", type = "redirect") })
     public String afterLogin() throws Exception {
         final ActionContext context = ServletActionContext.getContext();
         final HttpServletRequest request = ServletActionContext.getRequest();
-
         final AccessToken accessTokenObj = (new Oauth()).getAccessTokenByRequest(request);
 
         if (StringUtils.isBlank(accessTokenObj.getAccessToken())) {
@@ -126,9 +125,7 @@ public class QQApiAction extends BaseAction {
 
             final UserInfo qzoneUserInfo = new UserInfo(accessToken, openId);
             final UserInfoBean userInfoBean = qzoneUserInfo.getUserInfo();
-            if (userInfoBean.getRet() == 0) {
-                context.put("qzoneUser", userInfoBean);
-            } else {
+            if (userInfoBean.getRet() != 0) {
                 throw new Exception(userInfoBean.getMsg());
             }
 
@@ -154,6 +151,18 @@ public class QQApiAction extends BaseAction {
             }
             final User loginUser = userApi.getUser();
             logUserIn(loginUser);
+            loginUser.setAvatar(userInfoBean.getAvatar().getAvatarURL100());
+            this.user = loginUser;
+            if (loginUser.isApiUserActive()) {
+                final String redirectPath = (String) SessionFacade.getAttribute(SessionFacade.REDIRECT_KEY);
+                if (StringUtils.isNotBlank(redirectPath)) {
+                    context.put(SessionFacade.REDIRECT_KEY, redirectPath);
+                    SessionFacade.removeAttribute(SessionFacade.REDIRECT_KEY);
+                } else {
+                    context.put(SessionFacade.REDIRECT_KEY, "/");
+                }
+                return SessionFacade.REDIRECT_KEY;
+            }
 
             final com.qq.connect.api.weibo.UserInfo weiboUserInfo = new com.qq.connect.api.weibo.UserInfo(accessToken, openId);
             final com.qq.connect.javabeans.weibo.UserInfoBean weiboUserInfoBean = weiboUserInfo.getUserInfo();
@@ -199,7 +208,7 @@ public class QQApiAction extends BaseAction {
             final int oldUserId = userSession.getUserId();
             final User oldUser = userDao.get(oldUserId);
             if (oldUser.isApiUser() && !oldUser.isApiUserActive()) {
-                final UserApi userApi = userApiDao.getByUserAndUserAPISource(vUser, UserAPISource.QQ);
+                final UserApi userApi = userApiDao.getByUserAndUserAPISource(oldUser, UserAPISource.QQ);
                 userApi.setUser(vUser);
                 userApiDao.update(userApi);
                 vUser.setApiUser(true);
@@ -209,9 +218,84 @@ public class QQApiAction extends BaseAction {
                 logUserIn(vUser);
             }
         } else {
+            this.user = um.selectById(userSession.getUserId());
             this.addActionError(I18n.getMessage("Login.invalidLogin"));
             return INPUT;
         }
+
+        final String redirectPath = (String) SessionFacade.getAttribute(SessionFacade.REDIRECT_KEY);
+        context.put(SessionFacade.REDIRECT_KEY, "/");
+        if (StringUtils.isNotBlank(redirectPath)) {
+            // context.put(SessionFacade.REDIRECT_KEY, redirectPath);
+            SessionFacade.removeAttribute(SessionFacade.REDIRECT_KEY);
+        } else {
+            context.put(SessionFacade.REDIRECT_KEY, "/");
+        }
+
+        return SUCCESS;
+    }
+
+    @Action(value = "reg", results = { @Result(name = SUCCESS, location = "${redirectPath}", type = "redirect"),
+            @Result(name = INPUT, location = "qqApi_afterLogin.ftl") })
+    public String register() throws Exception {
+        final ActionContext context = getContext();
+        context.put("accountType", "noAccount");
+        final UserSession userSession = SessionFacade.getUserSession();
+        final int anonymousUserId = SystemGlobals.getIntValue(ConfigKeys.ANONYMOUS_USER_ID);
+        if (userSession.getUserId() == anonymousUserId) {
+            return PERMISSION;
+        }
+
+        final UserDAO um = DataAccessDriver.getInstance().newUserDAO();
+        
+        final String username = StringUtils.trimToEmpty(user.getUsername());
+        final String password = StringUtils.trimToEmpty(user.getPassword());
+
+        final User loginUser = um.selectById(userSession.getUserId());
+        if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
+            this.addActionError(I18n.getMessage("UsernamePasswordCannotBeNull"));
+            this.user = loginUser;
+            return INPUT;
+        }
+
+        if (StringUtils.isBlank(password_confirm) || !password_confirm.equals(user.getPassword())) {
+            this.addActionError(I18n.getMessage("User.passwordNotMatch"));
+            this.user = loginUser;
+            return INPUT;
+        }
+
+        if (username.length() > SystemGlobals.getIntValue(ConfigKeys.USERNAME_MAX_LENGTH)) {
+            this.addActionError(I18n.getMessage("User.usernameTooBig"));
+            this.user = loginUser;
+            return INPUT;
+        }
+
+        if (username.indexOf('<') > -1 || username.indexOf('>') > -1) {
+            this.addActionError(I18n.getMessage("User.usernameInvalidChars"));
+            this.user = loginUser;
+            return INPUT;
+        }
+
+        final User inSessionUser = userDao.get(userSession.getUserId());
+        // Only inactive apiUser permit to process this action.
+        if (!inSessionUser.isApiUser() || inSessionUser.isApiUserActive()) {
+            this.user = loginUser;
+            return PERMISSION;
+        }
+
+        final String lgoinUsernane = StringUtils.trimToEmpty(inSessionUser.getUsername());
+        if (!StringUtils.equals(username, lgoinUsernane) && um.isUsernameRegistered(username)) {
+            this.addActionError(I18n.getMessage("UsernameExists"));
+            this.user = loginUser;
+            return INPUT;
+        }
+        inSessionUser.setUsername(username);
+        inSessionUser.setPassword(MD5.crypt(password));
+        inSessionUser.setApiUser(true);
+        inSessionUser.setApiUserActive(true);
+        userDao.update(inSessionUser);
+        final User updateLoginUser = um.selectById(inSessionUser.getId());
+        logUserIn(updateLoginUser);
 
         final String redirectPath = (String) SessionFacade.getAttribute(SessionFacade.REDIRECT_KEY);
         context.put(SessionFacade.REDIRECT_KEY, "/");
@@ -256,7 +340,7 @@ public class QQApiAction extends BaseAction {
     private User insertUser(final UserInfoBean userInfoBean) {
         final UserDAO dao = DataAccessDriver.getInstance().newUserDAO();
         final User u = new User();
-        final String userName = userInfoBean.getNickname();
+        final String userName = StringUtils.trimToEmpty(userInfoBean.getNickname());
         if (dao.isUsernameRegistered(userName)) {
             for (int i = 2; i < 30; i++) {
                 if (!dao.isUsernameRegistered(userName + i)) {
@@ -277,12 +361,13 @@ public class QQApiAction extends BaseAction {
         final User userUpdate = dao.selectById(newUserId);
         userUpdate.setAvatar(userInfoBean.getAvatar().getAvatarURL100());
         userUpdate.setGender(userInfoBean.getGender());
+        dao.update(userUpdate);
         return userUpdate;
     }
 
     private void logUserIn(final User u) {
         SessionFacade.makeLogged();
-        final String sessionId = SessionFacade.isUserInSession(user.getId());
+        final String sessionId = SessionFacade.isUserInSession(u.getId());
         final UserSession userSession = new UserSession(SessionFacade.getUserSession());
         // Remove the "guest" session
         SessionFacade.remove(userSession.getSessionId());
@@ -305,12 +390,12 @@ public class QQApiAction extends BaseAction {
             userSession.setAutoLogin(true);
 
             // Generate the user-specific hash
-            String systemHash = MD5.crypt(SystemGlobals.getValue(ConfigKeys.USER_HASH_SEQUENCE) + user.getId());
+            String systemHash = MD5.crypt(SystemGlobals.getValue(ConfigKeys.USER_HASH_SEQUENCE) + u.getId());
             final String userHash = MD5.crypt(System.currentTimeMillis() + systemHash);
 
             // Persist the user hash
             final UserDAO dao = DataAccessDriver.getInstance().newUserDAO();
-            dao.saveUserAuthHash(user.getId(), userHash);
+            dao.saveUserAuthHash(u.getId(), userHash);
 
             systemHash = MD5.crypt(userHash);
 
@@ -331,14 +416,11 @@ public class QQApiAction extends BaseAction {
 
         SessionFacade.add(userSession);
         SessionFacade.setAttribute(ConfigKeys.TOPICS_READ_TIME, Maps.newHashMap());
-        ControllerUtils.addCookie(SystemGlobals.getValue(ConfigKeys.COOKIE_NAME_DATA), Integer.toString(user.getId()));
+        ControllerUtils.addCookie(SystemGlobals.getValue(ConfigKeys.COOKIE_NAME_DATA), Integer.toString(u.getId()));
 
-        SecurityRepository.load(user.getId(), true);
+        SecurityRepository.load(u.getId(), true);
 
-        SessionFacade.makeLogged();
-        SessionFacade.remove(SessionFacade.getUserSession().getSessionId());
-
-        getContext().put("logged", SessionFacade.isLogged());
+        this.getContext().put("logged", SessionFacade.isLogged());
     }
 
 }
