@@ -112,7 +112,6 @@ public class PortalAction extends BaseAction {
         }
         final List<Recommendation> teamRecommends = recommendDao.listByTypeByLimit(Recommendation.TYPE_INDEX_TEAM, 9);
         context.put("teamRecommends", teamRecommends);
-
         context.put("topicsPerPage", SystemGlobals.getIntValue(ConfigKeys.TOPICS_PER_PAGE));
         context.put("recentTopics", TopicRepository.getRecentTopics());
         context.put("hotTopics", TopicRepository.getHottestTopics());
