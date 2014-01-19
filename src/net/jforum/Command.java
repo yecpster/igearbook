@@ -78,9 +78,13 @@ public abstract class Command {
     protected ResponseContext response;
     protected SimpleHash context;
     protected ApplicationContext appContext;
-    
+
     public void setAppContext(final ApplicationContext appContext) {
         this.appContext = appContext;
+    }
+
+    protected <T> T getBean(final Class<T> theClass) {
+        return appContext.getBean(theClass);
     }
 
     protected void setTemplateName(final String templateName) {

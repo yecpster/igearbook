@@ -84,6 +84,8 @@ import net.jforum.view.forum.common.ViewCommon;
 import org.apache.log4j.Logger;
 import org.tuckey.web.filters.urlrewrite.utils.StringUtils;
 
+import com.igearbook.dao.UserDao;
+
 /**
  * @author Rafael Steil
  * @version $Id: UserAction.java,v 1.94 2007/09/21 17:26:09 rafaelsteil Exp $
@@ -173,7 +175,11 @@ public class UserAction extends Command {
     }
 
     public void insert() {
-        this.insert(false);
+        if (SessionFacade.isLogged()) {
+            JForumExecutionContext.setRedirect(this.request.getContextPath() + "/");
+        } else {
+            this.insert(false);
+        }
     }
 
     public void acceptAgreement() {
@@ -292,6 +298,13 @@ public class UserAction extends Command {
             error = true;
         }
 
+        final String remoteAddr = request.getRemoteAddr();
+        final UserDao sUserDao = this.getBean(UserDao.class);
+        if (!error && sUserDao.isIpRegistered(remoteAddr)) {
+            this.context.put("error", I18n.getMessage("User.ipExists"));
+            error = true;
+        }
+
         if (error) {
             this.insert(true);
             return;
@@ -300,6 +313,7 @@ public class UserAction extends Command {
         u.setUsername(username);
         u.setPassword(MD5.crypt(password));
         u.setEmail(email);
+        u.setRegisterIp(remoteAddr);
 
         final boolean requiresMailActivation = SystemGlobals.getBoolValue(ConfigKeys.MAIL_USER_EMAIL_AUTH);
 
@@ -578,7 +592,7 @@ public class UserAction extends Command {
     }
 
     public void logout() {
-        JForumExecutionContext.setRedirect(this.request.getContextPath() + "/forums/list" + SystemGlobals.getValue(ConfigKeys.SERVLET_EXTENSION));
+        JForumExecutionContext.setRedirect(this.request.getContextPath() + "/");
 
         final UserSession userSession = SessionFacade.getUserSession();
         SessionFacade.storeSessionData(userSession.getSessionId(), JForumExecutionContext.getConnection());
@@ -594,6 +608,10 @@ public class UserAction extends Command {
     }
 
     public void login() {
+        if (SessionFacade.isLogged()) {
+            JForumExecutionContext.setRedirect(this.request.getContextPath() + "/");
+            return;
+        }
         if (ConfigKeys.TYPE_SSO.equals(SystemGlobals.getValue(ConfigKeys.AUTHENTICATION_TYPE))) {
             this.registrationDisabled();
             return;

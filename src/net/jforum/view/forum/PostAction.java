@@ -194,7 +194,7 @@ public class PostAction extends Command {
             poll = pollDao.selectById(topic.getVoteId());
 
             if (canVoteOnPoll) {
-                canVoteOnPoll = !pollDao.hasUserVotedOnPoll(topic.getVoteId(), us.getUserId());
+                canVoteOnPoll = !pollDao.hasUserVotedOnPoll(topic.getVoteId(), request.getRemoteAddr());
             }
         }
 
@@ -347,8 +347,9 @@ public class PostAction extends Command {
 
             // vote on the poll
             final int userId = SessionFacade.getUserSession().getUserId();
-            if (!dao.hasUserVotedOnPoll(pollId, userId)) {
-                dao.voteOnPoll(pollId, optionId, userId, request.getRemoteAddr());
+            final String remoteAddr = request.getRemoteAddr();
+            if (!dao.hasUserVotedOnPoll(pollId, remoteAddr)) {
+                dao.voteOnPoll(pollId, optionId, userId, remoteAddr);
             }
         }
 

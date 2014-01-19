@@ -332,6 +332,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
         p.setString(3, user.getEmail());
         p.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
         p.setString(5, user.getActivationKey());
+        p.setString(6, user.getRegisterIp());
     }
 
     /**
@@ -344,7 +345,7 @@ public class GenericUserDAO extends AutoKeys implements UserDAO {
             p = this.getStatementForAutoKeys("UserModel.addNewWithId");
 
             this.initNewUser(user, p);
-            p.setInt(6, user.getId());
+            p.setInt(7, user.getId());
 
             p.executeUpdate();
 

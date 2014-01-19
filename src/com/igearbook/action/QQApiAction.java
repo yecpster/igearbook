@@ -174,7 +174,7 @@ public class QQApiAction extends BaseAction {
 
                 context.put("qqweiboOrigText", weiboUserInfoBean.getTweetInfo().getOrigText());
             } else {
-                throw new Exception(weiboUserInfoBean.getMsg());
+               // throw new Exception(weiboUserInfoBean.getMsg());
             }
         }
 
@@ -421,6 +421,7 @@ public class QQApiAction extends BaseAction {
         SecurityRepository.load(u.getId(), true);
 
         this.getContext().put("logged", SessionFacade.isLogged());
+        this.getContext().put("session", SessionFacade.getUserSession());
     }
 
 }

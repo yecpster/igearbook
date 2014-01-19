@@ -134,6 +134,7 @@ public class User implements Serializable {
     private boolean deleted;
     private String firstName;
     private String lastName;
+    private String registerIp;
     private final Map<String, Object> extra = Maps.newHashMap();
 
     public User(final int userId) {
@@ -229,6 +230,15 @@ public class User implements Serializable {
     @Column(name = "user_from")
     public String getFrom() {
         return this.from;
+    }
+
+    @Column(name = "reg_ip")
+    public String getRegisterIp() {
+        return registerIp;
+    }
+
+    public void setRegisterIp(final String registerIp) {
+        this.registerIp = registerIp;
     }
 
     @Transient

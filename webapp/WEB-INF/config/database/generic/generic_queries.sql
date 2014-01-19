@@ -60,10 +60,10 @@ UserModel.selectById = SELECT COUNT(pm.privmsgs_to_userid) AS private_messages, 
 	GROUP BY pm.privmsgs_to_userid
 
 UserModel.selectAll = SELECT user_email, user_id, user_avatar, user_posts, user_regdate, username, deleted, user_karma, user_from, \
-	user_website, user_viewemail FROM jforum_users ORDER BY user_id
+	user_website, user_viewemail FROM jforum_users  where deleted <> 1 ORDER BY user_id
 
 UserModel.selectAllByLimit = SELECT user_email, user_id, user_avatar, user_posts, user_regdate, username, deleted, user_karma, user_from, user_website, user_viewemail \
-	FROM jforum_users ORDER BY user_id LIMIT ?, ?
+	FROM jforum_users where deleted <> 1 ORDER BY user_id LIMIT ?, ?
 
 UserModel.selectAllByGroup = SELECT user_email, u.user_id, user_avatar, user_posts, user_regdate, username, deleted, user_karma, user_from, \
 	user_website, user_viewemail \
@@ -81,11 +81,11 @@ UserModel.incrementPosts = UPDATE jforum_users SET user_posts = user_posts + 1 W
 UserModel.decrementPosts = UPDATE jforum_users SET user_posts = user_posts - 1 WHERE user_id = ?
 UserModel.rankingId = UPDATE jforum_users SET rank_id = ? WHERE user_id = ?
 UserModel.activeStatus = UPDATE jforum_users SET user_active = ? WHERE user_id = ?
-UserModel.addNew = INSERT INTO jforum_users (username, user_password, user_email, user_regdate, user_actkey, rank_id) VALUES (?, ?, ?, ?, ?, 0)
+UserModel.addNew = INSERT INTO jforum_users (username, user_password, user_email, user_regdate, user_actkey, reg_ip, rank_id) VALUES (?, ?, ?, ?, ?, ?, 0)
 UserModel.findByName = SELECT user_id, username, user_email, deleted FROM jforum_users WHERE UPPER(username) LIKE UPPER(?)
 UserModel.findByEmail = SELECT * FROM jforum_users WHERE LOWER(user_email) = LOWER(?)
 UserModel.selectByName = SELECT * FROM jforum_users WHERE LOWER(username) = LOWER(?)
-UserModel.addNewWithId = INSERT INTO jforum_users (username, user_password, user_email, user_regdate, user_actkey, user_id) VALUES (?, ?, ?, ?, ?, ?)
+UserModel.addNewWithId = INSERT INTO jforum_users (username, user_password, user_email, user_regdate, user_actkey, reg_ip, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)
 
 UserModel.update = UPDATE jforum_users SET user_aim = ?, \
 	user_avatar = ?,\

@@ -9,4 +9,6 @@ public interface UserDao extends BaseDao<User> {
 
     public PaginationData<User> listByGroup(PaginationParams params);
 
+    public boolean isIpRegistered(String ip);
+
 }

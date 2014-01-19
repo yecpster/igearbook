@@ -64,9 +64,7 @@ Please check your browser settings or use a Javascript-capable browser.</p>
                 <#if !logged && !sso>
                     <a href="${JForumContext.encodeURL("/user/login")}" class="welcome" title="${I18n.getMessage("ForumBase.login")}">${I18n.getMessage("Admin.notYetLogin")}</a>
                     <a href="${JForumContext.encodeURL("/user/login")}" class="nobg">${I18n.getMessage("ForumBase.login")}</a>
-                    <#--
                     <a href="${contextPath}/qqapi/login.action" class="qqlogin">QQ登录</a>
-                    -->
                     <a href="${JForumContext.encodeURL("/user/insert")}" class="nobg">${I18n.getMessage("ForumBase.register")}</a>
                 </#if>
                 <#if canAccessModerationLog?default(false)>

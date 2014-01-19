@@ -20,4 +20,11 @@ public class UserDaoImpl extends BaseDaoImpl<User> implements UserDao {
         return this.doPagination(hql, params);
     }
 
+    @Override
+    public boolean isIpRegistered(final String ip) {
+        final String hql = "select count(*) from User where registerIp = :ip";
+        final Long count = (Long) getSession().createQuery(hql).setString("ip", ip).uniqueResult();
+        return count > 0;
+    }
+
 }
