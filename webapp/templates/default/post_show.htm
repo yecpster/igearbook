@@ -437,18 +437,15 @@ $("#main").find(".postbody img").each(function(){
     var width = img.attr("width");
     var height = img.attr("height");
 
-    if (shouldZoom) {
+    if (shouldZoom || width>720) {
+          if(width>720){
+            img.attr("width", 720);
+            img.attr("height", height/width*720);
+          }
           var zoomSrc = src.replace(/(.+)_\d\.(.+)/i, "$1_0.$2");
           img.attr("title", "点击查看原始大小图片");
           img.css("cursor", "url(${contextPath}/images/zoom.cur), pointer");
           img.click(function(){window.open(zoomSrc);});
-    }
-    if(width>720){
-     img.attr("width", 720);
-     img.attr("height", height/width*720);
-     img.attr("title", "点击查看原始大小图片");
-     img.css("cursor", "url(${contextPath}/images/zoom.cur), pointer");
-     img.click(function(){window.open(src);});
     }
 });
 });

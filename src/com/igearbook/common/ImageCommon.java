@@ -62,7 +62,7 @@ public class ImageCommon {
                 throw new AttachmentSizeTooBigException(I18n.getMessage("Attachments.tooBig", new Integer[] { ql.getSizeInBytes() / 1024,
                         (int) fileSize / 1024 }));
             }
-            //TODO handle this exception
+            // TODO handle this exception
         }
         final Map<ImageSize, ImageVo> result = Maps.newHashMap();
 
@@ -202,9 +202,10 @@ public class ImageCommon {
 
         final int oldWidth = bi.getWidth();
         final int oldHeight = bi.getHeight();
+        final int testNum = oldWidth > oldHeight ? oldWidth : oldHeight;
         if (isThumbIgnoreHeight() && oldWidth <= imageSize.getWidth()) {
             return false;
-        } else if (!isThumbIgnoreHeight() && oldWidth <= imageSize.getWidth() && oldHeight <= imageSize.getHeight()) {
+        } else if (!isThumbIgnoreHeight() && testNum <= imageSize.getWidth()) {
             return false;
         } else {
             return true;

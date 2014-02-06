@@ -60,11 +60,13 @@ import net.jforum.dao.GroupSecurityDAO;
 import net.jforum.dao.TopicDAO;
 import net.jforum.entities.Forum;
 import net.jforum.entities.ForumStats;
+import net.jforum.entities.Group;
 import net.jforum.entities.LastPostInfo;
 import net.jforum.entities.ModeratorInfo;
 import net.jforum.entities.Topic;
 import net.jforum.entities.User;
 import net.jforum.exceptions.DatabaseException;
+import net.jforum.security.SecurityConstants;
 import net.jforum.util.DbUtils;
 import net.jforum.util.preferences.ConfigKeys;
 import net.jforum.util.preferences.SystemGlobals;
@@ -76,8 +78,7 @@ import com.google.common.collect.Lists;
  * @author Vanessa Sabino
  * @author socialnetwork@gmail.com, adding "watch forum" methods.
  * 
- * @version $Id: GenericForumDAO.java,v 1.33 2007/08/24 23:11:35 rafaelsteil Exp
- *          $
+ * @version $Id: GenericForumDAO.java,v 1.33 2007/08/24 23:11:35 rafaelsteil Exp $
  */
 public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO {
     /**
@@ -119,7 +120,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
         f.setTotalTopics(rs.getInt("forum_topics"));
         f.setLastPostId(rs.getInt("forum_last_post_id"));
         f.setModerated(rs.getInt("moderated") > 0);
-        f.setUri(rs.getString("forum_uri")); 
+        f.setUri(rs.getString("forum_uri"));
         f.setTotalPosts(this.countForumPosts(f.getId()));
 
         return f;
@@ -457,31 +458,17 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
      */
     @Override
     public List<ModeratorInfo> getModeratorList(final int forumId) {
+        final Group moderationGroup = DataAccessDriver.getInstance().newGroupDAO().getEntitlementGroup(SecurityConstants.PERM_MODERATION_FORUMS, forumId);
+        final List<User> moderators = DataAccessDriver.getInstance().newUserDAO().selectAllByGroup(moderationGroup.getId(), 0, 50);
         final List<ModeratorInfo> l = Lists.newArrayList();
-
-        PreparedStatement p = null;
-        ResultSet rs = null;
-        try {
-            p = JForumExecutionContext.getConnection().prepareStatement(SystemGlobals.getSql("ForumModel.getModeratorList"));
-            p.setInt(1, forumId);
-
-            rs = p.executeQuery();
-
-            while (rs.next()) {
-                final ModeratorInfo mi = new ModeratorInfo();
-
-                mi.setId(rs.getInt("id"));
-                mi.setName(rs.getString("name"));
-
-                l.add(mi);
-            }
-
-            return l;
-        } catch (final SQLException e) {
-            throw new DatabaseException(e);
-        } finally {
-            DbUtils.close(rs, p);
+        for (final User user : moderators) {
+            final ModeratorInfo mi = new ModeratorInfo();
+            mi.setId(user.getId());
+            mi.setName(user.getUsername());
+            l.add(mi);
         }
+
+        return l;
     }
 
     /**
@@ -852,8 +839,7 @@ public class GenericForumDAO extends AutoKeys implements net.jforum.dao.ForumDAO
     }
 
     /**
-     * Remove all subscriptions on a forum, such as when a forum is locked. It
-     * is not used now.
+     * Remove all subscriptions on a forum, such as when a forum is locked. It is not used now.
      * 
      * @param forumId
      *            int

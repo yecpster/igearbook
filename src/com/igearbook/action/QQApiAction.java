@@ -102,11 +102,6 @@ public class QQApiAction extends BaseAction {
         return SUCCESS;
     }
 
-    @Action(value = "testlogin", results = { @Result(name = SUCCESS, location = "qqApi_testlogin.ftl") })
-    public String testlogin() throws Exception {
-        return this.login();
-    }
-
     @Action(value = "afterlogin", results = { @Result(name = SUCCESS, location = "qqApi_afterLogin.ftl"),
             @Result(name = SessionFacade.REDIRECT_KEY, location = "${redirectPath}", type = "redirect") })
     public String afterLogin() throws Exception {
