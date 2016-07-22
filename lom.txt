@@ -1,0 +1,1 @@
+itms-services://?action=download-manifest&url=https://raw.githubusercontent.com/yecpster/igearbook/master/Lom.plist
